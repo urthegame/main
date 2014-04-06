@@ -67,7 +67,7 @@ public class Agent : MonoBehaviour {
     private int isCraving = -1; //kuru vajadziibu gaaja apmierinaat
 
 
-    void Start() {
+    void Awake() {
         animator = transform.FindChild("cubeman").
                    transform.FindChild("cubeman-size").
                    transform.FindChild("cubeman-animation").GetComponent<Animator>();
@@ -75,36 +75,39 @@ public class Agent : MonoBehaviour {
             levelscript = GameObject.Find("Level").GetComponent<Level>();
         }
 
+       
         agentColor = new Color(Random.Range(0.1f, 0.5f), Random.Range(0.1f, 0.5f), Random.Range(0.1f, 0.5f), 1f);
+      
 
-
-        transform.FindChild("cubeman").
-        transform.FindChild("cubeman-size").
-        transform.FindChild("cubeman-animation").
-
-        transform.FindChild("body").renderer.material.color = agentColor;
-
+        //*
         //padaru kraasu gaishaaku (vienaadi palielinu katru komponenti)  (klampoju, lai nepaarsniedz max)
-        agentColor = new Color(Mathf.Clamp(agentColor.r + 0.3f, 0, 1),
-                               Mathf.Clamp(agentColor.g + 0.3f, 0, 1),
-                               Mathf.Clamp(agentColor.b + 0.3f, 0, 1),
+        agentColor = new Color(Mathf.Clamp(agentColor.r - 0.3f, 0, 1),
+                               Mathf.Clamp(agentColor.g - 0.3f, 0, 1),
+                               Mathf.Clamp(agentColor.b - 0.3f, 0, 1),
             1f);
         //*/
 
-        nominalSpeed *= Random.Range(0.7f, 1.3f); //atshkjiriigi standarta aatrumi katram agjentam
-        nominalTurningSpeed *= Random.Range(0.7f, 1.3f);
-
+        nominalSpeed *= Random.Range(0.7f, 1.3f); //atshkjiriigi standarta aatrumi katram agjentam     
+        nominalTurningSpeed *= Random.Range(0.7f, 1.3f); 
         speed = nominalSpeed;
         turningSpeed = nominalTurningSpeed;
 
 
         Needs = new AgentNeeds();
     }
+
+    public void Init(){
+        transform.FindChild("cubeman").
+        transform.FindChild("cubeman-size").
+        transform.FindChild("cubeman-animation").
+        transform.FindChild("body").renderer.material.color = agentColor;    
+
+    }
     
     // Update is called once per frame
     void Update() {
 
-         //  drawPath();
+           drawPath();
 
         manageResources(); //eed un gulj n stuff
         thinkAbout();//augstaaka liimenja stacked-finite-state-machine, kas liek varonim dariit lietas un pienjemt leemumu
@@ -467,7 +470,37 @@ public class Agent : MonoBehaviour {
 
     }
 
-   
+    //serializeeshanas funkcha - atgriezh visus parametrus CSV stringaa
+    public string InitToString(){
+
+        return string.Format(" {0} {1} {2} {3} {4} {5} {6}", 
+                             agentColor.r,
+                             agentColor.g,
+                             agentColor.b,
+                             nominalSpeed,
+                             nominalTurningSpeed,
+                             Needs.Reserve[(int)AgentNeeds.Types.Water],
+                             Needs.Reserve[(int)AgentNeeds.Types.Sleep]                          
+                             );
+
+    }
+
+    //deserializeeshana
+    public void InitFromString(string str){
+        string[] c = str.Split(' '); //sadala pa komponenteem:  nosaukums,x,y,z un tad shim levelobjektam svariigaas lietas
+        //taatad skipojam pirmos 4 (un mees skaitam no nulles)
+
+
+        agentColor = new Color(float.Parse(c[4]),float.Parse(c[5]),float.Parse(c[6]),1f);
+        nominalSpeed = float.Parse(c[7]);
+        nominalTurningSpeed = float.Parse(c[8]);
+        Needs.Reserve[(int)AgentNeeds.Types.Water] = float.Parse(c[9]);
+        Needs.Reserve[(int)AgentNeeds.Types.Sleep] = float.Parse(c[10]);
+
+        Init(); //lai agjents njem veeraa tikko nomainiitaas veertiibas
+
+    }
+
 
 
 }

@@ -254,7 +254,7 @@ public class LOBlock : Levelobject {
 			
 			//bloks sev panjem blockinfo objketu, kas atteelos vinja resursus
 			
-			GameObject blockinfoPrefab = Resources.Load("blockinfo") as GameObject;
+            GameObject blockinfoPrefab = Resources.Load("blockinfo") as GameObject; 
 			
 			GameObject blockinfo = Instantiate(
 				blockinfoPrefab, 
