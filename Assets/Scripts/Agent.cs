@@ -99,9 +99,9 @@ public class Agent : MonoBehaviour {
         //*
         //padaru kraasu gaishaaku (vienaadi palielinu katru komponenti)  (klampoju, lai nepaarsniedz max)
         //sho kraasu turpmaak lieto agjenta celja ziimeetaajs
-        agentColor = new Color(Mathf.Clamp(agentColor.r - 0.2f, 0, 1),
-                               Mathf.Clamp(agentColor.g - 0.2f, 0, 1),
-                               Mathf.Clamp(agentColor.b - 0.2f, 0, 1),
+        agentColor = new Color(Mathf.Clamp(agentColor.r + 0.2f, 0, 1),
+                               Mathf.Clamp(agentColor.g + 0.2f, 0, 1),
+                               Mathf.Clamp(agentColor.b + 0.2f, 0, 1),
                                1f);
         //*/
 

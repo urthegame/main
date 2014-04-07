@@ -270,11 +270,21 @@ public class Level : MonoBehaviour {
         var stopwatch = new System.Diagnostics.Stopwatch();
         stopwatch.Start();
 
-        //vispirms notiira visu esosho liimeni
-        foreach(Transform childTransform in levelObjectHolder.transform) {
+
+        int num = levelObjectHolder.transform.childCount;
+        //levlpbjektus saliek pagaidu konteineraa
+        //foreach(Transform childTransform in levelObjectHolder.transform) {
+        //for(int i = 0; i < num; i++){
+        while(levelObjectHolder.transform.childCount > 0){
+            Transform childTransform = levelObjectHolder.transform.GetChild(0);
+            childTransform.transform.name = childTransform.transform.name+"+DELETE";
             childTransform.transform.parent = destroyHolder.transform; //jaaieliek pagaidu konteinerii, jo Destroy notiks tikai naakamajaa kadraa, bet man vajag iisto konteineri tukshu ljoti driiz - jo navgrida paarreekjinaataajs skatiisies tur esoshos objektus
             Destroy(childTransform.gameObject);
         }
+
+      
+
+
         foreach(Transform agent in agentHolder.transform) {
             Destroy(agent.gameObject);
         }
@@ -621,13 +631,7 @@ public class Level : MonoBehaviour {
 
     public List<Vector2> FindPath(int sx, int sy, int fx, int fy) {
         int iter = 0;        
-        /*
-        sx = Mathf.RoundToInt(sx);
-        sy = Mathf.RoundToInt(sy);
-        fx = Mathf.RoundToInt(fx);
-        fy = Mathf.RoundToInt(fy);
-        //*/
-
+      
         //grafa virsotnes ir Vector4 - virsotnes X poziicija, Y poziicija, ATTAALUMS lidz meerkjim (no siis pozziicijas) + attalums no shiis poz. liidz startam, ATTAALUMS liidz startam (t.s. G-score)
         //lietoju parastu listi un sorteeju [kad vajag] peec Vector4 z komponentes
 
@@ -821,30 +825,20 @@ public class Level : MonoBehaviour {
                 
         int numLevelblocks = ListOfRooms.Count;
 
-        try {
-       
 
-            for(int i = 0; i < numLevelblocks; i++) {
+        for(int i = 0; i < numLevelblocks; i++) {
 
-                LOBlock r = ListOfRooms[i];
-                float halfWidth = r.SizeX / 2f;
-                float halfHeight = r.SizeY / 2f;
+            LOBlock r = ListOfRooms[i];
+            float halfWidth = r.SizeX / 2f;
+            float halfHeight = r.SizeY / 2f;
 
-                if(r.transform.position.x + halfWidth >= x && r.transform.position.x - halfWidth <= x && 
-                    r.transform.position.y + halfHeight >= y && r.transform.position.y - halfHeight <= y) { // vienkaarsha AABB kooliiziju detekcija, telpas koordinaate ir taas centraa, taapeec +/- pusgarums/platums
-                    return r;
-                }
+            if(r.transform.position.x + halfWidth >= x && r.transform.position.x - halfWidth <= x && 
+                r.transform.position.y + halfHeight >= y && r.transform.position.y - halfHeight <= y) { // vienkaarsha AABB kooliiziju detekcija, telpas koordinaate ir taas centraa, taapeec +/- pusgarums/platums
+                return r;
             }
-
-            
-        } catch(MissingReferenceException e) { //dazhreiz (vienmeer) peec liimenjielaades navgrids tiek paarreeekjinaats un telpu saraksts tiek atjaunots, bet atklaajas, ka saraksts noraada uz vairs neeksiteejoshaam telpaam (kuru vietaa tika ielaadeetas jaunas)
-            print("obanaa, atrastas neeksisteejpshas telpas"); 
-            CalculateNavgrid();
-            return roomAtThisPosition(x, y); //veelreiz sho pashu funkciju, lai nekas netiktu atgreizts null, kad tomeer ir iespeeja ieguut normaalu atbildi
-            //ps 99.999999% (paarbaudiiju) bezgaliigaas rekursijas droshiiba
         }
 
-
+       
         return null;
     }
 
