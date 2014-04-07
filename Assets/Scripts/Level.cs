@@ -45,9 +45,6 @@ public class Level : MonoBehaviour {
         guiscript = GameObject.Find("GUI").GetComponent<Gui>();
         gResScript = GameObject.Find("Level").GetComponent<GlobalResources>(); 
 
-
-        placeAgents();
-
     }
     
     // Update is called once per frame
@@ -63,34 +60,7 @@ public class Level : MonoBehaviour {
         //Debug.Log("There are " + FindObjectsOfType(typeof(GameObject)).Length + " gameObjects in your scene");
     }
 
-    void placeAgents() {
-
-        var stopwatch = new System.Diagnostics.Stopwatch();
-        stopwatch.Start();
-
-
-
-
-        GameObject prefab = Resources.Load("Avatar") as GameObject; 
-
-
-        for(int i = 0; i<3; i++) {
-            GameObject agent = Instantiate(
-            prefab, 
-            new Vector3(0, -4, 0),
-            Quaternion.identity) as GameObject;
-            agent.transform.parent = agentHolder.transform;
-            Agent script = agent.GetComponent<Agent>();
-            script.Init();
-
-        }
-
-        stopwatch.Stop();
-        print("Agjenti izveidoti  " + stopwatch.Elapsed);
-
-        
-        
-    }
+   
 
     /**
      * ielaadee prefabu un paliek zem PLACER objekta, lai biidiidu apkaart kopaa ar PLEISERA objektu
@@ -271,10 +241,7 @@ public class Level : MonoBehaviour {
         stopwatch.Start();
 
 
-        int num = levelObjectHolder.transform.childCount;
-        //levlpbjektus saliek pagaidu konteineraa
-        //foreach(Transform childTransform in levelObjectHolder.transform) {
-        //for(int i = 0; i < num; i++){
+        //dzeesh levelobjektus
         while(levelObjectHolder.transform.childCount > 0){
             Transform childTransform = levelObjectHolder.transform.GetChild(0);
             childTransform.transform.name = childTransform.transform.name+"+DELETE";
@@ -282,9 +249,7 @@ public class Level : MonoBehaviour {
             Destroy(childTransform.gameObject);
         }
 
-      
-
-
+        //dzeesh agjentus
         foreach(Transform agent in agentHolder.transform) {
             Destroy(agent.gameObject);
         }
@@ -902,6 +867,35 @@ public class Level : MonoBehaviour {
         }
 
         return coords;
+
+    }
+
+
+    /**
+     * izveido agjentu un novieto liimenii peles poziicijaa
+     */ 
+    public void AddAgent(){
+        
+        GameObject prefab = Resources.Load("Avatar") as GameObject; 
+        GameObject agent = Instantiate(
+            prefab, 
+            //new Vector3(0, -4, 0),
+            lastPos,
+            Quaternion.identity) as GameObject;
+        agent.transform.parent = agentHolder.transform;
+        Agent script = agent.GetComponent<Agent>();
+        script.Init();
+
+    }
+
+    /**
+     * aizvaac 1. agjentu
+     */ 
+    public void RemAgent(){
+
+        if(agentHolder.transform.childCount > 0){
+            Destroy(agentHolder.transform.GetChild(0).gameObject );
+        }
 
     }
         

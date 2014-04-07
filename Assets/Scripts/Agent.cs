@@ -110,7 +110,9 @@ public class Agent : MonoBehaviour {
     // Update is called once per frame
     void Update() {
 
+        if(levelscript.DebugDrawNavgrid){
            drawPath();
+        }
 
         manageResources(); //eed un gulj n stuff
         thinkAbout();//augstaaka liimenja stacked-finite-state-machine, kas liek varonim dariit lietas un pienjemt leemumu

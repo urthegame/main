@@ -48,7 +48,16 @@ public class Gui : MonoBehaviour {
 			levelscript.emptyPlacer();
 		}
 		
-		
+
+        if (Input.GetKeyDown(KeyCode.KeypadPlus)){
+            levelscript.AddAgent();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.KeypadMinus)){
+            levelscript.RemAgent();
+        }
+        
+
 		
 	}
 	
