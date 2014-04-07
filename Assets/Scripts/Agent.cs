@@ -79,13 +79,7 @@ public class Agent : MonoBehaviour {
         agentColor = new Color(Random.Range(0.1f, 0.5f), Random.Range(0.1f, 0.5f), Random.Range(0.1f, 0.5f), 1f);
       
 
-        //*
-        //padaru kraasu gaishaaku (vienaadi palielinu katru komponenti)  (klampoju, lai nepaarsniedz max)
-        agentColor = new Color(Mathf.Clamp(agentColor.r - 0.3f, 0, 1),
-                               Mathf.Clamp(agentColor.g - 0.3f, 0, 1),
-                               Mathf.Clamp(agentColor.b - 0.3f, 0, 1),
-            1f);
-        //*/
+    
 
         nominalSpeed *= Random.Range(0.7f, 1.3f); //atshkjiriigi standarta aatrumi katram agjentam     
         nominalTurningSpeed *= Random.Range(0.7f, 1.3f); 
@@ -101,6 +95,15 @@ public class Agent : MonoBehaviour {
         transform.FindChild("cubeman-size").
         transform.FindChild("cubeman-animation").
         transform.FindChild("body").renderer.material.color = agentColor;    
+
+        //*
+        //padaru kraasu gaishaaku (vienaadi palielinu katru komponenti)  (klampoju, lai nepaarsniedz max)
+        //sho kraasu turpmaak lieto agjenta celja ziimeetaajs
+        agentColor = new Color(Mathf.Clamp(agentColor.r - 0.2f, 0, 1),
+                               Mathf.Clamp(agentColor.g - 0.2f, 0, 1),
+                               Mathf.Clamp(agentColor.b - 0.2f, 0, 1),
+                               1f);
+        //*/
 
     }
     
@@ -482,6 +485,9 @@ public class Agent : MonoBehaviour {
                              Needs.Reserve[(int)AgentNeeds.Types.Water],
                              Needs.Reserve[(int)AgentNeeds.Types.Sleep]                          
                              );
+        /**
+         * pagaidaam save/load ignoree jebkaadu meerkji un motivaaciju utt. seivo tikai izskatu un atrashanaas vietu - ar to pietiek, lai izskatiitos, ka viss straadaa
+         */ 
 
     }
 

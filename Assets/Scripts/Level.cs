@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,7 +19,8 @@ public class Level : MonoBehaviour {
     public List<LOBlock> ListOfRooms; //saraksts ar visiem liimenii esoshajiem leveloblokiem jeb telpam
 
     private GameObject levelObjectHolder;
-    private GameObject AgentHolder;
+    private GameObject agentHolder;
+    private GameObject destroyHolder;
     private GameObject placer;
     private Gui guiscript; //vieniigais/globalais GUI skripts
     private GlobalResources gResScript; //globaalo resursu pieskatiitaaajs, arii singltons :P
@@ -38,10 +39,12 @@ public class Level : MonoBehaviour {
     void Start() {
     
         levelObjectHolder = GameObject.Find("LevelobjectHolder");
+        agentHolder = GameObject.Find("AgentHolder");
+        destroyHolder = GameObject.Find("DestroyHolder");
         placer = GameObject.Find("Placer");
         guiscript = GameObject.Find("GUI").GetComponent<Gui>();
         gResScript = GameObject.Find("Level").GetComponent<GlobalResources>(); 
-        AgentHolder = GameObject.Find("AgentHolder");
+
 
         placeAgents();
 
@@ -76,7 +79,7 @@ public class Level : MonoBehaviour {
             prefab, 
             new Vector3(0, -4, 0),
             Quaternion.identity) as GameObject;
-            agent.transform.parent = AgentHolder.transform;
+            agent.transform.parent = agentHolder.transform;
             Agent script = agent.GetComponent<Agent>();
             script.Init();
 
@@ -187,7 +190,7 @@ public class Level : MonoBehaviour {
         }
 
         if(Input.GetMouseButtonDown(2)) { // 0 => klik mid 
-            print (lastPos);
+            print(lastPos);
         }
 
 
@@ -237,7 +240,7 @@ public class Level : MonoBehaviour {
         output += "agents\n";
 
 
-        foreach(Transform agent in AgentHolder.transform) {
+        foreach(Transform agent in agentHolder.transform) {
             
             Agent script = agent.GetComponent<Agent>();
 
@@ -245,9 +248,9 @@ public class Level : MonoBehaviour {
             
             
             //tips x y z \n
-            output += "Avatar " +  Mathf.RoundToInt(agent.position.x) + " " + 
-                                   Mathf.RoundToInt(agent.position.y) + " " + 
-                                   Mathf.RoundToInt(agent.position.z) + extraParams + "\n";
+            output += "Avatar " + Mathf.RoundToInt(agent.position.x) + " " + 
+                Mathf.RoundToInt(agent.position.y) + " " + 
+                Mathf.RoundToInt(agent.position.z) + extraParams + "\n";
             i++;
         }
 
@@ -267,11 +270,12 @@ public class Level : MonoBehaviour {
         var stopwatch = new System.Diagnostics.Stopwatch();
         stopwatch.Start();
 
-        //vispirms notiira visu esosholiimeni
+        //vispirms notiira visu esosho liimeni
         foreach(Transform childTransform in levelObjectHolder.transform) {
+            childTransform.transform.parent = destroyHolder.transform; //jaaieliek pagaidu konteinerii, jo Destroy notiks tikai naakamajaa kadraa, bet man vajag iisto konteineri tukshu ljoti driiz - jo navgrida paarreekjinaataajs skatiisies tur esoshos objektus
             Destroy(childTransform.gameObject);
         }
-        foreach(Transform agent in AgentHolder.transform) {
+        foreach(Transform agent in agentHolder.transform) {
             Destroy(agent.gameObject);
         }
         numLevelobjects = 0;
@@ -290,7 +294,7 @@ public class Level : MonoBehaviour {
       
         //atlikushaas rindas ir levelobjekti | skip(1) ... burtiski noskipo pirmo elementu
         foreach(string l in lvlLines.Skip(1)) {
-            if(l == "agents"){  //sastop rindinju, kur rakstiits "agents" - sakas agjentu nodalja seivfailaa
+            if(l == "agents") {  //sastop rindinju, kur rakstiits "agents" - sakas agjentu nodalja seivfailaa
                 break;
             }
 
@@ -336,7 +340,7 @@ public class Level : MonoBehaviour {
                 prefab, 
                 new Vector3(x, y, z),
                 Quaternion.identity) as GameObject;
-            agent.transform.parent = AgentHolder.transform;
+            agent.transform.parent = agentHolder.transform;
             Agent script = agent.GetComponent<Agent>();
             script.InitFromString(l);
 
@@ -346,8 +350,9 @@ public class Level : MonoBehaviour {
         CheckWorkingStatusEveryBlock(1); //divreiz, jo paarbauda ljoti nesistemaatiski un, ja gjenerators ir peedeejais objekts, tad var gadiities, ka neiesleedz nevienu levelobjektu, jo nav elektriibas >:)
         CalculateNavgrid();
 
+
         stopwatch.Stop();
-        print("ir ielaadeets liimenis " + levelname + " ir  " + (numLevelobjects) + " objekti + " + numAgents + " agjenti  "  + stopwatch.Elapsed);
+        print("ir ielaadeets liimenis " + levelname + " ir  " + (numLevelobjects) + " objekti + " + numAgents + " agjenti  " + stopwatch.Elapsed);
 
 
 
@@ -357,7 +362,7 @@ public class Level : MonoBehaviour {
     //@note -- ir aizdomas, ka shii keshoshana ir bezjeedziiga, junitijs pats piekesho atveertus prefabus
     public GameObject loadLevelobjectPrefab(string prefabName) {
         if(!prefabCache.ContainsKey(prefabName)) {
-            prefabCache[prefabName] = Resources.Load("Levelobjects/" +prefabName) as GameObject;
+            prefabCache[prefabName] = Resources.Load("Levelobjects/" + prefabName) as GameObject;
         }
         return prefabCache[prefabName];
     }
@@ -462,6 +467,9 @@ public class Level : MonoBehaviour {
 
     }
 
+    /**
+     * @todo -- tikko peec levelobjektu dzeeshanas izpildiita funkcija joprojaam tos redz - tie veel nav pazudushi
+     */ 
     public void CalculateNavgrid() {
 
 
@@ -598,25 +606,7 @@ public class Level : MonoBehaviour {
 
         print("navgrid updated; " + Navgrid.Count + " nodes");
         print("telpas paarskaititas, ir " + ListOfRooms.Count); 
-/*
-        foreach(KeyValuePair<Vector4, float> p in Navgrid){ 
-          print(p.Key.x + ","+p.Key.y +  " -> " + p.Key.z + ","+p.Key.w);
-        }
 
-        foreach(LOBlock room in ListOfRooms) {
-            print ("telpa " + room.name);
-        }
-//*/
-
-/*
-        for(int y = 0; y < lengthY; y++){       
-            string line = "";
-            for(int x = 0; x < lengthX; x++){
-                line += " " + x;
-            } 
-            //print ( y + ":  " + line);
-        }
-*/
 
     }
 
@@ -668,7 +658,7 @@ public class Level : MonoBehaviour {
             
             if(current.x == finish.x && current.y == finish.y) { //es ceru, ka INT=>FLOAT=>INT nemaina vertibu :\
                 //ir atrasts celjsh, peec tam izdomaashu kaa to dabuut aaraa
-               //   print ("A*  Celjsh atrasts !");
+                //   print ("A*  Celjsh atrasts !");
                 
                 List<Vector2> realRoute = new List<Vector2>(); // A* iedeva key=>value tonnu ar celjiem, man ir jaatrod iistais
                 
@@ -708,29 +698,29 @@ public class Level : MonoBehaviour {
 
            
             
-            maybeNeighbor = new Vector4(Mathf.RoundToInt(current.x), Mathf.RoundToInt(current.y),  Mathf.RoundToInt(current.x - 1), Mathf.RoundToInt(current.y)); //vector4: no_x,no_y,uz_x,uz_y
-           // print("varbuutderiigs kaiminsh: " + maybeNeighbor + "  #" + maybeNeighbor.GetHashCode() );
+            maybeNeighbor = new Vector4(Mathf.RoundToInt(current.x), Mathf.RoundToInt(current.y), Mathf.RoundToInt(current.x - 1), Mathf.RoundToInt(current.y)); //vector4: no_x,no_y,uz_x,uz_y
+            // print("varbuutderiigs kaiminsh: " + maybeNeighbor + "  #" + maybeNeighbor.GetHashCode() );
             if(Navgrid.ContainsKey(maybeNeighbor)) { //liiimenja navgridaa ir atrodams celjshs starp shiem kaiminjiem
                 neighbors.Add(new Vector4(current.x - 1, current.y));
-             //   print("deriigs kaiminsh: " + maybeNeighbor+ "  #" + maybeNeighbor.GetHashCode() );
+                //   print("deriigs kaiminsh: " + maybeNeighbor+ "  #" + maybeNeighbor.GetHashCode() );
             }
             
-            maybeNeighbor = new Vector4(Mathf.RoundToInt(current.x), Mathf.RoundToInt(current.y),  Mathf.RoundToInt(current.x + 1), Mathf.RoundToInt(current.y)); 
-          //  print("varbuutderiigs kaiminsh: " + maybeNeighbor+ "  #" + maybeNeighbor.GetHashCode() );
+            maybeNeighbor = new Vector4(Mathf.RoundToInt(current.x), Mathf.RoundToInt(current.y), Mathf.RoundToInt(current.x + 1), Mathf.RoundToInt(current.y)); 
+            //  print("varbuutderiigs kaiminsh: " + maybeNeighbor+ "  #" + maybeNeighbor.GetHashCode() );
             if(Navgrid.ContainsKey(maybeNeighbor)) { 
                 neighbors.Add(new Vector4(current.x + 1, current.y));
-               // print("deriigs kaiminsh: " + maybeNeighbor+ "  #" + maybeNeighbor.GetHashCode() );
+                // print("deriigs kaiminsh: " + maybeNeighbor+ "  #" + maybeNeighbor.GetHashCode() );
             }
             
             maybeNeighbor = new Vector4(current.x, current.y, current.x, current.y - 1);
             if(Navgrid.ContainsKey(maybeNeighbor)) { 
                 neighbors.Add(new Vector4(current.x, current.y - 1));
-              //  print("deriigs kaiminsh: " + maybeNeighbor);
+                //  print("deriigs kaiminsh: " + maybeNeighbor);
             }
             maybeNeighbor = new Vector4(current.x, current.y, current.x, current.y + 1);
             if(Navgrid.ContainsKey(maybeNeighbor)) { 
                 neighbors.Add(new Vector4(current.x, current.y + 1));
-               // print("deriigs kaiminsh: " + maybeNeighbor);
+                // print("deriigs kaiminsh: " + maybeNeighbor);
             }
             //print("maybeNeighbor " + maybeNeighbor);
             
@@ -780,7 +770,7 @@ public class Level : MonoBehaviour {
             }
             
         }
-       // print ("A*  Hmm, neatrada");
+        // print ("A*  Hmm, neatrada");
         
         return new List<Vector2>();
         
@@ -816,7 +806,7 @@ public class Level : MonoBehaviour {
         float dx = Mathf.Abs(x1 - x2);
         float dy = Mathf.Abs(y1 - y2);
         float d = (dx + dy); //manhetenas distance | manhetena ir taisnaakas striipas nekaa diagonaaldistancei, kaa arii shajaa speelee nav diagonaalpaarvietosahnaas
-       // print( x1 +"," +y1 +" -> " +x2 +"," +y2 + " = " + d );
+        // print( x1 +"," +y1 +" -> " +x2 +"," +y2 + " = " + d );
         return d;
         
     }
@@ -831,26 +821,29 @@ public class Level : MonoBehaviour {
                 
         int numLevelblocks = ListOfRooms.Count;
 
-      //  x = Mathf.FloorToInt(x);
-       // y = Mathf.FloorToInt(y);
+        try {
+       
 
-       // print("vai x,y ir telpaa " + x + "," + y);
+            for(int i = 0; i < numLevelblocks; i++) {
 
-        for(int i = 0; i < numLevelblocks; i++) {
+                LOBlock r = ListOfRooms[i];
+                float halfWidth = r.SizeX / 2f;
+                float halfHeight = r.SizeY / 2f;
 
-            LOBlock r = ListOfRooms[i];
-            float halfWidth = r.SizeX / 2f;
-            float halfHeight = r.SizeY / 2f;
-
-         //   print (r.transform.position.x +" + "+ halfWidth +" >= "+ x +" && "+ r.transform.position.x +" - "+ halfWidth +" <= "+ x +" && "+
-         //          r.transform.position.y +" + "+ halfHeight +" >= "+ y +" && "+ r.transform.position.y +" - "+ halfHeight +" <= "+ y);
-
-            if(r.transform.position.x + halfWidth >= x && r.transform.position.x - halfWidth <= x && 
-                r.transform.position.y + halfHeight >= y && r.transform.position.y - halfHeight <= y) { // vienkaarsha AABB kooliiziju detekcija, telpas koordinaate ir taas centraa, taapeec +/- pusgarums/platums
-           //     print("bija shajaa");
-                return r;
+                if(r.transform.position.x + halfWidth >= x && r.transform.position.x - halfWidth <= x && 
+                    r.transform.position.y + halfHeight >= y && r.transform.position.y - halfHeight <= y) { // vienkaarsha AABB kooliiziju detekcija, telpas koordinaate ir taas centraa, taapeec +/- pusgarums/platums
+                    return r;
+                }
             }
+
+            
+        } catch(MissingReferenceException e) { //dazhreiz (vienmeer) peec liimenjielaades navgrids tiek paarreeekjinaats un telpu saraksts tiek atjaunots, bet atklaajas, ka saraksts noraada uz vairs neeksiteejoshaam telpaam (kuru vietaa tika ielaadeetas jaunas)
+            print("obanaa, atrastas neeksisteejpshas telpas"); 
+            CalculateNavgrid();
+            return roomAtThisPosition(x, y); //veelreiz sho pashu funkciju, lai nekas netiktu atgreizts null, kad tomeer ir iespeeja ieguut normaalu atbildi
+            //ps 99.999999% (paarbaudiiju) bezgaliigaas rekursijas droshiiba
         }
+
 
         return null;
     }
@@ -890,7 +883,7 @@ public class Level : MonoBehaviour {
      */ 
     public Vector2 randomCubeInThisRoom(LOBlock room) {
 
-        Vector2 coords = new Vector2(room.transform.position.x,room.transform.position.y); //telpas saakumpunkts, to atgrieziis, ja nebuus nekaa praatiigaaka
+        Vector2 coords = new Vector2(room.transform.position.x, room.transform.position.y); //telpas saakumpunkts, to atgrieziis, ja nebuus nekaa praatiigaaka
                     
         List<Vector2> accessableCubes = new List<Vector2>(); //te savaakshu visus kubikus telpaa, kas ir ejami (vinju XY lokaalajaas koordinaatees )
 
@@ -901,16 +894,16 @@ public class Level : MonoBehaviour {
                     
                 int directionsInThisCube = (int)room.waypoints.passableDirections[currentCube++]; //taipkaastoju enumu uz intu | kaa aii uzzinu kaados virzienos shajaa kubikaa var paarvietoties 
                 if(directionsInThisCube > 0) { //shajaa kubikaa ir jebkaada veida ieshana (0 - pilniibaa nepieejams)
-                    accessableCubes.Add(new Vector2(Mathf.FloorToInt( a +coords.x), Mathf.FloorToInt(b + coords.y) ) );
-                //    print ( "accessable cubes " + new Vector2(Mathf.FloorToInt( a +coords.x), Mathf.FloorToInt(b + coords.y) ));
+                    accessableCubes.Add(new Vector2(Mathf.FloorToInt(a + coords.x), Mathf.FloorToInt(b + coords.y)));
+                    //    print ( "accessable cubes " + new Vector2(Mathf.FloorToInt( a +coords.x), Mathf.FloorToInt(b + coords.y) ));
                 }
                     
             }
         }
     
 
-        if(accessableCubes.Count > 0){
-            return accessableCubes[Random.Range(0,accessableCubes.Count)]; //telpas saakumkoordinaateem pieskaita nejausha telpas bloka koordinaates 
+        if(accessableCubes.Count > 0) {
+            return accessableCubes[Random.Range(0, accessableCubes.Count)]; //telpas saakumkoordinaateem pieskaita nejausha telpas bloka koordinaates 
 
         }
 
