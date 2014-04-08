@@ -12,6 +12,9 @@ public class Gui : MonoBehaviour {
 
 	private int vert;
 
+    private RadialMenu radialMenu; //radialMenu geimobjekta skripts, radialmenu geimobjekts atrodas zem kameras objekta - lai vienmeer buutu ekraanaa
+   
+
 	public void Awake(){
 		levelscript = GameObject.Find("Level").GetComponent<Level>(); //no-bullshit singleton
 		gResScript  = GameObject.Find("Level").GetComponent<GlobalResources>(); //no-bullshit singleton
@@ -22,11 +25,24 @@ public class Gui : MonoBehaviour {
 	//lietas, ko vajag resetot/peistarteet ielaadeejot liimeni (ar singltoniem viss buus kaartiibaa)
 	public void Init(){
 		QueryMode = false;
+        radialMenu = GameObject.Find("RadialMenu").GetComponent<RadialMenu>();
 	}
 
 	public void Update(){
+        mouse();
 		keyboard();
-	}
+   	}
+
+    void mouse(){
+
+        radialMenu.RadialMenuWasOn = radialMenu.RadialMenuOn;
+        if(Input.GetMouseButton(1)){ //kameer nospiesta labaa pele
+            radialMenu.RadialMenuOn = true;
+        } else {
+            radialMenu.RadialMenuOn = false;
+        }
+
+    }
 
 	
 	void keyboard(){
@@ -175,27 +191,27 @@ public class Gui : MonoBehaviour {
 
 					LOBlock itIsActuallyLOBlock = (LOBlock)QueryTarget;
 
+                    string offText = "OFF";
+                    string onText = "on";
 					if( itIsActuallyLOBlock.Working ){
-						if(GUI.Button(new Rect(Screen.width - 10 - 130,65,80,20), "Turn off")) {
-							itIsActuallyLOBlock.setWorkingStatus(false,true);
-						}
-					} else {
-						if(GUI.Button(new Rect(Screen.width - 10 - 130,65,80,20), "Turn on")) {
-							itIsActuallyLOBlock.setWorkingStatus(true,true);
-						}
+                         offText = "off";
+                         onText = "ON";
+                    }
+
+                    if(GUI.Button(new Rect(Screen.width - 10 - 130,65,35,20), offText)) {
+                        itIsActuallyLOBlock.setWorkingStatus(false,true);
+                    }
+                    if(GUI.Button(new Rect(Screen.width - 10 - 130 + 45 ,65,35,20),onText)) {
+                        itIsActuallyLOBlock.setWorkingStatus(true,true);
+                    }
+						
 					}
-
 				}
-				
-
-
-
-			}
+			
 		} catch {
 
 			QueryMode = false; //apskataamais levelobjets tika izniicinaats inforiiku neinformeejot :(
 		}
-
 
 	}
 
@@ -217,6 +233,7 @@ public class Gui : MonoBehaviour {
 
 		return false;
 	}
+
 
 
 }

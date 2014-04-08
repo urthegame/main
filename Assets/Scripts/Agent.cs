@@ -442,8 +442,8 @@ public class Agent : MonoBehaviour {
         int destX = Mathf.FloorToInt(x);
         int destY = Mathf.FloorToInt(y);
 
-       var stopwatch = new System.Diagnostics.Stopwatch();
-       stopwatch.Start();
+    //   var stopwatch = new System.Diagnostics.Stopwatch();
+     //  stopwatch.Start();
 
 
         lastRoute = levelscript.FindPath(currX, currY, destX, destY);              
