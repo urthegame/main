@@ -154,9 +154,12 @@ public class Level : MonoBehaviour {
 
         }
 
-        
+        if(Input.GetMouseButtonDown(1)) { //rait
+            emptyPlacer();
+        }
 
-        if(Input.GetMouseButtonDown(2)) { // 0 => klik mid 
+
+        if(Input.GetMouseButtonDown(2)) { // 2 => klik mid 
             print(lastPos);
         }
 

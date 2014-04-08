@@ -12,7 +12,6 @@ public class Gui : MonoBehaviour {
 
 	private int vert;
 
-    private RadialMenu radialMenu; //radialMenu geimobjekta skripts, radialmenu geimobjekts atrodas zem kameras objekta - lai vienmeer buutu ekraanaa
    
 
 	public void Awake(){
@@ -25,7 +24,6 @@ public class Gui : MonoBehaviour {
 	//lietas, ko vajag resetot/peistarteet ielaadeejot liimeni (ar singltoniem viss buus kaartiibaa)
 	public void Init(){
 		QueryMode = false;
-        radialMenu = GameObject.Find("RadialMenu").GetComponent<RadialMenu>();
 	}
 
 	public void Update(){
@@ -35,12 +33,6 @@ public class Gui : MonoBehaviour {
 
     void mouse(){
 
-        radialMenu.RadialMenuWasOn = radialMenu.RadialMenuOn;
-        if(Input.GetMouseButton(1)){ //kameer nospiesta labaa pele
-            radialMenu.RadialMenuOn = true;
-        } else {
-            radialMenu.RadialMenuOn = false;
-        }
 
     }
 
