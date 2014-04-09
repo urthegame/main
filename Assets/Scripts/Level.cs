@@ -351,10 +351,13 @@ public class Level : MonoBehaviour {
      */ 
     public void FillWithGroundcubes() {
         int gameobjectLayer = 1 << 9; //9. slaanis ir visi levelobjekti
-        GameObject prefab = loadLevelobjectPrefab("groundcube-1");     
+        GameObject prefab;//
+        GameObject groundCube = loadLevelobjectPrefab("groundcube-1");    
+        GameObject groundFlat = loadLevelobjectPrefab("groundcube-flat-1");    
+
 
         for(int i = limits.XA; i<limits.XB; i++) {
-            for(int j = limits.YA; j<limits.YB; j++) {
+            for(int j = limits.YA; j<limits.YB+1; j++) { //viss liiimeni kaa arii 1 rinda virs liimenjia (+1 pa Y asi) 
 
                 Vector3 positionInGrid = new Vector3(i, j, 0);
 
@@ -363,6 +366,11 @@ public class Level : MonoBehaviour {
                     continue;
                 }
 
+                if(j == limits.YB){ //viena rinda virs liimenja - tur ies cita veida zemes kluciitis
+                    prefab = groundFlat;
+                } else {
+                    prefab = groundCube;
+                }
 
 
                 //@NON_DRY sekojoshais koda gabals tiek vairaakkaartiigi :D dubleets shajaa failaa
@@ -382,6 +390,10 @@ public class Level : MonoBehaviour {
 
             }
         }
+
+
+
+
     }
 
     /**

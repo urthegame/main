@@ -212,7 +212,7 @@ public class LOBlock : Levelobject {
 
 
 		if(mode == 0){ //manuaali peivienotajiem levelobjektiem paarbaudiis vai nav novietots aarpus liimenja robezhaam
-			if(transform.position.x < levelscript.limits.XA){
+            if(transform.position.x-(SizeX * 0.5f) + 1 < levelscript.limits.XA){
 				//print ("par taalu uz kreiso pusi");
 				return;
 			}

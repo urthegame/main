@@ -73,8 +73,12 @@ public class Gui : MonoBehaviour {
 
 	void OnGUI () {
 
+
+        int left = 20;
 		int height = 20;
 		int vSpace = 10;
+      
+
 
 		vert = 35;
 		GUI.Box(new Rect(15,vert,90,22), string.Format("€: {0}",gResScript.Money));
@@ -89,78 +93,119 @@ public class Gui : MonoBehaviour {
 
 
 		
-		if(GUI.Button(new Rect(20,vert,35,height), "S")) {
+        if(GUI.Button(new Rect(20,vert,35,height),new GUIContent("S", "Save") )) {
 			levelscript.SaveLevel("");
 		}
-		if(GUI.Button(new Rect(65,vert,35,height), "L")) {
+        if(GUI.Button(new Rect(65,vert,35,height), new GUIContent("L", "Load"))) {
 			levelscript.LoadLevel("");
 		}
 		vert += height + vSpace;
-		if(GUI.Button(new Rect(20,vert,35,height), "X")) {
+        if(GUI.Button(new Rect(20,vert,35,height), new GUIContent("X", "Destruction tool"))) {
 			levelscript.PutObjInPlacer("delete-1");
 		}
-		if(GUI.Button(new Rect(65,vert,35,height), "?")) {
+        if(GUI.Button(new Rect(65,vert,35,height), new GUIContent("?", "Query tool"))) {
 			levelscript.PutObjInPlacer("query-1");
 		}
-		vert += height + vSpace;
-		if(GUI.Button(new Rect(20,vert,80,height), "Air gen.")) {
-			levelscript.PutObjInPlacer("air-gen-11");
-		}
+
+        
+        vert += height + vSpace;
+        if(GUI.Button(new Rect(20,vert,80,height), new GUIContent("Base", "Triple Base unit"))) {
+            levelscript.PutObjInPlacer("base-31");
+        }
 
 		vert += height + vSpace;
-		if(GUI.Button(new Rect(20,vert,80,height), "Electr. gen.")) {
-			levelscript.PutObjInPlacer("electr-gen-22");
-		}
-		vert += height + vSpace;
-		if(GUI.Button(new Rect(20,vert,80,height), "Water gen.")) {
-			levelscript.PutObjInPlacer("water-gen-12");
-		}
+        if(GUI.Button(new Rect(left,vert,23,height), new GUIContent("A", "Air generator"))) {
+			levelscript.PutObjInPlacer("air-gen-11");
+		}       	
+
+        if(GUI.Button(new Rect(left+28,vert,23,height), new GUIContent("E", "Electricity generator"))) {
+            levelscript.PutObjInPlacer("electr-gen-22");
+        }           
+
+        if(GUI.Button(new Rect(left+58,vert,23,height), new GUIContent("W", "Water generator"))) {
+            levelscript.PutObjInPlacer("water-gen-12");
+        }           
+
+        
+
         vert += height + vSpace;
-        if(GUI.Button(new Rect(20,vert,80,height), "Bedroom 1")) {
+        if(GUI.Button(new Rect(20,vert,35,height), new GUIContent("B1", "Single Bedroom"))) {
             levelscript.PutObjInPlacer("bedroom-11");
         }
-        vert += height + vSpace;
-        if(GUI.Button(new Rect(20,vert,80,height), "Bedroom 2")) {
+
+        if(GUI.Button(new Rect(65,vert,35,height), new GUIContent("B2", "Double Bedroom"))) {
             levelscript.PutObjInPlacer("bedroom-21");
         }
+
+
+
         vert += height + vSpace;
-        if(GUI.Button(new Rect(20,vert,80,height), "Canteen")) {
+        if(GUI.Button(new Rect(20,vert,80,height), new GUIContent("Canteen", "Canteen"))) {
             levelscript.PutObjInPlacer("canteen-21");
         }
+
+
+        vert += height + vSpace;
+        if(GUI.Button(new Rect(20,vert,35,height), new GUIContent("S1", "Single Storage"))) {
+            levelscript.PutObjInPlacer("storage-11");
+        }
+        
+        if(GUI.Button(new Rect(65,vert,35,height), new GUIContent("S2", "Double Storage"))) {
+            levelscript.PutObjInPlacer("storage-21");
+        }
+
+
+
+
 		vert += height + vSpace;
-		if(GUI.Button(new Rect(20,vert,80,height), "Storage 1")) {
-			levelscript.PutObjInPlacer("storage-11");
-		}
-		vert += height + vSpace;
-		if(GUI.Button(new Rect(20,vert,80,height), "Storage 2")) {
-			levelscript.PutObjInPlacer("storage-21");
-		}	
-		vert += height + vSpace;
-		if(GUI.Button(new Rect(20,vert,80,height), "workshop")) {
+        if(GUI.Button(new Rect(20,vert,80,height),  new GUIContent("Workshop", "Workshop"))) {
 			levelscript.PutObjInPlacer("workshop-21");
 		}
-		vert += height + vSpace;
-		if(GUI.Button(new Rect(20,vert,80,height), "corridor 1")) {
-			levelscript.PutObjInPlacer("corridor-11");
-		}
-		vert += height + vSpace;
-		if(GUI.Button(new Rect(20,vert,80,height), "corridor 2")) {
-			levelscript.PutObjInPlacer("corridor-21");
-		}
-		vert += height + vSpace;
-		if(GUI.Button(new Rect(20,vert,80,height), "Stairwell 2")) {
-			levelscript.PutObjInPlacer("stairwell-12");
-		}
-		vert += height + vSpace;
-		if(GUI.Button(new Rect(20,vert,80,height), "Stairwell 3")) {
-			levelscript.PutObjInPlacer("stairwell-13");
-		}
-		vert += height + vSpace;
-		if(GUI.Button(new Rect(20,vert,80,height), "*ground*")) {
-			levelscript.PutObjInPlacer("groundcube-1");
-		}
+
+        vert += height + vSpace;
+        if(GUI.Button(new Rect(left,vert,25,height), new GUIContent("C1", "Single Corridor"))) {
+            levelscript.PutObjInPlacer("corridor-11");
+        }           
+        
+        if(GUI.Button(new Rect(left+30,vert,26,height), new GUIContent("C2", "Double Corridor"))) {
+            levelscript.PutObjInPlacer("corridor-21");
+        }           
+        
+        if(GUI.Button(new Rect(left+60,vert,26,height), new GUIContent("C3", "Triple Corridor"))) {
+            levelscript.PutObjInPlacer("corridor-31");
+        }           
+
+
+
+
+
+        vert += height + vSpace;
+        if(GUI.Button(new Rect(20,vert,35,height), new GUIContent("St2", "Two story Stairwell"))) {
+            levelscript.PutObjInPlacer("stairwell-12");
+        }
+        
+        if(GUI.Button(new Rect(65,vert,35,height), new GUIContent("St3", "Three story Stairwell"))) {
+            levelscript.PutObjInPlacer("stairwell-13");
+        }
+
+
+
+        vert += height + vSpace;
+        if(GUI.Button(new Rect(20,vert,35,height), new GUIContent("G1", "Ground cube"))) {
+            levelscript.PutObjInPlacer("groundcube-1");
+        }
+        
+        if(GUI.Button(new Rect(65,vert,35,height), new GUIContent("GF", "Flat Ground"))) {
+            levelscript.PutObjInPlacer("groundcube-flat-1");
+        }
+
+
 
 		vert += height;
+
+
+        //visaam pogaam ir shis tuultip (katrai savs teksts)
+        GUI.Label (new Rect (20,vert+10,130,20), GUI.tooltip);
 
 		//backgoundbox
 		GUI.Box(new Rect(10,10,100,vert), "Ur");

@@ -803,7 +803,7 @@ MonoBehaviour:
     GenerationWater: 0
     UsageAir: 0
     UsageElectricity: 1
-    UsageWater: 0
+    UsageWater: 2
     AgentNeedsWater: 20
     AgentNeedsSleep: 0
   Working: 0

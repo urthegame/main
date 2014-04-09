@@ -49,6 +49,7 @@ public class Agent : MonoBehaviour {
     private float nominalTurningSpeed = 10f;
     private float turningSpeed;
     private Color agentColor;
+    private Color agentColorLight;
 
     //globaalaas FSM mainiigie
     public enum AgentStates {
@@ -99,7 +100,7 @@ public class Agent : MonoBehaviour {
         //*
         //padaru kraasu gaishaaku (vienaadi palielinu katru komponenti)  (klampoju, lai nepaarsniedz max)
         //sho kraasu turpmaak lieto agjenta celja ziimeetaajs
-        agentColor = new Color(Mathf.Clamp(agentColor.r + 0.2f, 0, 1),
+        agentColorLight = new Color(Mathf.Clamp(agentColor.r + 0.2f, 0, 1),
                                Mathf.Clamp(agentColor.g + 0.2f, 0, 1),
                                Mathf.Clamp(agentColor.b + 0.2f, 0, 1),
                                1f);
@@ -465,7 +466,7 @@ public class Agent : MonoBehaviour {
                 for(float thickness = 0.01f; thickness < 0.05f; thickness+= 0.01f) {
                     Vector3 pos = new Vector3(lastRoute[i].x + thickness, lastRoute[i].y + thickness, 0);
                     Vector3 npos = new Vector3(lastRoute[i + 1].x + thickness, lastRoute[i + 1].y + thickness, 0);
-                    Debug.DrawLine(pos, npos, agentColor);
+                    Debug.DrawLine(pos, npos, agentColorLight);
                 }
 
                 //  print ("A* Ziimee " + lastRoute [i].x + "," + lastRoute [i].y + " " + lastRoute [i+1].x + "," + lastRoute [i+1].y);         
