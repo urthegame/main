@@ -65,7 +65,9 @@ public class ResourceInitInfo{
 
 public class LOBlock : Levelobject {
 
-	public Waypoints waypoints; 
+	public Waypoints waypoints;  //prefabaa noraadaami weipointi   
+    public WorkUnit[] workUnits; //prefabaa noraadaami telpaa daraamie darbinji
+
 
 	public ResourceInitInfo resourceInitInfo = new ResourceInitInfo();
 	public Dictionary<Res,float> Generation; //cik resursvieniibas rada 1 sekundee 

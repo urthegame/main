@@ -1502,6 +1502,7 @@ MonoBehaviour:
   OffsetY: 0
   waypoints:
     passableDirections: 0a0000000a0000000a000000
+  workUnits: []
   resourceInitInfo:
     GenerationAir: 5
     GenerationElectricity: 5

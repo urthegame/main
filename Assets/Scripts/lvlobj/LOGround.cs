@@ -21,7 +21,10 @@ public class LOGround : Levelobject {
 			if(ConstrPercent <= 0){
 				Destroy(transform.gameObject); //aizvaac sho kluciiti no liimenja
 			}
-		}
+		} 
+
+
+
 
 	}
 
@@ -43,9 +46,30 @@ public class LOGround : Levelobject {
 		
 	}
 
-	// tiek dzeests aaraa - vajag leenaam izdzeesties
+	// tiek dzeests aaraa
 	public override void RemovedFromGrid(){
 		Destructing = true; //saakam jaukt nost
+
+        //jaaizveido worknodes, lai no blakusesoshaam telpaam vareetu piekljuut un veikt darbu
+        /*
+        GameObject prefab = Resources.Load("worknode") as GameObject; 
+        GameObject node = Instantiate(
+            prefab, 
+            new Vector3(transform.position.x+0.75f, transform.position.y, 0),
+            Quaternion.identity) as GameObject;
+        node.name = "worknode - right";
+        node.transform.parent = transform;
+
+        node = Instantiate(
+            prefab, 
+            new Vector3(transform.position.x-0.75f, transform.position.y, 0),
+            Quaternion.identity) as GameObject;
+        node.name = "worknode - left";
+        node.transform.parent = transform;
+
+*/
+       
+
 	}
 
 
