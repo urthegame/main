@@ -1507,8 +1507,8 @@ MonoBehaviour:
     GenerationElectricity: 5
     GenerationWater: 5
     UsageAir: 0
-    UsageElectricity: 2
-    UsageWater: 1
+    UsageElectricity: 0
+    UsageWater: 0
     AgentNeedsWater: 15
     AgentNeedsSleep: 20
   Working: 0

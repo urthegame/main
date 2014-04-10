@@ -35,6 +35,9 @@ public class Agent : MonoBehaviour {
 
     private Animator animator;
     static private Level levelscript;
+//    private Transform thoughtbubble;
+ //   private TextMesh tbText;
+//    private bool tbOn;
 
     //paarvietoshanaas FSM mainiigie
     private List<Vector2> lastRoute = new List<Vector2>();//aktuaalaakais varonja celjsh 
@@ -66,6 +69,7 @@ public class Agent : MonoBehaviour {
     // globaalaas FSM mainiigie nav droshi lietosahanaa nekur citur!!11
     private LOBlock currentRoom = null; // null vai telpa, kur atrodas cilveeks, to maina lielais FSM un tikai, galapunktos
     private int isCraving = -1; //kuru vajadziibu gaaja apmierinaat
+    private float idlingFor;
 
 
     void Awake() {
@@ -75,12 +79,17 @@ public class Agent : MonoBehaviour {
         if(levelscript == null) {
             levelscript = GameObject.Find("Level").GetComponent<Level>();
         }
+        /*
+        thoughtbubble = transform.FindChild("thoughtbubble");
+        tbOn = true;
+       // thoughtbubble.renderer.enabled = false;
+        tbText = thoughtbubble.FindChild("text").GetComponent<TextMesh>();
+        tbText.text = "+" + Random.Range(1,9999);
+        */
 
-       
         agentColor = new Color(Random.Range(0.1f, 0.5f), Random.Range(0.1f, 0.5f), Random.Range(0.1f, 0.5f), 1f);
       
-
-    
+       
 
         nominalSpeed *= Random.Range(0.7f, 1.3f); //atshkjiriigi standarta aatrumi katram agjentam     
         nominalTurningSpeed *= Random.Range(0.7f, 1.3f); 
@@ -184,11 +193,16 @@ public class Agent : MonoBehaviour {
             isCraving = -1; //nemeklee nekaadu resursu
 
             int numResourceShortages = Needs.Shortage.Count(c => c); // ezoteeriskaa veidaa izskaita cik ir TRUE shajaa masiivaa - tik mums ir resursu, kas iet uz galu un jaaiet tos papildinaat
-            if(numResourceShortages > 0){
+            if(numResourceShortages > 0){ //meklees sev resursus
                 CurrentState = AgentStates.choosingResourceDestination;
 
-            } else  if(Random.Range(1, 100) > 18.5) { //ja nav jaameklee resursus, tad pagaidiis un izveeleesies nejaushu galapunktu
+            } else if(idlingFor > 0){ //pagaidiis bezdarbiibaa
+
+                idlingFor -= Time.deltaTime;
+
+            } else { //ja nav jaameklee resursus, tad izveeleesies nejaushu galapunktu un tur pagaidiis
                 CurrentState = AgentStates.choosingRandomDestination;
+                idlingFor = Random.Range(1, 3);
 
                // print("STATE:idling + choseRND");
             }
@@ -433,6 +447,14 @@ public class Agent : MonoBehaviour {
             
         }
 
+        /*
+        if(tbOn) {
+            //vienmeer jaapieluuko, lai domu burbuliitis buutu veersts pret kameru
+            //taapeec pozicioneeju to absoluutaas koordinaatees (vietaa, kur ir agjents)
+            thoughtbubble.rotation = Quaternion.Euler(0, 0, 0);
+            thoughtbubble.position = new Vector3(transform.position.x + 0.2f, transform.position.y + 0.5f, -0.51f);
+        }
+        */
     }
 
     public void GoThere(float x, float y) {   
