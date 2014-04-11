@@ -33,7 +33,8 @@ public class AgentNeeds {
 
 public class Agent : MonoBehaviour {
 
-    private Animator animator;
+    private Animator avatarAnimator;
+
     static private Level levelscript;
 //    private Transform thoughtbubble;
  //   private TextMesh tbText;
@@ -73,9 +74,12 @@ public class Agent : MonoBehaviour {
 
 
     void Awake() {
-        animator = transform.FindChild("cubeman").
-                   transform.FindChild("cubeman-size").
-                   transform.FindChild("cubeman-animation").GetComponent<Animator>();
+        avatarAnimator = transform.FindChild("cubeman").
+           transform.FindChild("cubeman-size").
+           transform.FindChild("cubeman-animation").GetComponent<Animator>();
+
+   
+
         if(levelscript == null) {
             levelscript = GameObject.Find("Level").GetComponent<Level>();
         }
@@ -199,10 +203,13 @@ public class Agent : MonoBehaviour {
             } else if(idlingFor > 0){ //pagaidiis bezdarbiibaa
 
                 idlingFor -= Time.deltaTime;
+                //bodyAnimator.SetBool("waving", true);
+
 
             } else { //ja nav jaameklee resursus, tad izveeleesies nejaushu galapunktu un tur pagaidiis
                 CurrentState = AgentStates.choosingRandomDestination;
                 idlingFor = Random.Range(1, 3);
+                //bodyAnimator.SetBool("waving", false);
 
                // print("STATE:idling + choseRND");
             }
@@ -315,7 +322,11 @@ public class Agent : MonoBehaviour {
         case AgentStates.consumingResource:
             // currentRoom -- tikai sheit droshi varu lietot sho mainiigo, jo tas ir uzsists ieprieksheejaa kadraa vieniigajaa IFaa, kas ved uz shejieni
 
+
             for(int need = 0; need < AgentNeeds.numTypes; need++) { //iet cauri visaam agjentvajadziibaam
+
+                avatarAnimator.SetBool("eating", true); //pagaidaam ir tikai 1 teereeshanas animaacija - eeshana, visus resursus pateeree eedot - arii miedzinju XD
+
                 Needs.Reserve[need] += currentRoom.AgentNeedsGeneration[need] * Time.deltaTime; //eed visus resursus (kas ir 0 vai pozitiivs skaitlis)
 
                 if(Needs.Reserve[need] > Needs.Max[need]){ //neljauj paareesties, ierobesho maximumu
@@ -324,6 +335,7 @@ public class Agent : MonoBehaviour {
 
                 if(Needs.Reserve[isCraving] == Needs.Max[isCraving]){ // vajadziiba, kuras deelj naaca uz sho telpu, ir apmierinaata
                     CurrentState = AgentStates.idling; 
+                    avatarAnimator.SetBool("eating", false);
                 }
 
             }
@@ -368,7 +380,7 @@ public class Agent : MonoBehaviour {
 
                 isTurning = true;
                 destinationNode = new Vector3(nextRouteNode.x, nextRouteNode.y, nextRouteNode.z); 
-                animator.SetBool("fast", true);
+                avatarAnimator.SetBool("fast", true);
                 //aaaaaaaanimeeeeeet!
 
             } else {
@@ -416,7 +428,7 @@ public class Agent : MonoBehaviour {
             if(Vector3.Distance(transform.position, destinationNode) < Vector3.Distance(newpos, destinationNode)) {// grib attaalinaaties
                 isWalking = false;
                 nextRouteNodeIsSet = false;
-                animator.SetBool("fast", false);
+                avatarAnimator.SetBool("fast", false);
                 transform.position = destinationNode; //ir atnaacis
             } else {
                 transform.position = newpos; //iet
@@ -433,7 +445,7 @@ public class Agent : MonoBehaviour {
                 isScaling = false;
                 nextRouteNodeIsSet = false;
                 transform.position = destinationNode; //ir atnaacis
-                animator.SetBool("fast", false);
+                avatarAnimator.SetBool("fast", false);
             } else {
                 Vector3 direction; //taa kaa varonis negriezhas un augshu/leju, tad man manuaali jaapadod virzien, kuraa gribu, lai vinsh kaapj
                 if(destinationNode.y > transform.position.y) {
