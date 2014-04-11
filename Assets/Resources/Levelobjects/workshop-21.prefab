@@ -713,7 +713,12 @@ MonoBehaviour:
   OffsetY: 0
   waypoints:
     passableDirections: 0a0000000a000000
-  workUnits: []
+  workUnits:
+  - parentGameobject: {fileID: 100024}
+    parentLevelobject: {fileID: 0}
+    on: 0
+    positions: 1
+    WorkUnitTypeNumber: 1
   resourceInitInfo:
     GenerationAir: 0
     GenerationElectricity: 0

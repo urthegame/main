@@ -8,15 +8,18 @@ public abstract class Levelobject : MonoBehaviour {
 
 
 	protected static GlobalResources gResScript; //globaalo resursu pieskatiitaaajs - singltons 
+    protected static WorkManager workManagerScript;//darbinju pieskatiitaajs - arii singltons
 	protected static Level levelscript; //viens vieniigais Liimenja paarvaldniekskripts
 
 	public float ConstrTime = 1; //cik sekundes ilgi buuvee
 	public float DestrTime = 1; //cik sekundes ilgi jauc nostii
 	public int Price = 0; //cik eiras maksaa uzbuuveesahana
 
-
+    [HideInInspector]
     public bool Constructing; //vai celj (nevis jauc nost)
+    [HideInInspector]
     public bool Destructing; //vai tomeer jauc nost
+    [HideInInspector]
 	public float ConstrPercent;  //cik % uzcelts
 
 
@@ -57,6 +60,7 @@ public abstract class Levelobject : MonoBehaviour {
 		if(gResScript == null){
 			//print("you know, this one time ...");
 			gResScript  = GameObject.Find("Level").GetComponent<GlobalResources>(); 
+            workManagerScript = GameObject.Find("Level").GetComponent<WorkManager>(); 
 			levelscript = GameObject.Find("Level").GetComponent<Level>();
 		}
 
@@ -71,7 +75,9 @@ public abstract class Levelobject : MonoBehaviour {
 			DestrTime = 0.001f;
 		}
 		DestrTime = 60 / DestrTime;
-			
+
+
+		
 
 	}
 

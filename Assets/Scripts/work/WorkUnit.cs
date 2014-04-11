@@ -8,14 +8,18 @@ using System.Collections;
 public class WorkUnit {
     public enum WorkUnitTypes {  ManualLabor = 1  };
 
-    public GameObject levelobject; //te jaanoraada (prefabaa) objekts, kam pieder shis skripts
-    //workType @todo -- celt/nojaukt, gatavot pusdienas, aarsteet kakjiishsus
+    public GameObject parentGameobject; //te jaanoraada (prefabaa) objekts, kam pieder shis skripts
+    [HideInInspector]
+    public LOBlock parentLevelobject; //shii geimobjekta LOBlock komponente (ieguushu no "parentGameobject" )
 
     /**
      * vai darbinju var dariit, piem, celshana un nojaukshana kljuust pieejama tikai peec dazhaadiem notikumiem
      * kaa arii, ja telpaa nav elektriiba un uudens (prefabaa ir noraadiids, ka tas ir nepieciehsams), tad telpa izsleedz sho darbinju
      */ 
     public bool on;
+
+
+    public int positions = 1; //cik cilveeki var dariit sho darbu vienlaiciigi
 
 
 
@@ -27,7 +31,16 @@ public class WorkUnit {
 
 
 
-    public WorkUnit() {
+    /**
+     * shai klasei nestraadaa konstruktors, jo taa tiek izveidota prefabaa nevis c# kodaa
+     */ 
+    public void Init() {
+
+        on = true;//joka peec iesleedz uzreiz
+
+        if(parentGameobject != null) {
+            parentLevelobject = parentGameobject.GetComponent<LOBlock>();
+        }
 
 
         /**

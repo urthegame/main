@@ -116,7 +116,8 @@ public class LOBlock : Levelobject {
         AgentNeedsGeneration[(int)AgentNeeds.Types.Sleep] = resourceInitInfo.AgentNeedsSleep;
 
 		WantWorking = true;
-	
+
+        	
 	}
 	
 	
@@ -287,6 +288,12 @@ public class LOBlock : Levelobject {
 				}
 
 			}
+
+            
+            //prefabaa defineetos darbinjus ieliek kopeejaa sarakstaa
+            foreach(WorkUnit w in workUnits){
+                workManagerScript.AddWork(w);
+            }
 
             
 			updateBlockInfo();

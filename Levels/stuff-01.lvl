@@ -1,4 +1,7 @@
-950
+865
+bedroom-11 5 -7 0 True False False 100
 canteen-21 -0.5 -7 0 True False False 100
 corridor-31 2 -7 0 True False False 100
+stairwell-13 4 -7 0 True False False 100
+workshop-21 5.5 -6 0 True False False 100
 agents

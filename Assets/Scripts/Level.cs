@@ -24,6 +24,7 @@ public class Level : MonoBehaviour {
     private GameObject placer;
     private Gui guiscript; //vieniigais/globalais GUI skripts
     private GlobalResources gResScript; //globaalo resursu pieskatiitaaajs, arii singltons :P
+    private WorkManager workManagerScript;//singltons 
 
     private Vector3 lastPos;
     public bool objectInPlacer = false; //pleiseris ir konteineris, ko biida apkaart ar peli - priekshskatiijuma versija
@@ -37,13 +38,14 @@ public class Level : MonoBehaviour {
 
     // Use this for initialization
     void Start() {
-    
+     
         levelObjectHolder = GameObject.Find("LevelobjectHolder");
         agentHolder = GameObject.Find("AgentHolder");
         destroyHolder = GameObject.Find("DestroyHolder");
         placer = GameObject.Find("Placer");
         guiscript = GameObject.Find("GUI").GetComponent<Gui>();
         gResScript = GameObject.Find("Level").GetComponent<GlobalResources>(); 
+        workManagerScript = GameObject.Find("Level").GetComponent<WorkManager>(); 
 
     }
     
