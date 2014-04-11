@@ -6,7 +6,7 @@ using System.Collections;
  */ 
 [System.Serializable]
 public class WorkUnit {
-    public enum WorkUnitTypeNumbers {  ManualLabor = 1  };
+    public enum WorkUnitTypes {  ManualLabor = 1  };
 
     public GameObject levelobject; //te jaanoraada (prefabaa) objekts, kam pieder shis skripts
     //workType @todo -- celt/nojaukt, gatavot pusdienas, aarsteet kakjiishsus
@@ -21,20 +21,23 @@ public class WorkUnit {
 
     /**
      * prefabaa noraada vienu enuma veertiibu: 
-     *   kuru no [WorkUnitType extendeejoshaam] klaseem lietot shim darbinjam kaa darbu aprakstosho skriptu
      * 
      */ 
-    public WorkUnitTypeNumbers WorkUnitTypeNumber; 
-    public WorkUnitType WorkDescriptionScript; //te ieliks sho darba tipa aprakstosho skriptu
+    public WorkUnitTypes WorkUnitTypeNumber; 
+
 
 
     public WorkUnit() {
 
-        switch(WorkUnitTypeNumber) {
-        case WorkUnitTypeNumbers.ManualLabor:
-            WorkDescriptionScript = new ManualLabor();
-            break;
 
+        /**
+         * peec izveeleetaa darba veida, uzsitiis parametrus
+         */ 
+        switch(WorkUnitTypeNumber) {
+        case WorkUnitTypes.ManualLabor:
+            //stuff, njigu njegu
+
+            break;
 
         }
 
