@@ -19,7 +19,6 @@ public class WorkUnit {
     public bool on;
 
 
-    public int positions = 1; //cik cilveeki var dariit sho darbu vienlaiciigi
 
 
 
@@ -36,7 +35,6 @@ public class WorkUnit {
      */ 
     public void Init() {
 
-        on = true;//joka peec iesleedz uzreiz
 
         if(parentGameobject != null) {
             parentLevelobject = parentGameobject.GetComponent<LOBlock>();

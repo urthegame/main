@@ -1,7 +1,12 @@
-865
-bedroom-11 5 -7 0 True False False 100
-canteen-21 -0.5 -7 0 True False False 100
-corridor-31 2 -7 0 True False False 100
-stairwell-13 4 -7 0 True False False 100
-workshop-21 5.5 -6 0 True False False 100
+570
+air-gen-11 0 -4 0 True False False 100
+bedroom-11 -1 -5 0 True False True 90
+canteen-21 2.5 -5 0 True False False 100
+corridor-31 6 -5 0 True False False 100
+electr-gen-22 1.5 -3.5 0 True False False 100
+stairwell-13 4 -6 0 True False False 100
+storage-21 0.5 -5 0 True False False 100
+water-gen-12 3 -3.5 0 True False False 100
+workshop-21 2.5 -7 0 True False False 100
+workshop-21 2.5 -6 0 True False False 100
 agents

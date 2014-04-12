@@ -145,61 +145,7 @@ public class LOBlock : Levelobject {
 
 			}
 
-		/*
-		if(started){
-
-
-			foreach (Res r in Enum.GetValues(typeof(Res))){
-				//teeree
-				ammount[r] -= Depletion[r] * Time.deltaTime;
-				if(ammount[r] < 0){
-					ammount[r] = 0;
-				}
-				//rada
-				ammount[r] += Generation[r] * Time.deltaTime;
-				if(ammount[r] > Capacity[r]){
-					ammount[r] = Capacity[r];
-				}
-				
-				//padod taalaak
-				//izplata pieejamos resursus kaiminjiem (tikai MAN-IR-DAUDZ uz KAIMINJIEM-IR-MAZ virzienaa)
-				//dot taadaa seciibaa, kaa kaiminji atrodas sarakstaa (mosh peec pointera adreses kaartots, or smtn) taapeec ir jaadod leenaam lai nebuutu briinumu
-				float saturation = ammount[r] / Capacity[r]; // cik man procentu *gaisa*
-				float givenAway = 0;
-				foreach (LOBlock neighbor in neighbors.Keys){
-					float neighborSaturation = neighbor.ammount[r] / neighbor.Capacity[r];
-					if(neighborSaturation < saturation - 0.1f){ //ir jaadod | 0.1 buferis, lai neskrietu izliidzinaat katru molekulu 
-						neighbor.ammount[r] += flow[r] * Time.deltaTime;
-						ammount[r] -= flow[r] * Time.deltaTime;						
-						givenAway += flow[r] * Time.deltaTime;
-						
-
-					}	 else {
-						
-					
-						
-					}
-					if(DEBUG_ME){
-						print ("  mikumee" + neighbor.name );
-					}
-				}
-				
-			}
-
-
-			
-			if(DEBUG_ME){
-				print ("  mikumee-wat " + neighbors.Count );
-			}
-			
-			
-			if(DEBUG_ME){
-				//	print ("gaiss radiits " + (GenerationAir * Time.deltaTime ) + "  gaiss atdots " + givenAway);
-			}
-
-		}
-		*/
-
+	
 			if(everyOtherFrameCounter++ > 5){ //ik peec n kadreim (varbuut ik peec m milisekuneed ?) (un veel - varbuut vajag kaut kaadu globaalu noslodzes indikaatoru, darbu rindu - lai shis retais darbinsh tiek izliidzinaats ar citiem retiem darbinjiem)
 				updateBlockInfo();
 				everyOtherFrameCounter = 0;
@@ -508,7 +454,7 @@ public class LOBlock : Levelobject {
 		blockinfos["wantoff"].renderer.enabled = !WantWorking;
 		blockinfos["wanton"].renderer.enabled = WantWorking;
 
-
+        workManagerScript.SetStatusOnThisBlocksJobs(Working,this); //iesleedz/izsleedz darbinjus shajaa telpaa
 
 	}
 	

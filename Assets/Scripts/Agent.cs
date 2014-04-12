@@ -212,7 +212,7 @@ public class Agent : MonoBehaviour {
                 //bodyAnimator.SetBool("waving", true);
             
             } else if(workManagerScript.workAvailable) { //ir kaads darbinsh pieejams
-                print("ir kaads darbinsh");
+              //  print("ir kaads darbinsh");
                 CurrentState = AgentStates.choosingWorkDestination;
 
             } else { //ja nav jaameklee resursus, tad izveeleesies nejaushu galapunktu un tur pagaidiis
@@ -285,10 +285,10 @@ public class Agent : MonoBehaviour {
                 Vector2 rc = levelscript.randomCubeInThisRoom(room); //randomcube - nejaushss kubiks atrastajaa telpaa
                 GoThere(rc.x, rc.y);
                 CurrentState = AgentStates.traveling;
-                print("atrada darbinju");
+              //  print("atrada darbinju");
             } else {
                 CurrentState = AgentStates.idling; //neko neatrada - jaaiet neko nedariit
-                print("NEatrada darbinju");
+               // print("NEatrada darbinju");
             }
 
 
@@ -305,7 +305,7 @@ public class Agent : MonoBehaviour {
           
 
             if(workUnit != null){ //te ieradies darba dariishanaas
-                print("ieradies straaadaaat");
+             //   print("ieradies straaadaaat");
                 workingFor = Random.Range(2,5); //dazhas sekundes pastraadaas
                 avatarAnimator.SetBool("working", true); 
                 CurrentState = AgentStates.working;
