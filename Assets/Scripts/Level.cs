@@ -325,6 +325,7 @@ public class Level : MonoBehaviour {
 
         CheckWorkingStatusEveryBlock(1); //kad vissi levelobjekti novietoti, varu sleegt tos iekshaa; ir/vai jaasleedz iekshaa, shis statuss jau ir uzsetots levelobjektaa
         CheckWorkingStatusEveryBlock(1); //divreiz, jo paarbauda ljoti nesistemaatiski un, ja gjenerators ir peedeejais objekts, tad var gadiities, ka neiesleedz nevienu levelobjektu, jo nav elektriibas >:)
+        CheckWorkingStatusEveryBlock(1); //triisreiz!11
         CalculateNavgrid();
 
 

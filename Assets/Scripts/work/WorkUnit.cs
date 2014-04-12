@@ -3,6 +3,8 @@ using System.Collections;
 
 /**
  * viena darbavieta
+ * kalpo tikai kaa datu struktuura - funkcionalitaate atrodas WorkManager skriptaa
+ * 
  */ 
 [System.Serializable]
 public class WorkUnit {
@@ -18,7 +20,8 @@ public class WorkUnit {
      */ 
     public bool on;
 
-
+    [HideInInspector]
+    public Agent agentWorkingOn; //kursh agjents pashlaik straada sho darbinju
 
 
 
@@ -52,6 +55,21 @@ public class WorkUnit {
 
         }
 
+    }
+
+
+    
+    /**
+     * pieraksta shim darbinjam, ka shis agjents dara sho darbu (un darbs ir nepieejams citiem) 
+     * start - TRUE saak darbu; FALSE beidz darbu (tas kljuuust atkal pieejams citiem)
+     */
+    public void ReserveWork(bool start, Agent agent = null){
+        if(start) {
+            agentWorkingOn = agent;
+        } else {
+            agentWorkingOn = null;
+
+        }
     }
 
 }

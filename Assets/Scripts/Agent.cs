@@ -198,6 +198,7 @@ public class Agent : MonoBehaviour {
         
 
         switch(CurrentState) {
+        //---------------------------------------------------------------
         case AgentStates.idling:
             isCraving = -1; //nemeklee nekaadu resursu
             workUnit = null;
@@ -211,9 +212,10 @@ public class Agent : MonoBehaviour {
                 idlingFor -= Time.deltaTime;
                 //bodyAnimator.SetBool("waving", true);
             
-            } else if(workManagerScript.workAvailable) { //ir kaads darbinsh pieejams
-              //  print("ir kaads darbinsh");
+            } else if(workManagerScript.IsThereWorkAvailable()) { //ir kaads darbinsh pieejams
+            //    print("ir kaads darbinsh");
                 CurrentState = AgentStates.choosingWorkDestination;
+
 
             } else { //ja nav jaameklee resursus, tad izveeleesies nejaushu galapunktu un tur pagaidiis
                 CurrentState = AgentStates.choosingRandomDestination;
@@ -224,6 +226,7 @@ public class Agent : MonoBehaviour {
             }
             //print("STATE:idling");
             break;
+            //---------------------------------------------------------------
         case AgentStates.choosingRandomDestination:
 
 
@@ -244,6 +247,7 @@ public class Agent : MonoBehaviour {
 
             //print("STATE:choosingRandomDestination");
             break;
+            //---------------------------------------------------------------
         case AgentStates.choosingResourceDestination:
             //jaaatrod TUVAAKAA telpa, kas apmierina vajadziibu peec resursa
 
@@ -275,16 +279,17 @@ public class Agent : MonoBehaviour {
 
            // print("STATE:choosingResourceDestination craving=" + isCraving);
             break;
+            //---------------------------------------------------------------
         case AgentStates.choosingWorkDestination:
             //print("STATE:choosingWorkDestination ");
 
             workUnit = workManagerScript.GetWork();
             room = workUnit.parentLevelobject; //darbinja parametrs - kurai telpai vinsh pieder
-
             if(room != null){  //jaaiet uz atrasto telpu
                 Vector2 rc = levelscript.randomCubeInThisRoom(room); //randomcube - nejaushss kubiks atrastajaa telpaa
                 GoThere(rc.x, rc.y);
                 CurrentState = AgentStates.traveling;
+                workUnit.ReserveWork(true,this);
               //  print("atrada darbinju");
             } else {
                 CurrentState = AgentStates.idling; //neko neatrada - jaaiet neko nedariit
@@ -293,6 +298,7 @@ public class Agent : MonoBehaviour {
 
 
             break;
+            //---------------------------------------------------------------
         case AgentStates.traveling:
             // print("STATE:traveling");
             //kad agjents buus nonaacis galaa, tad vinja staavokli nomainiis moveAbout() metodee nevis sheit; nomainiis uz "arriving"
@@ -309,6 +315,7 @@ public class Agent : MonoBehaviour {
                 workingFor = Random.Range(2,5); //dazhas sekundes pastraadaas
                 avatarAnimator.SetBool("working", true); 
                 CurrentState = AgentStates.working;
+
                 break; //break case
 
             } else if(isCraving >= 0){//sheit ieradies apmierinaat kaadu vajadziibu
@@ -351,6 +358,7 @@ public class Agent : MonoBehaviour {
 
             //print("STATE:arriving");
             break;
+            //---------------------------------------------------------------
         case AgentStates.consumingResource:
             // currentRoom -- tikai sheit droshi varu lietot sho mainiigo, jo tas ir uzsists ieprieksheejaa kadraa vieniigajaa IFaa, kas ved uz shejieni
 
@@ -380,11 +388,13 @@ public class Agent : MonoBehaviour {
 
             //print("STATE:consumingResource");
             break;
+            //---------------------------------------------------------------
         case AgentStates.working:
 
             if(!workUnit.on){ //darbinsh tiek izsleegts
                 CurrentState = AgentStates.idling;
                 avatarAnimator.SetBool("working", false); 
+                workUnit.ReserveWork(false); //padara darbinju pieejamu citiem
                 break;
             }
 
@@ -395,6 +405,7 @@ public class Agent : MonoBehaviour {
             if(workingFor < 0){ //buus gana straadaats
                 CurrentState = AgentStates.idling;
                 avatarAnimator.SetBool("working", false); 
+                workUnit.ReserveWork(false);//padara darbinju pieejamu citiem
                 break;
             }
 

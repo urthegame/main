@@ -15,12 +15,12 @@ public class WorkManager : MonoBehaviour {
     /**
      * pieregjistreee levelobjeta padoto darbinju kopeejaa listee
      */ 
-    public void AddWork(WorkUnit workunit){
+    public void AddWork(WorkUnit workunit) {
         workunit.Init();
         worklist.Add(workunit);
 
 
-        checkForAvailableWork();
+        IsThereWorkAvailable();
 
     }
 
@@ -28,60 +28,61 @@ public class WorkManager : MonoBehaviour {
     /**
      * iesleedz/izsleedz visus darbinjus, kas pieder padotajai telpai
      */ 
-    public void SetStatusOnThisBlocksJobs(bool status, LOBlock block){
+    public void SetStatusOnThisBlocksJobs(bool status, LOBlock block) {
 
-        foreach(WorkUnit w in worklist){
-            if(w.parentLevelobject == block){ 
+        foreach(WorkUnit w in worklist) {
+            if(w.parentLevelobject == block) { 
                 w.on = status;
             }
         }
 
-        checkForAvailableWork();
+        IsThereWorkAvailable();
 
     }
 
+    public WorkUnit GetWork() {
 
-    public WorkUnit GetWork(){
-
-            /**
-             * @todo -- atrast piemeerotaako darbu (nav veel prasmes un darba prasiibas)
-             * @todo -- atrast tuvaako (dabuut listi ar deriigajiem darbiem un sakaartot peec attaaluma)
-             * @todo -- tikai darbus, kur ir briivas poziicijas
-             */ 
-        foreach(WorkUnit w in worklist.OrderBy(a => System.Guid.NewGuid())){
-                if(w.on){ 
-                    return w;
-                }
+        /**
+         * @todo -- atrast piemeerotaako darbu (nav veel prasmes un darba prasiibas)
+         * @todo -- atrast tuvaako (dabuut listi ar deriigajiem darbiem un sakaartot peec attaaluma)
+         * @todo -- tikai darbus, kur ir briivas poziicijas
+         */ 
+        foreach(WorkUnit w in worklist.OrderBy(a => System.Guid.NewGuid())) {
+            if(w.on && w.agentWorkingOn == null) { 
+                return w;
             }
+        }
 
         return null;
 
     }
 
-    private void checkForAvailableWork(){
+    public bool IsThereWorkAvailable() {
         /**
          * iziet cauri visai listei un noskaidro vai ir kaads darbinsh pieejams
-         * @todo -- tikai aktiivos (on) darbinjus
-         * @todo -- tikai, ja ir kaads slots briivs
+         * -- tikai aktiivos (on) darbinjus
+         * -- tikai, ja kaads agjents jau tur nestraadaa
          */ 
-        workAvailable = false;
+        workAvailable = false; //reizee arii globaalais mainiigais
         int i = 0;
-        foreach(WorkUnit w in worklist){
+        foreach(WorkUnit w in worklist) {
 
-            if(w.parentGameobject == null){ //telpa ar darbinju izdzeesta
+            if(w.parentGameobject == null) { //telpa ar darbinju izdzeesta
                 worklist.RemoveAt(i);
-                checkForAvailableWork(); //izmainiiju listi, taapeec nevaru turpinaat ciklu, atlukushos jaaskata jaunaa ciklaa
-                return;
+               
+                return IsThereWorkAvailable();   //izmainiiju listi, taapeec nevaru turpinaat ciklu, atlikushos jaaskata jaunaa ciklaa
             }
 
-            if(w.on){ 
+            if(w.on && w.agentWorkingOn == null) { 
                 workAvailable = true;
                 break;
             }
             i++;
         }
 
+       return workAvailable;
     }
+
 
 }
 

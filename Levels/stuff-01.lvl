@@ -1,6 +1,6 @@
 570
 air-gen-11 0 -4 0 True False False 100
-bedroom-11 -1 -5 0 True False True 90
+bedroom-11 -1 -5 0 True False False 100
 canteen-21 2.5 -5 0 True False False 100
 corridor-31 6 -5 0 True False False 100
 electr-gen-22 1.5 -3.5 0 True False False 100
@@ -10,3 +10,6 @@ water-gen-12 3 -3.5 0 True False False 100
 workshop-21 2.5 -7 0 True False False 100
 workshop-21 2.5 -6 0 True False False 100
 agents
+Avatar 4 -6 0 0.2722311 0.2654991 0.4920931 1.81078 7.051569 18.68585 18.68585
+Avatar 2 -7 0 0.3773781 0.3087508 0.2846296 1.638408 8.181494 19.99572 19.99572
+Avatar 1 -5 0 0.3873302 0.1680234 0.1971902 1.391332 8.571594 98.83889 14.09325
