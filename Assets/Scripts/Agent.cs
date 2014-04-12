@@ -42,7 +42,7 @@ public class Agent : MonoBehaviour {
 //    private bool tbOn;
 
     //paarvietoshanaas FSM mainiigie
-    private List<Vector2> lastRoute = new List<Vector2>();//aktuaalaakais varonja celjsh 
+    private List<Vector2> actualRoute = new List<Vector2>();//aktuaalaakais varonja celjsh 
     private Vector3 nextRouteNode; //celja punkts, uz kuru pashlaik varonis dodas
     private bool nextRouteNodeIsSet;
     private bool isWalking;
@@ -65,7 +65,8 @@ public class Agent : MonoBehaviour {
         traveling,
         arriving,
         consumingResource,
-        working
+        working,
+        offTheGrid
     }
     public AgentStates CurrentState = AgentStates.idling;
     public AgentNeeds Needs; //datu struktuura, kur glabaajaas cik agjentam ir katrs resurss
@@ -76,6 +77,7 @@ public class Agent : MonoBehaviour {
     private float idlingFor; // cik ilgi slinkos
     private WorkUnit workUnit;  //ko darbinsh, ko dara (vai iet dariit) null, ja pashlaik neko nedara
     private float workingFor; //cik ilgi veel straadaas
+    private float offTheGridFor; //cik ilgi muljljaajaas un netiek atpakalj telpaa
 
     void Awake() {
         avatarAnimator = transform.FindChild("cubeman").
@@ -235,7 +237,10 @@ public class Agent : MonoBehaviour {
 
             if(room != null) {
                 Vector2 rc = levelscript.randomCubeInThisRoom(room); //randomcube - nejaushss kubiks atrastajaa telpaa
-                GoThere(rc.x, rc.y);
+                if(GoThere(rc.x, rc.y) == -1){ // kljuuda - agjents neatrodas uz grida
+                    CurrentState = AgentStates.offTheGrid;
+                    break;
+                }
 
              //   print("rooom "  + Mathf.RoundToInt(room.transform.position.x) + ", " + Mathf.RoundToInt(room.transform.position.y) + "randCube "  + Mathf.RoundToInt(rc.x) + ", " + Mathf.RoundToInt(rc.y));
               // print("RANDrooom "  + (room.transform.position.x) + ", " + (room.transform.position.y) + "   RANDcube "  + (rc.x) + ", " + (rc.y));
@@ -266,7 +271,10 @@ public class Agent : MonoBehaviour {
             
             if(room != null){  //jaaiet uz atrasto telpu
                 Vector2 rc = levelscript.randomCubeInThisRoom(room); //randomcube - nejaushss kubiks atrastajaa telpaa
-                GoThere(rc.x, rc.y);
+                if(GoThere(rc.x, rc.y) == -1){ // kljuuda - agjents neatrodas uz grida
+                    CurrentState = AgentStates.offTheGrid;
+                    break;
+                }
                 CurrentState = AgentStates.traveling;
                // print("atrada  " + rc.x + ","  + rc.y);
             } else {
@@ -287,7 +295,10 @@ public class Agent : MonoBehaviour {
             room = workUnit.parentLevelobject; //darbinja parametrs - kurai telpai vinsh pieder
             if(room != null){  //jaaiet uz atrasto telpu
                 Vector2 rc = levelscript.randomCubeInThisRoom(room); //randomcube - nejaushss kubiks atrastajaa telpaa
-                GoThere(rc.x, rc.y);
+                if(GoThere(rc.x, rc.y) == -1){ // kljuuda - agjents neatrodas uz grida
+                    CurrentState = AgentStates.offTheGrid;
+                    break;
+                }
                 CurrentState = AgentStates.traveling;
                 workUnit.ReserveWork(true,this);
               //  print("atrada darbinju");
@@ -302,9 +313,50 @@ public class Agent : MonoBehaviour {
         case AgentStates.traveling:
             // print("STATE:traveling");
             //kad agjents buus nonaacis galaa, tad vinja staavokli nomainiis moveAbout() metodee nevis sheit; nomainiis uz "arriving"
+          
 
             break;
+           //---------------------------------------------------------------
+        case AgentStates.offTheGrid:
+            //neatrodas uz navgrida, jaaatrod tuvaakais navgridaa esoshais punts un jaaevakueejas taa virzienaa
 
+            if(offTheGridFor > 0){ //pagaidiis kaadu laicinju, lai neceptu procesoru
+                offTheGridFor -= Time.deltaTime;
+                break;
+            }
+
+            if(levelscript.Navgrid.Count > 0){ //ja ir navgridaa punkti, kur mukt
+
+                Vector2 closestPoint = new Vector2(0,0);
+                float closestDistance = 0;
+                float x = transform.position.x;
+                float y = transform.position.y;
+
+                foreach(KeyValuePair<Vector4, float> p in levelscript.Navgrid) {
+                    if(p.Key.y == y){ //meklee tuvaakos punkts tikai shajaa staavaa                    
+                        float d = levelscript.MapDistanceBetweenPoints(p.Key.x,p.Key.y,x,y);//cik taalu shis navgrida punkts no agjenta
+                        if(closestDistance == 0 || d < closestDistance){
+                            closestPoint = new Vector2(p.Key.x,p.Key.y); //shis ir tuvaakais navgrida punkts
+                            closestDistance = d;
+                        }
+                    }
+                }
+
+                if(closestDistance > 0){
+                //    print("atradaam kaadu punktu, kur glaabties");
+                    destinationNode = closestPoint;
+                    actualRoute.Add(closestPoint); //manuaali izveidoju celju (stur tikai 1 punktu - kur skrienu glaabties)
+                    CurrentState = AgentStates.traveling; //peec ieshanas automaatiski staavoklis buus IDLING
+                    //print(x + "," + y + " -> " + closestPoint);
+                    break;
+                } else {
+                  //  print("NEatradaam nevienu punktu, kur glaabties");
+                    offTheGridFor = 3; //3 sekundes pagaidiis, liidz meegjinaas atkal, varbuut tad buuus kaut kas uzbuuveets
+                }
+
+            }
+            break;
+           //-----------------------------------------------------------------
         case AgentStates.arriving:
 
 
@@ -429,10 +481,10 @@ public class Agent : MonoBehaviour {
 
         if(!nextRouteNodeIsSet) { //nav dabuut naakamais solis
          //   print ("njem naakamo virsotni  lastRoute.Count = "  + lastRoute.Count);
-            if(lastRoute != null && lastRoute.Count > 0) { //bet ir veel celjsh priekhsaa
+            if(actualRoute != null && actualRoute.Count > 0) { //bet ir veel celjsh priekhsaa
                 nextRouteNodeIsSet = true;
-                nextRouteNode = lastRoute[lastRoute.Count - 1]; //POP 2 soljos :/
-                lastRoute.RemoveAt(lastRoute.Count - 1);
+                nextRouteNode = actualRoute[actualRoute.Count - 1]; //POP 2 soljos :/
+                actualRoute.RemoveAt(actualRoute.Count - 1);
                 //print ("panjeema naakamo virsotni");
                 //lieku iet un griezties uz naakamo punktu
 
@@ -450,7 +502,7 @@ public class Agent : MonoBehaviour {
             } else {
                 if(CurrentState == AgentStates.traveling) { //nomaina staavokli lielajaa FSM - ka  esam sasniegushi galapunktu
                     CurrentState = AgentStates.arriving;
-                 //   print ("ieshana beigusies ? esam klaat ? ");
+                    //print ("ieshana beigusies ? esam klaat ? ");
                 }
 
             }
@@ -523,17 +575,15 @@ public class Agent : MonoBehaviour {
             
         }
 
-        /*
-        if(tbOn) {
-            //vienmeer jaapieluuko, lai domu burbuliitis buutu veersts pret kameru
-            //taapeec pozicioneeju to absoluutaas koordinaatees (vietaa, kur ir agjents)
-            thoughtbubble.rotation = Quaternion.Euler(0, 0, 0);
-            thoughtbubble.position = new Vector3(transform.position.x + 0.2f, transform.position.y + 0.5f, -0.51f);
-        }
-        */
     }
 
-    public void GoThere(float x, float y) {   
+    /**
+     * atrod celju uz padoto punktu
+     * 
+     * atgriezh 0, ja viss labi, -1, ja agjents neatrodas uz grida
+     * 
+     */ 
+    public int GoThere(float x, float y) {   
 
         int currX = Mathf.FloorToInt(transform.position.x);
         int currY = Mathf.FloorToInt(transform.position.y);
@@ -541,29 +591,37 @@ public class Agent : MonoBehaviour {
         int destX = Mathf.FloorToInt(x);
         int destY = Mathf.FloorToInt(y);
 
-    //   var stopwatch = new System.Diagnostics.Stopwatch();
-     //  stopwatch.Start();
+        actualRoute = new List<Vector2>();
 
+        try {
+            actualRoute = levelscript.FindPath(currX, currY, destX, destY);   
+            return 0;
+        } catch(System.Exception e) {
+            if(e.Message == "not-on-a-grid"){
+                print("not on a gridddd");
+                return -1;
+            }
+        
 
-        lastRoute = levelscript.FindPath(currX, currY, destX, destY);              
-    //    print ("beidza mekleet A*  " + currX+","+currY  + " -> " + destX+","+destY + "  num: " +  lastRoute.Count  + "  " + stopwatch.Elapsed);
+        }
 
-
+     
+        return 118;//te nevinam nav jaanonaak
 
     }
 
     private void drawPath() {
     
 
-        if(lastRoute.Count > 0) {
-            for(int i = 0; i < lastRoute.Count-1; i++) {
+        if(actualRoute.Count > 0) {
+            for(int i = 0; i < actualRoute.Count-1; i++) {
                 
 
                 ///Debug.DrawLine (pos, npos);
 
                 for(float thickness = 0.01f; thickness < 0.05f; thickness+= 0.01f) {
-                    Vector3 pos = new Vector3(lastRoute[i].x + thickness, lastRoute[i].y + thickness, 0);
-                    Vector3 npos = new Vector3(lastRoute[i + 1].x + thickness, lastRoute[i + 1].y + thickness, 0);
+                    Vector3 pos = new Vector3(actualRoute[i].x + thickness, actualRoute[i].y + thickness, 0);
+                    Vector3 npos = new Vector3(actualRoute[i + 1].x + thickness, actualRoute[i + 1].y + thickness, 0);
                     Debug.DrawLine(pos, npos, agentColorLight);
                 }
 

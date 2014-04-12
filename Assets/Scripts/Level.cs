@@ -34,11 +34,8 @@ public class Level : MonoBehaviour {
     public LevelLimits limits; //liimenjrobezhas
     
 
-
-
-    // Use this for initialization
     void Start() {
-     
+
         levelObjectHolder = GameObject.Find("LevelobjectHolder");
         agentHolder = GameObject.Find("AgentHolder");
         destroyHolder = GameObject.Find("DestroyHolder");
@@ -49,7 +46,6 @@ public class Level : MonoBehaviour {
 
     }
     
-    // Update is called once per frame
     void Update() {
         drawGrid();
         mouse();
@@ -457,9 +453,6 @@ public class Level : MonoBehaviour {
 
     }
 
-    /**
-     * @todo -- tikko peec levelobjektu dzeeshanas izpildiita funkcija joprojaam tos redz - tie veel nav pazudushi
-     */ 
     public void CalculateNavgrid() {
 
 
@@ -471,8 +464,8 @@ public class Level : MonoBehaviour {
         for(int i = 0; i< levelObjectHolder.transform.childCount; i++) { //ikviens levelobjekts liimenii
             Levelobject lo = levelObjectHolder.transform.GetChild(i).GetComponent<Levelobject>();
             if(lo is LOBlock) { //vai levelobjekts ir levelbloks                
-                if(lo.ConstrPercent < 5 && lo.Destructing) { 
-                    continue; // skipo geimobjektus, kas tiek jaukti nost un ir jau gandriiz nojaukti
+                if( /*lo.ConstrPercent < 5 && */ lo.Destructing) { 
+                    continue; // skipo geimobjektus, kas tiek jaukti nost 
                 }
                 LOBlock room = (LOBlock)lo;
                 ListOfRooms.Add(room);
@@ -518,7 +511,8 @@ public class Level : MonoBehaviour {
             for(int b=0; b<room.SizeY; b++) {
                 for(int a=0; a<room.SizeX; a++) { 
                 
-                   
+                    bool cubeIsPassable = false;
+
                     int directionsInThisCube = (int)room.waypoints.passableDirections[currentCube++]; //taipkaastoju enumu uz intu | kaa aii uzzinu kaados virzienos shajaa kubikaa var paarvietoties 
                     //Vector3 o = new Vector3(x+a,y+b,-1);
                 
@@ -531,10 +525,12 @@ public class Level : MonoBehaviour {
                                 if(!Navgrid.ContainsKey(path)) {
                                     Navgrid.Add(path, 1f); 
                                 }
+
                             }
                             //Debug.DrawLine(o,new Vector3(x+a+0.02f,y+b+0.4f,-1),Color.yellow); //
                         }
                         //Debug.DrawLine(o,new Vector3(x+a+0.01f,y+b+0.3f,-1),Color.red);
+                        cubeIsPassable = true;
                     }
                     if((directionsInThisCube & (int)Waypoints.dirs.l) == (int)Waypoints.dirs.l) {  //shis klucis ljauj iet pa kreisi ... 
                         int neighborDirs;
@@ -549,6 +545,7 @@ public class Level : MonoBehaviour {
                             //Debug.DrawLine(o,new Vector3(x+a-0.4f,y+b+0.02f,-1),Color.yellow); //
                         }
                         //Debug.DrawLine(o,new Vector3(x+a-0.3f,y+b+0.01f,-1),Color.red);
+                        cubeIsPassable = true;
                     }
                     if((directionsInThisCube & (int)Waypoints.dirs.b) == (int)Waypoints.dirs.b) { //shis kluis ljauj iet lejup
                         int neighborDirs;
@@ -559,10 +556,12 @@ public class Level : MonoBehaviour {
                                 if(!Navgrid.ContainsKey(path)) {
                                     Navgrid.Add(path, 1f); 
                                 }
+
                             }
                             //Debug.DrawLine(o,new Vector3(x+a+0.02f,y+b-0.4f,-1),Color.yellow); //
                         }
                         //Debug.DrawLine(o,new Vector3(x+a+0.01f,y+b-0.3f,-1),Color.red);
+                        cubeIsPassable = true;
                     }
                     if((directionsInThisCube & (int)Waypoints.dirs.r) == (int)Waypoints.dirs.r) { // klucis ljuaj iet pa labi
                         int neighborDirs;
@@ -577,15 +576,23 @@ public class Level : MonoBehaviour {
                             //Debug.DrawLine(o,new Vector3(x+a+0.4f,y+b+0.02f,-1),Color.yellow); 
                         }
                         //Debug.DrawLine(o,new Vector3(x+a+0.3f,y+b+0.01f,-1),Color.red);
+                        cubeIsPassable = true;
                     }
                 
-                    //salikt paths masiivaa - visus atrastos celjus
-                    // un tad ziimeet paths masiivu 
-                
+
+
+
+                    if(cubeIsPassable){
+                        //navgridaa, joka peec, ieliks celju no klucha uz sevi (tad varees zhigli uzzinaat, vai punkts eksistee navgridaaa)
+                        Vector4 loop = new Vector4(Mathf.RoundToInt(x + a), Mathf.RoundToInt(y + b), Mathf.RoundToInt(x + a), Mathf.RoundToInt(y + b));
+                        if(!Navgrid.ContainsKey(loop)) {
+                            Navgrid.Add(loop, 0f); 
+                        }
+                    }
+
+
                 }   
             }
-        
-            //  room.waypoints.squares
         
         
         
@@ -617,9 +624,16 @@ public class Level : MonoBehaviour {
 
         Vector4 start = new Vector4(sx, sy, MapDistanceBetweenPoints(sx, sy, fx, fy), 0f);
         Vector4 finish = new Vector4(fx, fy, 0f, 0f);
-        
-        
-        //print(" FindPath "  + sx + "," + sy + " -> " + fx + "," + fy+ "");
+
+
+        Vector4 loop = new Vector4(Mathf.RoundToInt(sx),Mathf.RoundToInt(sy),Mathf.RoundToInt(sx),Mathf.RoundToInt(sy)); // punkts atpakalj uz sevi -- shaadi paarbaudu, vai tagadeejais punkts vispaar atrodas navgridaaa
+        if(!Navgrid.ContainsKey(loop)) { //saakumpunkts neatrodas uz grida, nevaru piemekleet celju
+            throw new System.Exception("not-on-a-grid");
+            //print("nav uz grida!   " + loop);
+        }
+   
+
+
         
         List<Vector4> open = new List<Vector4>(); //veel jaapskata
         List<Vector4> closed = new List<Vector4>(); 
@@ -779,14 +793,14 @@ public class Level : MonoBehaviour {
     /**
      * aliass priesh tiem floutinjiem
      */ 
-    float MapDistanceBetweenPoints(float x1, float y1, float x2, float y2) {
+    public float MapDistanceBetweenPoints(float x1, float y1, float x2, float y2) {
         return MapDistanceBetweenPoints(Mathf.FloorToInt(x1), Mathf.FloorToInt(y1), Mathf.FloorToInt(x2), Mathf.FloorToInt(y2));
     }
     
     /**
      * attalums starp punktiem uz kartes (tieshaa liinijaa)
      */
-    float MapDistanceBetweenPoints(int x1, int y1, int x2, int y2) {
+    public float MapDistanceBetweenPoints(int x1, int y1, int x2, int y2) {
         float dx = Mathf.Abs(x1 - x2);
         float dy = Mathf.Abs(y1 - y2);
         float d = (dx + dy); //manhetenas distance | manhetena ir taisnaakas striipas nekaa diagonaaldistancei, kaa arii shajaa speelee nav diagonaalpaarvietosahnaas
