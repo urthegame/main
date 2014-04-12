@@ -12,6 +12,9 @@ public class WorkManager : MonoBehaviour {
     public bool workAvailable;
 
 
+
+
+
     /**
      * pieregjistreee levelobjeta padoto darbinju kopeejaa listee
      */ 
@@ -31,8 +34,8 @@ public class WorkManager : MonoBehaviour {
     public void SetStatusOnThisBlocksJobs(bool status, LOBlock block) {
 
         foreach(WorkUnit w in worklist) {
-            if(w.parentLevelobject == block) { 
-                w.on = status;
+            if(w.parentLevelobject == block) { //darbs pieder shim levelobjektam
+                w.setOn(status);
             }
         }
 
@@ -48,7 +51,7 @@ public class WorkManager : MonoBehaviour {
          * @todo -- tikai darbus, kur ir briivas poziicijas
          */ 
         foreach(WorkUnit w in worklist.OrderBy(a => System.Guid.NewGuid())) {
-            if(w.on && w.agentWorkingOn == null) { 
+            if(w.IsOn() && w.agentWorkingOn == null) { 
                 return w;
             }
         }
@@ -73,7 +76,7 @@ public class WorkManager : MonoBehaviour {
                 return IsThereWorkAvailable();   //izmainiiju listi, taapeec nevaru turpinaat ciklu, atlikushos jaaskata jaunaa ciklaa
             }
 
-            if(w.on && w.agentWorkingOn == null) { 
+            if(w.IsOn() && w.agentWorkingOn == null) { 
                 workAvailable = true;
                 break;
             }
@@ -82,6 +85,43 @@ public class WorkManager : MonoBehaviour {
 
        return workAvailable;
     }
+
+
+    /**
+     * izveido buuvdarbu (sho netaisa prefabam aarpus speeles, jo shis ir iislaiciigi pieejams darbs)
+     */ 
+    public void CreateAndAddConstructionJob(LOBlock block, WorkUnit.WorkUnitTypes workType){
+
+        WorkUnit constructionJob = new WorkUnit();
+        constructionJob.parentGameobject = block.gameObject;
+        constructionJob.WorkUnitTypeNumber = workType;
+        constructionJob.setOn(true);
+        AddWork(constructionJob);
+
+    }
+
+    /**
+     * izniicina visus buuvdarbus shim levelobjektam
+     */ 
+    public void RemoveAllConstructionJobsForThisBlock(LOBlock block){
+            
+        int i = 0;
+        foreach(WorkUnit w in worklist) {
+            
+            if(w.parentLevelobject == block && (int)w.WorkUnitTypeNumber < 10) { //shai telpai piederoshs Buuvdarbs darbinsh
+                w.setOn(false,true); //svariigi izsleegt, citaadi nabaga agjents straadaas liidz darbalaika beigaam
+                worklist.RemoveAt(i);
+                
+                RemoveAllConstructionJobsForThisBlock(block);   //izmainiiju listi, taapeec nevaru turpinaat ciklu, atlikushos jaaskata jaunaa ciklaa
+                return;
+            }
+            
+
+            i++;
+        }
+
+    }
+
 
 
 }

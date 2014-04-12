@@ -126,18 +126,25 @@ public class LOBlock : Levelobject {
 		if(placedOnGrid){
 
 			if(Constructing){
-				ConstrPercent += ConstrTime * Time.deltaTime;
+
+				//ConstrPercent += ConstrTime * Time.deltaTime;
+                //konstrukcijas procentus inkrementee workUnit skriptaa
+
 				if(ConstrPercent > 100){
 					ConstrPercent = 100;
 					Constructing = false;
 					setWorkingStatus(WantWorking,true); //ieszleedz iekshaa (ja vien speeleetaajs nav paguvis buuveesahnas laikaa izsleegt aaraa)
 					blockinfos["percent"].renderer.enabled = false;
+                    workManagerScript.RemoveAllConstructionJobsForThisBlock(this); //buuveeshana pabeigta, jaaizniicina darbinsh
 				}
 			}
 
 			if(Destructing){
-				ConstrPercent -= DestrTime * Time.deltaTime;
+				//ConstrPercent -= DestrTime * Time.deltaTime;
+                //konstrukcijas procentus inkrementee workUnit skriptaa
+
 				if(ConstrPercent <= 0){
+                    workManagerScript.RemoveAllConstructionJobsForThisBlock(this); //nojaukshana pabeigta, jaaizniicina darbinsh
 					Destroy(transform.gameObject); //aizvaac sho kluciiti no liimenja
 					//Destructing = false;
                     levelscript.CalculateNavgrid(); //lieku liimenim paarreekjinaat visus ejamos celjus, jo ir izmainjas
@@ -234,8 +241,22 @@ public class LOBlock : Levelobject {
 				}
 
 			}
+    
 
-            
+            /**
+             * ielaadeets puspabeigts vai tikko nopirkts
+             * izveido celtnieciibas darbinju
+             * to buus jaaizvaac, kad pabeigs
+             */ 
+            if(Constructing){ 
+                workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Construction );
+            }
+            //tas pats ar nost jaukshanu
+            if(Destructing){ 
+                workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Destruction );
+            }
+
+         
             //prefabaa defineetos darbinjus ieliek kopeejaa sarakstaa
             foreach(WorkUnit w in workUnits){
                 workManagerScript.AddWork(w);
@@ -252,7 +273,7 @@ public class LOBlock : Levelobject {
 
 	public override void RemovedFromGrid(){
 
-	
+        workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Destruction );
 		setWorkingStatus(false,true);//jaaizsleedz pirms aizvaakshanas, lai var atskaitiit savus resursus no globaalaa kopuma
 		Destructing = true; //saakam jaukt nost
 		Constructing = false; //paarstaaj celt, ja veel nebija pabeidzis

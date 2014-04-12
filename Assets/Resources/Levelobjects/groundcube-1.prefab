@@ -158,7 +158,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ConstrTime: 0
-  DestrTime: 0
+  DestrTime: 10
   Price: 5
   Constructing: 0
   Destructing: 0

@@ -698,8 +698,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6e38c5cbd0aefa428a45e31a66b95fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConstrTime: 2
-  DestrTime: 2
+  ConstrTime: 20
+  DestrTime: 20
   Price: 35
   Constructing: 0
   Destructing: 0
@@ -716,9 +716,8 @@ MonoBehaviour:
   workUnits:
   - parentGameobject: {fileID: 100024}
     parentLevelobject: {fileID: 0}
-    on: 0
-    positions: 1
-    WorkUnitTypeNumber: 1
+    agentWorkingOn: {fileID: 0}
+    WorkUnitTypeNumber: 10
   resourceInitInfo:
     GenerationAir: 0
     GenerationElectricity: 0
@@ -730,7 +729,7 @@ MonoBehaviour:
     AgentNeedsSleep: 0
   Working: 0
   WantWorking: 0
-  DEBUG_ME: 0
+  DEBUG_ME: 1
   AgentNeedsGeneration: []
 --- !u!136 &13600000
 CapsuleCollider:

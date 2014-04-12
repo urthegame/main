@@ -151,12 +151,12 @@ public class Agent : MonoBehaviour {
 
         //parastie teereeshanas aatrumi katram resursam
         float[] consumption = new float[AgentNeeds.numTypes];
-        consumption[(int)AgentNeeds.Types.Water] = 1;
-        consumption[(int)AgentNeeds.Types.Sleep] = 1;
+        consumption[(int)AgentNeeds.Types.Water] = 0.1f;
+        consumption[(int)AgentNeeds.Types.Sleep] = 0.1f;
 
         if(CurrentState == AgentStates.traveling) { //ja agjents staigaa, tad teeree aatraak
-            consumption[(int)AgentNeeds.Types.Water] = 2;
-            consumption[(int)AgentNeeds.Types.Sleep] = 2;
+            consumption[(int)AgentNeeds.Types.Water] = 0.2f;
+            consumption[(int)AgentNeeds.Types.Sleep] = 0.2f;
         }
 
 
@@ -292,6 +292,11 @@ public class Agent : MonoBehaviour {
             //print("STATE:choosingWorkDestination ");
 
             workUnit = workManagerScript.GetWork();
+            if(workUnit == null){ //nav neviena briiva darbinja
+                CurrentState = AgentStates.idling;
+                break;
+            }
+
             room = workUnit.parentLevelobject; //darbinja parametrs - kurai telpai vinsh pieder
             if(room != null){  //jaaiet uz atrasto telpu
                 Vector2 rc = levelscript.randomCubeInThisRoom(room); //randomcube - nejaushss kubiks atrastajaa telpaa
@@ -443,7 +448,13 @@ public class Agent : MonoBehaviour {
             //---------------------------------------------------------------
         case AgentStates.working:
 
-            if(!workUnit.on){ //darbinsh tiek izsleegts
+
+
+          
+
+
+
+            if(!workUnit.IsOn()){ //darbinsh tiek izsleegts
                 CurrentState = AgentStates.idling;
                 avatarAnimator.SetBool("working", false); 
                 workUnit.ReserveWork(false); //padara darbinju pieejamu citiem
@@ -452,6 +463,7 @@ public class Agent : MonoBehaviour {
 
 
             workingFor -= Time.deltaTime;
+            workUnit.DoSomeActualMotherFlippingJob();
 
 
             if(workingFor < 0){ //buus gana straadaats
@@ -461,7 +473,7 @@ public class Agent : MonoBehaviour {
                 break;
             }
 
-
+            //visa magjija un progress notiek workunit skriptaa
 
 
             break;

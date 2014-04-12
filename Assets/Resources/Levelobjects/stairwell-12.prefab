@@ -675,8 +675,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6e38c5cbd0aefa428a45e31a66b95fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConstrTime: 2
-  DestrTime: 2
+  ConstrTime: 15
+  DestrTime: 15
   Price: 30
   Constructing: 0
   Destructing: 0
@@ -690,6 +690,7 @@ MonoBehaviour:
   OffsetY: 0
   waypoints:
     passableDirections: 0b0000000e000000
+  workUnits: []
   resourceInitInfo:
     GenerationAir: 0
     GenerationElectricity: 0
