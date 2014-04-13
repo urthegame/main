@@ -130,7 +130,7 @@ public class LOBlock : Levelobject {
 				//ConstrPercent += ConstrTime * Time.deltaTime;
                 //konstrukcijas procentus inkrementee workUnit skriptaa
 
-				if(ConstrPercent > 100){
+				if(ConstrPercent >= 100){
 					ConstrPercent = 100;
 					Constructing = false;
 					setWorkingStatus(WantWorking,true); //ieszleedz iekshaa (ja vien speeleetaajs nav paguvis buuveesahnas laikaa izsleegt aaraa)
@@ -248,12 +248,27 @@ public class LOBlock : Levelobject {
              * izveido celtnieciibas darbinju
              * to buus jaaizvaac, kad pabeigs
              */ 
+
+
             if(Constructing){ 
-                workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Construction );
+                if(ConstrTime == 0){ //momentaa buuveejamaas telpas
+                    //darbinju neveido
+                    ConstrPercent = 100; //100 procenti, taatad naakamajaa UPDATE funkchaa konstrukcija tiks finalizeeta
+                } else {
+                   
+                    workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Construction );
+                }
             }
+
             //tas pats ar nost jaukshanu
             if(Destructing){ 
-                workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Destruction );
+
+                if(ConstrTime == 0){
+                    ConstrPercent = 0;
+                } else {
+                    workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Destruction );
+                }
+
             }
 
          

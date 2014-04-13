@@ -2,7 +2,8 @@
 air-gen-11 1 -4 0 True False False 100
 corridor-31 2 -5 0 True False False 100
 electr-gen-22 2.5 -3.5 0 True False False 100
-stairwell-12 0 -4.5 0 True False True 95
+groundcube-1 4 -5 0 True False False 100
+stairwell-12 0 -4.5 0 True False False 100
 water-gen-12 4 -3.5 0 True False False 100
 agents
-Avatar 0 -5 0 0.1304881 0.2758879 0.1902786 1.898685 12.82922 98.44169 98.75202
+Avatar 0 -5 0 0.1304881 0.2758879 0.1902786 1.898685 12.82922 98.02714 98.33747

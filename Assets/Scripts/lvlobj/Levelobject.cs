@@ -26,7 +26,8 @@ public abstract class Levelobject : MonoBehaviour {
 	//shii kluciisha praktiskaa funkcija:
 	public enum FuncTypes {
 		block, //noliekams bloks
-		util //nenoliekams bloks, info prasiitaajs, aaraa dzeeseejs vai kas cits
+		util, //nenoliekams bloks, info prasiitaajs, aaraa dzeeseejs vai kas cits
+        ground, //ambience
 	}
 
 
@@ -65,16 +66,16 @@ public abstract class Levelobject : MonoBehaviour {
 		}
 
 
-		if(ConstrTime <= 0){ //negatiivs laiks buutu bezjeedziige, bet nulle vispaar visu kosmosu salauztu
-			ConstrTime = 0.001f;
+		if(ConstrTime > 0){ 
+            ConstrTime = 60 / ConstrTime; //lai buuveeshanas ilgums buutu sekundees (lai var reizinaat ar delta_time)
 		}
-		ConstrTime = 60 / ConstrTime; //lai buuveeshanas ilgums buutu sekundees (lai var reizinaat ar delta_time)
 		
 		
-		if(DestrTime <= 0){ 
-			DestrTime = 0.001f;
+		
+		if(DestrTime > 0){ 
+            DestrTime = 60 / DestrTime;	
 		}
-		DestrTime = 60 / DestrTime;
+		
 
 
 		
