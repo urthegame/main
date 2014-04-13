@@ -386,6 +386,7 @@ public class Level : MonoBehaviour {
                 levelobject.gameObject.layer = 9; //levelobjektu leijeris
                 
                 script.PlaceOnGrid(1); //zinjoju blokam, ka tas novietots speeles laukumaa
+                script.ConstrPercent = 100; //haks - pasaku, ka gatavs
 
             }
         }

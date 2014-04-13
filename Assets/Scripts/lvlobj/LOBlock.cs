@@ -234,7 +234,6 @@ public class LOBlock : Levelobject {
 			if(mode == 0){ //nulltais rezhiims - speeleetaajs manuaali uzliek levelobjektu
 				Constructing = true; //saak buuveeshanu 
 
-
 			} else { //levelobjekts tiek likts ielaadeejot seivgemu
 
 				if(!Constructing && !Destructing){
@@ -256,7 +255,6 @@ public class LOBlock : Levelobject {
                     //darbinju neveido
                     ConstrPercent = 100; //100 procenti, taatad naakamajaa UPDATE funkchaa konstrukcija tiks finalizeeta
                 } else {
-                   
                     workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Construction );
                 }
             }
@@ -264,8 +262,8 @@ public class LOBlock : Levelobject {
             //tas pats ar nost jaukshanu
             if(Destructing){ 
 
-                if(ConstrTime == 0){
-                    ConstrPercent = 0;
+                if(DestrTime == 0){
+                    DestrTime = 0;
                 } else {
                     workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Destruction );
                 }
@@ -277,15 +275,17 @@ public class LOBlock : Levelobject {
                 workManagerScript.AddWork(w);
             }
 
-
-
+            
+			updateBlockInfo();
             if(FuncType == FuncTypes.ground){//zemiites blokiem aizvaac GUI, tiem viss ir 0 un tikai lieki aizpilda ekraanu
-                blockinfo.transform.position = new Vector3 (0,0,-9999); //tikai pasleepju
+                foreach(KeyValuePair<string, TextMesh> bInfo in blockinfos) {
+                    if(bInfo.Key != "percent") { //procentinjus man vajag, paareejie - tiek pasleepti
+                        bInfo.Value.transform.position = new Vector3(0,0,-99999); //nevis izsleedzu bet aizstumju taalu prom - jo dazhaas vietaas tie tiek iesleegti/izsleegti
+                    }
+                }
+
             }
 
-
-
-			updateBlockInfo();
 			placedOnGrid = true;
 
 
@@ -295,7 +295,16 @@ public class LOBlock : Levelobject {
 
 	public override void RemovedFromGrid(){
 
-        workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Destruction );
+
+        if(DestrTime == 0){
+            ConstrPercent = 0; // ja konstrukcijas laiks ir nulle, tad uzsit 0 procentuis (naakamais UPDATE finalizees un aizvaaks sho kluciiti)
+        } else {
+            //ja ir konstrukcijas laiks, tad jaaveido darbinsh
+            workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Destruction );
+        }
+
+
+
 		setWorkingStatus(false,true);//jaaizsleedz pirms aizvaakshanas, lai var atskaitiit savus resursus no globaalaa kopuma
 		Destructing = true; //saakam jaukt nost
 		Constructing = false; //paarstaaj celt, ja veel nebija pabeidzis
@@ -490,7 +499,6 @@ public class LOBlock : Levelobject {
 		}
 		
 		
-
 		//paarsleedz ikoninjas
 		blockinfos["off"].renderer.enabled = !Working;
 		blockinfos["on"].renderer.enabled = Working;
