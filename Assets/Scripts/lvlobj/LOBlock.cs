@@ -158,6 +158,7 @@ public class LOBlock : Levelobject {
 				everyOtherFrameCounter = 0;
 			}
 		}
+
 		
 	}
 	
@@ -270,14 +271,20 @@ public class LOBlock : Levelobject {
                 }
 
             }
-
          
             //prefabaa defineetos darbinjus ieliek kopeejaa sarakstaa
             foreach(WorkUnit w in workUnits){
                 workManagerScript.AddWork(w);
             }
 
-            
+
+
+            if(FuncType == FuncTypes.ground){//zemiites blokiem aizvaac GUI, tiem viss ir 0 un tikai lieki aizpilda ekraanu
+                blockinfo.transform.position = new Vector3 (0,0,-9999); //tikai pasleepju
+            }
+
+
+
 			updateBlockInfo();
 			placedOnGrid = true;
 
@@ -483,6 +490,7 @@ public class LOBlock : Levelobject {
 		}
 		
 		
+
 		//paarsleedz ikoninjas
 		blockinfos["off"].renderer.enabled = !Working;
 		blockinfos["on"].renderer.enabled = Working;

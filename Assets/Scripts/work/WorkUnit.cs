@@ -82,7 +82,7 @@ public class WorkUnit {
 
             break;
         case WorkUnitTypes._Destruction:
-            parentLevelobject.ConstrPercent -= parentLevelobject.ConstrTime * Time.deltaTime;
+            parentLevelobject.ConstrPercent -= parentLevelobject.DestrTime * Time.deltaTime;
             
             break;
         case WorkUnitTypes.ManualLabor:

@@ -385,7 +385,7 @@ public class Level : MonoBehaviour {
                 numLevelobjects++;
                 levelobject.gameObject.layer = 9; //levelobjektu leijeris
                 
-                script.PlaceOnGrid(0); //zinjoju blokam, ka tas novietots speeles laukumaa
+                script.PlaceOnGrid(1); //zinjoju blokam, ka tas novietots speeles laukumaa
 
             }
         }
@@ -601,8 +601,8 @@ public class Level : MonoBehaviour {
 
 
 
-        print("navgrid updated; " + Navgrid.Count + " nodes");
-        print("telpas paarskaititas, ir " + ListOfRooms.Count); 
+//        print("navgrid updated; " + Navgrid.Count + " nodes");
+//        print("telpas paarskaititas, ir " + ListOfRooms.Count); 
 
 
     }
@@ -785,7 +785,7 @@ public class Level : MonoBehaviour {
             if(el.x == thislist[i].x && el.y == thislist[i].y) {
                 return true;
             }
-        } 
+        }
         return false;
         
     }
