@@ -25,6 +25,7 @@ public class Level : MonoBehaviour {
     private Gui guiscript; //vieniigais/globalais GUI skripts
     private GlobalResources gResScript; //globaalo resursu pieskatiitaaajs, arii singltons :P
     private WorkManager workManagerScript;//singltons 
+    private Dictionary<Vector4, List<Vector2>> pathCache = new Dictionary<Vector4, List<Vector2>>(); //piekeshos katru atrasto celju, notiiriis paarziimeejot navgridu
 
     private Vector3 lastPos;
     public bool objectInPlacer = false; //pleiseris ir konteineris, ko biida apkaart ar peli - priekshskatiijuma versija
@@ -457,7 +458,7 @@ public class Level : MonoBehaviour {
 
     public void CalculateNavgrid() {
 
-
+        pathCache = new Dictionary<Vector4, List<Vector2>>(); //noreseto atrsto celju keshu
         Navgrid = new Dictionary<Vector4, float>(); //noreseto
         ListOfRooms = new List<LOBlock>();//pie viena ieguus aktuaalaako levelobjektu sarakstu 
 
@@ -660,7 +661,7 @@ public class Level : MonoBehaviour {
      * te buutu jaapiekesho visi atrastie celji un jaanotiira keshss ikreiz paarbuuveejot navgridu
      */ 
     public List<Vector2> FindPath(int sx, int sy, int fx, int fy) {
-        int iter = 0;        
+            
       
         //grafa virsotnes ir Vector4 - virsotnes X poziicija, Y poziicija, ATTAALUMS lidz meerkjim (no siis pozziicijas) + attalums no shiis poz. liidz startam, ATTAALUMS liidz startam (t.s. G-score)
         //lietoju parastu listi un sorteeju [kad vajag] peec Vector4 z komponentes
@@ -675,6 +676,12 @@ public class Level : MonoBehaviour {
             //print("nav uz grida!   " + loop);
         }
    
+        Vector4 pathID = new Vector4(sx, sy, fx, fy); // unikaals celja identifikators 
+        if(pathCache.ContainsKey(pathID)){
+            return pathCache[pathID]; //bija keshaa
+        }
+
+        int iter = 0;    
 
 
         
@@ -728,6 +735,8 @@ public class Level : MonoBehaviour {
                 //  print ("A* iistais celjs sastaav no " + realRoute.Count +  " punktiem" );
                 
                 //for (int i = 0; i < realRoute.Count; i++) { print ("A* RealRoute " + realRoute [i].x + "," + realRoute [i].y);}
+
+                pathCache.Add(pathID,realRoute); //piekesho
                 return realRoute;
                 
             }
@@ -805,6 +814,7 @@ public class Level : MonoBehaviour {
                 
                 if(iter++ > 5000) {
                     print("A*  nu jau buus gana");
+                    pathCache.Add(pathID,new List<Vector2>()); //piekesho arii sho neatrasto celju
                     return new List<Vector2>();
                 }
                 
@@ -813,6 +823,7 @@ public class Level : MonoBehaviour {
         }
         // print ("A*  Hmm, neatrada");
         
+        pathCache.Add(pathID,new List<Vector2>()); //piekesho arii sho neatrasto celju
         return new List<Vector2>();
         
     }
