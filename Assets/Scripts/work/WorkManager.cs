@@ -13,6 +13,9 @@ public class WorkManager : MonoBehaviour {
 
 
 
+    public void Init(){
+        worklist = new List<WorkUnit>();
+    }
 
 
     /**

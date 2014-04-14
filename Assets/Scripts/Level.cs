@@ -254,6 +254,7 @@ public class Level : MonoBehaviour {
         numLevelobjects = 0;
         gResScript.Init();
         guiscript.Init();
+        workManagerScript.Init();
 
 
         string[] lvlLines = System.IO.File.ReadAllLines("Levels/" + levelname + ".lvl");
@@ -469,9 +470,13 @@ public class Level : MonoBehaviour {
         for(int i = 0; i< levelObjectHolder.transform.childCount; i++) { //ikviens levelobjekts liimenii
             Levelobject lo = levelObjectHolder.transform.GetChild(i).GetComponent<Levelobject>();
             if(lo is LOBlock) { //vai levelobjekts ir levelbloks                
-                if( lo.ConstrPercent < 5 && lo.Destructing) { 
+                if( lo.ConstrPercent < 5 &&  lo.Destructing) { 
                     continue; // skipo geimobjektus, kas tiek jaukti nost (kad gandriiz jau nojaukts)
                 }
+                /*
+                if( lo.ConstrPercent < 50 && lo.Constructing) { 
+                    continue; 
+                } */
                 LOBlock room = (LOBlock)lo;
                 ListOfRooms.Add(room);
                 float x = room.transform.position.x - (room.SizeX * 0.5f) + 0.5f; //atnjemu istabas izmeerus - t.i. xy moraada uz istabas apaksheejo kreiso kubicinju 

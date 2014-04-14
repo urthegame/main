@@ -320,10 +320,21 @@ public class Agent : MonoBehaviour {
                                     potentialJobs.Add(w);
                                     workingRemotely = true;
                                     remoteWork = new Vector2(destX+w.parentLevelobject.SizeX,destY); //neis uz nepiejamo kluciiti, bet straadaas no shiis poziiicijas
+
                                 } else if(levelscript.FindPath(currX,currY,destX-1,destY).Count > 0){  //kreisaa puse - x-1
                                     potentialJobs.Add(w);
                                     workingRemotely = true;
                                     remoteWork = new Vector2(destX-1,destY);
+
+                                }  else if(levelscript.FindPath(currX,currY,destX,destY-w.parentLevelobject.SizeY).Count > 0){  //augsha
+                                    potentialJobs.Add(w);
+                                    workingRemotely = true;
+                                    remoteWork = new Vector2(destX,destY-w.parentLevelobject.SizeY);
+
+                                } else if(levelscript.FindPath(currX,currY,destX,destY+1).Count > 0){  //apaksha
+                                    potentialJobs.Add(w);
+                                    workingRemotely = true;
+                                    remoteWork = new Vector2(destX,destY+1);
                                 }
 
 
@@ -397,7 +408,7 @@ public class Agent : MonoBehaviour {
             }
 
             if(levelscript.Navgrid.Count > 0){ //ja ir navgridaa punkti, kur mukt
-                print ("provees tikt uz celja");
+                //print ("provees tikt uz celja");
                 Vector2 closestPoint = new Vector2(0,0);
                 float closestDistance = -1;
                 float x = transform.position.x;

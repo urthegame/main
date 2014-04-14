@@ -296,6 +296,8 @@ public class LOBlock : Levelobject {
 	public override void RemovedFromGrid(){
 
 
+        workManagerScript.RemoveAllConstructionJobsForThisBlock(this); //jaapaartrauc visi celtnieciibas darbi, if-any
+
         if(DestrTime == 0){
             ConstrPercent = 0; // ja konstrukcijas laiks ir nulle, tad uzsit 0 procentuis (naakamais UPDATE finalizees un aizvaaks sho kluciiti)
         } else {
