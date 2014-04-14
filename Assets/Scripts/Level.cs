@@ -462,6 +462,10 @@ public class Level : MonoBehaviour {
 
         Dictionary<Vector2,int> directionsInCubes = new Dictionary<Vector2, int>(); //ikvienam blokam (x,y ) liimeenii, kam vinja prefabaa ir noraaditi iespeejamie virzieni (Waypoints.dirs), tiek ielikti te
 
+
+        /**
+         * A) vispirms noskaidroju kuri kubiki iejami un tiks izmantoti paathfaindingaa, vinju virzieni tiek salikti datu struktuuraa
+         */
         for(int i = 0; i< levelObjectHolder.transform.childCount; i++) { //ikviens levelobjekts liimenii
             Levelobject lo = levelObjectHolder.transform.GetChild(i).GetComponent<Levelobject>();
             if(lo is LOBlock) { //vai levelobjekts ir levelbloks                
@@ -478,7 +482,6 @@ public class Level : MonoBehaviour {
                     continue; //prefaba nav noraadiiti iespeejamie virzieni visiem kubikiem, skipojam shaadu
                 }
 
-                // AAAAA) vispirms noskaidroju kuri kubiki iejami un tiks izmantoti paathfaindingaa, vinju virzieni tiek salikti datu struktuuraa
                 int currentCube = 0;
                 for(int b=0; b<room.SizeY; b++) {//ikviens kubiks istabaa | apskata visus kubikus telpaa no kreisaas uz labo, no apakshas uz augshu
                     for(int a=0; a<room.SizeX; a++) { 
@@ -494,8 +497,39 @@ public class Level : MonoBehaviour {
             }
         }
 
-      
+        /**
+         * A+) visi levelobjekti ir apskatiiti, tagad skatiishos aarpusee - ejami ir arii tie kubiki, kas ir tukshi un zem kuriem atrodas levelobjekts - taatad ejama ir arii tukshas alaas
+         */
+        for(int x = limits.XA; x< limits.XB; x++) {
+            for(int y = limits.YA; y< limits.YB; y++) {
+           
+                if(roomAtThisPosition(x,y) == null && roomAtThisPosition(x,y-1) != null){ //shis kubiks tukshs, apakshaa nav tukshs
 
+                    Vector2 pos = new Vector2(x,y); //taatad shis kubiks ir ejams
+                    if(!directionsInCubes.ContainsKey(pos)) { 
+                        directionsInCubes.Add(pos, (int)Waypoints.dirs.lr); // L<->R kustiiba
+                        print("L<->R " + pos);
+                    }
+
+                }
+
+            }
+        }
+
+
+      
+        /**
+         * B) zinot, kuri kubiki ir atveerti satiksmei, varu salikt patiesaas celja maksas (galvenais vai vispaar no a uz b var aiziet)
+         */
+        foreach(KeyValuePair<Vector2,int> cube in directionsInCubes) { 
+            float x = cube.Key.x;
+            float y = cube.Key.y;
+            int directionsInThisCube = cube.Value; //   (int) Waypoints.dirs
+            if(directionsInThisCube == 0){ //shis kubiks nezkapee ir ierakstiits, lai gan tajaa nav atljauta kustiiba
+                continue;
+            }
+
+            /*
         foreach(LOBlock room in ListOfRooms) {
                 
             float x = room.transform.position.x - (room.SizeX * 0.5f) + 0.5f;
@@ -505,95 +539,95 @@ public class Level : MonoBehaviour {
             if(numCubes != room.SizeX * room.SizeY) {
                 continue; 
             }
+        */
+
         
-            // BBBB) zinot, kuri kubiki ir atveerti satiksmei, varu salikt patiesaas celja maksas (galvenais vai vispaar no a uz b var aiziet)
+           // int currentCube = 0;
+          //  for(int b=0; b<room.SizeY; b++) {
+            //    for(int a=0; a<room.SizeX; a++) {
         
-            int currentCube = 0;
-            for(int b=0; b<room.SizeY; b++) {
-                for(int a=0; a<room.SizeX; a++) { 
-                
-                    bool cubeIsPassable = false;
+            bool cubeIsPassable = false;
 
-                    int directionsInThisCube = (int)room.waypoints.passableDirections[currentCube++]; //taipkaastoju enumu uz intu | kaa aii uzzinu kaados virzienos shajaa kubikaa var paarvietoties 
-                    //Vector3 o = new Vector3(x+a,y+b,-1);
-                
-                    if((directionsInThisCube & (int)Waypoints.dirs.t) == (int)Waypoints.dirs.t) { // shis klucis ljauj iet augshup ... 
-                        int neighborDirs;
-                        if(directionsInCubes.TryGetValue(new Vector2(Mathf.RoundToInt(x + a), Mathf.RoundToInt(y + b + 1)), out neighborDirs)) { // ... bet vai augshaa ir klucis
-                            if((neighborDirs & (int)Waypoints.dirs.b) == (int)Waypoints.dirs.b) { // ... ,kursh ljauj iet lejup
-                                //Debug.DrawLine(o,new Vector3(x+a+0.03f,y+b+0.5f,-1),Color.green); 
-                                Vector4 path = new Vector4(Mathf.RoundToInt(x + a), Mathf.RoundToInt(y + b), Mathf.RoundToInt(x + a), Mathf.RoundToInt(y + b + 1));//vienaa vector4 tiek ielikti 1 punkta xy un otraa punkta xy
-                                if(!Navgrid.ContainsKey(path)) {
-                                    Navgrid.Add(path, 1f); 
-                                }
-
-                            }
-                            //Debug.DrawLine(o,new Vector3(x+a+0.02f,y+b+0.4f,-1),Color.yellow); //
+            //int directionsInThisCube = (int)room.waypoints.passableDirections[currentCube++]; //taipkaastoju enumu uz intu | kaa aii uzzinu kaados virzienos shajaa kubikaa var paarvietoties 
+            //Vector3 o = new Vector3(x+a,y+b,-1);
+        
+            if((directionsInThisCube & (int)Waypoints.dirs.t) == (int)Waypoints.dirs.t) { // shis klucis ljauj iet augshup ... 
+                int neighborDirs;
+                if(directionsInCubes.TryGetValue(new Vector2(Mathf.RoundToInt(x), Mathf.RoundToInt(y + 1)), out neighborDirs)) { // ... bet vai augshaa ir klucis
+                    if((neighborDirs & (int)Waypoints.dirs.b) == (int)Waypoints.dirs.b) { // ... ,kursh ljauj iet lejup
+                        //Debug.DrawLine(o,new Vector3(x+a+0.03f,y+b+0.5f,-1),Color.green); 
+                        Vector4 path = new Vector4(Mathf.RoundToInt(x), Mathf.RoundToInt(y), Mathf.RoundToInt(x), Mathf.RoundToInt(y + 1));//vienaa vector4 tiek ielikti 1 punkta xy un otraa punkta xy
+                        if(!Navgrid.ContainsKey(path)) {
+                            Navgrid.Add(path, 1f); 
                         }
-                        //Debug.DrawLine(o,new Vector3(x+a+0.01f,y+b+0.3f,-1),Color.red);
-                        cubeIsPassable = true;
+
                     }
-                    if((directionsInThisCube & (int)Waypoints.dirs.l) == (int)Waypoints.dirs.l) {  //shis klucis ljauj iet pa kreisi ... 
-                        int neighborDirs;
-                        if(directionsInCubes.TryGetValue(new Vector2(Mathf.RoundToInt(x + a - 1), Mathf.RoundToInt(y + b)), out neighborDirs)) { // ... bet vai pa kreisi ir klucis
-                            if((neighborDirs & (int)Waypoints.dirs.r) == (int)Waypoints.dirs.r) { // ... ,kursh ljauj iet pa labi
-                                //Debug.DrawLine(o,new Vector3(x+a-0.5f,y+b+0.03f,-1),Color.green); 
-                                Vector4 path = new Vector4(Mathf.RoundToInt(x + a), Mathf.RoundToInt(y + b), Mathf.RoundToInt(x + a - 1), Mathf.RoundToInt(y + b));
-                                if(!Navgrid.ContainsKey(path)) {
-                                    Navgrid.Add(path, 1f); 
-                                }
-                            }
-                            //Debug.DrawLine(o,new Vector3(x+a-0.4f,y+b+0.02f,-1),Color.yellow); //
-                        }
-                        //Debug.DrawLine(o,new Vector3(x+a-0.3f,y+b+0.01f,-1),Color.red);
-                        cubeIsPassable = true;
-                    }
-                    if((directionsInThisCube & (int)Waypoints.dirs.b) == (int)Waypoints.dirs.b) { //shis kluis ljauj iet lejup
-                        int neighborDirs;
-                        if(directionsInCubes.TryGetValue(new Vector2(Mathf.RoundToInt(x + a), Mathf.RoundToInt(y + b - 1)), out neighborDirs)) { // ... bet vai lejaa ir klucis
-                            if((neighborDirs & (int)Waypoints.dirs.t) == (int)Waypoints.dirs.t) { // ... ,kursh ljauj iet augshup
-                                //Debug.DrawLine(o,new Vector3(x+a+0.03f,y+b-0.5f,-1),Color.green); 
-                                Vector4 path = new Vector4(Mathf.RoundToInt(x + a), Mathf.RoundToInt(y + b), Mathf.RoundToInt(x + a), Mathf.RoundToInt(y + b - 1));
-                                if(!Navgrid.ContainsKey(path)) {
-                                    Navgrid.Add(path, 1f); 
-                                }
-
-                            }
-                            //Debug.DrawLine(o,new Vector3(x+a+0.02f,y+b-0.4f,-1),Color.yellow); //
-                        }
-                        //Debug.DrawLine(o,new Vector3(x+a+0.01f,y+b-0.3f,-1),Color.red);
-                        cubeIsPassable = true;
-                    }
-                    if((directionsInThisCube & (int)Waypoints.dirs.r) == (int)Waypoints.dirs.r) { // klucis ljuaj iet pa labi
-                        int neighborDirs;
-                        if(directionsInCubes.TryGetValue(new Vector2(Mathf.RoundToInt(x + a + 1), Mathf.RoundToInt(y + b)), out neighborDirs)) { 
-                            if((neighborDirs & (int)Waypoints.dirs.l) == (int)Waypoints.dirs.l) { 
-                                //Debug.DrawLine(o,new Vector3(x+a+0.5f,y+b+0.03f,-1),Color.green); 
-                                Vector4 path = new Vector4(Mathf.RoundToInt(x + a), Mathf.RoundToInt(y + b), Mathf.RoundToInt(x + a + 1), Mathf.RoundToInt(y + b));
-                                if(!Navgrid.ContainsKey(path)) {
-                                    Navgrid.Add(path, 1f); 
-                                }
-                            }
-                            //Debug.DrawLine(o,new Vector3(x+a+0.4f,y+b+0.02f,-1),Color.yellow); 
-                        }
-                        //Debug.DrawLine(o,new Vector3(x+a+0.3f,y+b+0.01f,-1),Color.red);
-                        cubeIsPassable = true;
-                    }
-                
-
-
-
-                    if(cubeIsPassable){
-                        //navgridaa, joka peec, ieliks celju no klucha uz sevi (tad varees zhigli uzzinaat, vai punkts eksistee navgridaaa)
-                        Vector4 loop = new Vector4(Mathf.RoundToInt(x + a), Mathf.RoundToInt(y + b), Mathf.RoundToInt(x + a), Mathf.RoundToInt(y + b));
-                        if(!Navgrid.ContainsKey(loop)) {
-                            Navgrid.Add(loop, 0f); 
-                        }
-                    }
-
-
-                }   
+                    //Debug.DrawLine(o,new Vector3(x+a+0.02f,y+b+0.4f,-1),Color.yellow); //
+                }
+                //Debug.DrawLine(o,new Vector3(x+a+0.01f,y+b+0.3f,-1),Color.red);
+                cubeIsPassable = true;
             }
+            if((directionsInThisCube & (int)Waypoints.dirs.l) == (int)Waypoints.dirs.l) {  //shis klucis ljauj iet pa kreisi ... 
+                int neighborDirs;
+                if(directionsInCubes.TryGetValue(new Vector2(Mathf.RoundToInt(x - 1), Mathf.RoundToInt(y)), out neighborDirs)) { // ... bet vai pa kreisi ir klucis
+                    if((neighborDirs & (int)Waypoints.dirs.r) == (int)Waypoints.dirs.r) { // ... ,kursh ljauj iet pa labi
+                        //Debug.DrawLine(o,new Vector3(x+a-0.5f,y+b+0.03f,-1),Color.green); 
+                        Vector4 path = new Vector4(Mathf.RoundToInt(x), Mathf.RoundToInt(y), Mathf.RoundToInt(x - 1), Mathf.RoundToInt(y));
+                        if(!Navgrid.ContainsKey(path)) {
+                            Navgrid.Add(path, 1f); 
+                        }
+                    }
+                    //Debug.DrawLine(o,new Vector3(x+a-0.4f,y+b+0.02f,-1),Color.yellow); //
+                }
+                //Debug.DrawLine(o,new Vector3(x+a-0.3f,y+b+0.01f,-1),Color.red);
+                cubeIsPassable = true;
+            }
+            if((directionsInThisCube & (int)Waypoints.dirs.b) == (int)Waypoints.dirs.b) { //shis kluis ljauj iet lejup
+                int neighborDirs;
+                if(directionsInCubes.TryGetValue(new Vector2(Mathf.RoundToInt(x), Mathf.RoundToInt(y - 1)), out neighborDirs)) { // ... bet vai lejaa ir klucis
+                    if((neighborDirs & (int)Waypoints.dirs.t) == (int)Waypoints.dirs.t) { // ... ,kursh ljauj iet augshup
+                        //Debug.DrawLine(o,new Vector3(x+a+0.03f,y+b-0.5f,-1),Color.green); 
+                        Vector4 path = new Vector4(Mathf.RoundToInt(x), Mathf.RoundToInt(y), Mathf.RoundToInt(x), Mathf.RoundToInt(y - 1));
+                        if(!Navgrid.ContainsKey(path)) {
+                            Navgrid.Add(path, 1f); 
+                        }
+
+                    }
+                    //Debug.DrawLine(o,new Vector3(x+a+0.02f,y+b-0.4f,-1),Color.yellow); //
+                }
+                //Debug.DrawLine(o,new Vector3(x+a+0.01f,y+b-0.3f,-1),Color.red);
+                cubeIsPassable = true;
+            }
+            if((directionsInThisCube & (int)Waypoints.dirs.r) == (int)Waypoints.dirs.r) { // klucis ljuaj iet pa labi
+                int neighborDirs;
+                if(directionsInCubes.TryGetValue(new Vector2(Mathf.RoundToInt(x + 1), Mathf.RoundToInt(y )), out neighborDirs)) { 
+                    if((neighborDirs & (int)Waypoints.dirs.l) == (int)Waypoints.dirs.l) { 
+                        //Debug.DrawLine(o,new Vector3(x+a+0.5f,y+b+0.03f,-1),Color.green); 
+                        Vector4 path = new Vector4(Mathf.RoundToInt(x), Mathf.RoundToInt(y ), Mathf.RoundToInt(x + 1), Mathf.RoundToInt(y));
+                        if(!Navgrid.ContainsKey(path)) {
+                            Navgrid.Add(path, 1f); 
+                        }
+                    }
+                    //Debug.DrawLine(o,new Vector3(x+a+0.4f,y+b+0.02f,-1),Color.yellow); 
+                }
+                //Debug.DrawLine(o,new Vector3(x+a+0.3f,y+b+0.01f,-1),Color.red);
+                cubeIsPassable = true;
+            }
+        
+
+
+
+            if(cubeIsPassable){
+                //navgridaa, joka peec, ieliks celju no klucha uz sevi (tad varees zhigli uzzinaat, vai punkts eksistee navgridaaa)
+                Vector4 loop = new Vector4(Mathf.RoundToInt(x), Mathf.RoundToInt(y), Mathf.RoundToInt(x), Mathf.RoundToInt(y));
+                if(!Navgrid.ContainsKey(loop)) {
+                    Navgrid.Add(loop, 0f); 
+                }
+            }
+
+
+               // }   
+           // }
         
         
         

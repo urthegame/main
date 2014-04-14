@@ -1,8 +1,8 @@
-935
-corridor-31 2 -5 0 True False False 100
-groundcube-1 0 -5 0 True False False 100
-groundcube-1 1 -4 0 True False False 100
-groundcube-flat-1 4 -5 0 True False False 100
-groundcube-flat-1 5 -5 0 True False False 100
+855
+corridor-11 2 -6 0 True False True 0
+corridor-31 6 -6 0 True False True 0
+groundcube-1 1 -6 0 True False False 100
+stairwell-12 7 -3.5 0 True False True 0
+stairwell-13 4 -3 0 True False True 0
+workshop-21 2.5 -4 0 True False True 0
 agents
-Avatar 3 -5 0 0.2351829 0.3088522 0.1775205 1.766223 12.42815 9946.06 4997.43
