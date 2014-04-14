@@ -508,7 +508,6 @@ public class Level : MonoBehaviour {
                     Vector2 pos = new Vector2(x,y); //taatad shis kubiks ir ejams
                     if(!directionsInCubes.ContainsKey(pos)) { 
                         directionsInCubes.Add(pos, (int)Waypoints.dirs.lr); // L<->R kustiiba
-                        print("L<->R " + pos);
                     }
 
                 }
@@ -651,6 +650,10 @@ public class Level : MonoBehaviour {
         }
     }
 
+
+    /**
+     * te buutu jaapiekesho visi atrastie celji un jaanotiira keshss ikreiz paarbuuveejot navgridu
+     */ 
     public List<Vector2> FindPath(int sx, int sy, int fx, int fy) {
         int iter = 0;        
       
@@ -903,6 +906,7 @@ public class Level : MonoBehaviour {
 
     /**
      * atgriezh abosluutaas XY koordinaates 1 nejausha bloka koordinaates, kursh ietilpst padotajaa telpaa
+     * nedod kubikus, kas nav navgridaa
      */ 
     public Vector2 randomCubeInThisRoom(LOBlock room) {
 

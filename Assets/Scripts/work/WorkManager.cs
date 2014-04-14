@@ -43,12 +43,14 @@ public class WorkManager : MonoBehaviour {
 
     }
 
+    //@deprecated -- paaraak cieshi integreets ar agjentu un ceja mekleeshanu, meklees darbinju agjenta FSMaa
     public WorkUnit GetWork() {
+
 
         /**
          * @todo -- atrast piemeerotaako darbu (nav veel prasmes un darba prasiibas)
          * @todo -- atrast tuvaako (dabuut listi ar deriigajiem darbiem un sakaartot peec attaaluma)
-         * @todo -- tikai darbus, kur ir briivas poziicijas
+         * tikai darbus, kur ir briivas poziicijas
          */ 
         foreach(WorkUnit w in worklist.OrderBy(a => System.Guid.NewGuid())) {
             if(w.IsOn() && w.agentWorkingOn == null) { 

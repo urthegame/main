@@ -19,7 +19,7 @@ public abstract class Levelobject : MonoBehaviour {
     public bool Constructing; //vai celj (nevis jauc nost)
     [HideInInspector]
     public bool Destructing; //vai tomeer jauc nost
-    [HideInInspector]
+    //[HideInInspector]
 	public float ConstrPercent;  //cik % uzcelts
 
 

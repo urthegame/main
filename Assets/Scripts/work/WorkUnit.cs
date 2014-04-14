@@ -78,11 +78,11 @@ public class WorkUnit {
         switch(WorkUnitTypeNumber) {
 
         case WorkUnitTypes._Construction:
-            parentLevelobject.ConstrPercent += parentLevelobject.ConstrTime * Time.deltaTime;
+            parentLevelobject.ConstrPercent += parentLevelobject.ConstrTime * Time.deltaTime * 5;
 
             break;
         case WorkUnitTypes._Destruction:
-            parentLevelobject.ConstrPercent -= parentLevelobject.DestrTime * Time.deltaTime;
+            parentLevelobject.ConstrPercent -= parentLevelobject.DestrTime * Time.deltaTime * 5;
             
             break;
         case WorkUnitTypes.ManualLabor:
