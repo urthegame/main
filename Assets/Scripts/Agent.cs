@@ -290,6 +290,42 @@ public class Agent : MonoBehaviour {
             //---------------------------------------------------------------
         case AgentStates.choosingWorkDestination:
             //print("STATE:choosingWorkDestination ");
+
+            workUnit = null;
+
+            try{
+                workUnit = workManagerScript.GetWork(this);
+                if(workUnit != null){
+
+                    
+                    if(GoThere(workUnit.BestPositionToStandWhileWorking.x, workUnit.BestPositionToStandWhileWorking.y) == -1){ // iet uz noraadiito darbavietu (ja -1 tad Agjents neatrodas uz grida, jaaiet sho glaabt)
+                        CurrentState = AgentStates.offTheGrid;
+                        break;
+                    }
+                    
+                    CurrentState = AgentStates.traveling;
+                    workUnit.ReserveWork(true,this);
+
+                 //   print("ir straadaashana " + workUnit + "  @" + workUnit.parentGameobject.transform + "  bestPOS " + workUnit.BestPositionToStandWhileWorking);
+
+                } else { //nav neviena briiva,pieejama darbinja
+                    CurrentState = AgentStates.idling;
+                    break;
+                }
+
+            } catch(System.Exception e) { // kjer pathfinding iznjeemumu, ka agjents nemaz neatrodas uz grida
+                if(e.Message == "not-on-a-grid"){
+                    CurrentState = AgentStates.offTheGrid; //agjents ies glaabties
+                }
+
+            }
+            
+        
+
+
+            break;
+
+            /*
             try{
                  
 
@@ -388,9 +424,10 @@ public class Agent : MonoBehaviour {
                 }
                 
                 
-            }
+            } 
 
             break;
+//*/
             //---------------------------------------------------------------
         case AgentStates.traveling:
             // print("STATE:traveling");

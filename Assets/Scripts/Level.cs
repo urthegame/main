@@ -915,32 +915,91 @@ public class Level : MonoBehaviour {
      */ 
     public Vector2 randomCubeInThisRoom(LOBlock room) {
 
-        Vector2 coords = new Vector2(room.transform.position.x, room.transform.position.y); //telpas saakumpunkts, to atgrieziis, ja nebuus nekaa praatiigaaka
                     
-        List<Vector2> accessableCubes = new List<Vector2>(); //te savaakshu visus kubikus telpaa, kas ir ejami (vinju XY lokaalajaas koordinaatees )
-
-        
-        int currentCube = 0;
-        for(int b=0; b<room.SizeY; b++) {
-            for(int a=0; a<room.SizeX; a++) {
-                    
-                int directionsInThisCube = (int)room.waypoints.passableDirections[currentCube++]; //taipkaastoju enumu uz intu | kaa aii uzzinu kaados virzienos shajaa kubikaa var paarvietoties 
-                if(directionsInThisCube > 0) { //shajaa kubikaa ir jebkaada veida ieshana (0 - pilniibaa nepieejams)
-                    accessableCubes.Add(new Vector2(Mathf.FloorToInt(a + coords.x), Mathf.FloorToInt(b + coords.y)));
-                    //    print ( "accessable cubes " + new Vector2(Mathf.FloorToInt( a +coords.x), Mathf.FloorToInt(b + coords.y) ));
-                }
-                    
-            }
-        }
-    
+        List<Vector2> accessableCubes = AllAccessableCubesInThisRoom(room); 
 
         if(accessableCubes.Count > 0) {
             return accessableCubes[Random.Range(0, accessableCubes.Count)]; //telpas saakumkoordinaateem pieskaita nejausha telpas bloka koordinaates 
 
         }
 
-        return coords;
+        return new Vector2(room.transform.position.x, room.transform.position.y); //telpas saakumpunkts;
 
+    }
+
+
+    /**
+     * 
+     */
+    public List<Vector2> AllAccessableCubesInThisRoom(LOBlock room, bool includeNeighbors = false){
+
+        List<Vector2> allCubes = new List<Vector2> ();
+        Vector2 coords = new Vector2(room.transform.position.x, room.transform.position.y); //telpas saakumpunkts
+       
+
+        for(int b=0; b<room.SizeY; b++) {
+            for(int a=0; a<room.SizeX; a++) {
+                
+                int localX = Mathf.FloorToInt(a + coords.x); //apskataamaa kubika koordinaates
+                int localY = Mathf.FloorToInt(b + coords.y);
+
+                if(Navgrid.ContainsKey(new Vector4(localX,localY,localX,localY))) { //vai navgridaa ir shis punkts x,y,x,y )
+                    allCubes.Add(new Vector2(localX,localY));
+                }
+
+            }
+        }
+
+
+        //+ visi robezhkubicinji (no diagonal chicks)
+        if(includeNeighbors){
+
+            for(int b=0; b<room.SizeY; b++) { //skatos no augshas uz leju
+
+                //kubiks pa kreisi
+                int localX = Mathf.FloorToInt(-1 + coords.x);
+                int localY = Mathf.FloorToInt(b + coords.y);                
+                if(Navgrid.ContainsKey(new Vector4(localX,localY,localX,localY))) {
+                    allCubes.Add(new Vector2(localX,localY));
+                }
+
+
+                //kubiks pa labi
+                localX = Mathf.FloorToInt(room.SizeX + coords.x);
+                localY = Mathf.FloorToInt(b + coords.y);                
+                if(Navgrid.ContainsKey(new Vector4(localX,localY,localX,localY))) {
+                    allCubes.Add(new Vector2(localX,localY));
+                }
+
+            }
+
+
+            for(int a=0; a<room.SizeX; a++) { //horizontaali
+                
+                //kubiks uz augshu
+                int localX = Mathf.FloorToInt(a + coords.x);
+                int localY = Mathf.FloorToInt(-1 + coords.y);                
+                if(Navgrid.ContainsKey(new Vector4(localX,localY,localX,localY))) {
+                    allCubes.Add(new Vector2(localX,localY));
+                }
+                
+
+                //kubiks uz leju
+                localX = Mathf.FloorToInt(a + coords.x);
+                localY = Mathf.FloorToInt(room.SizeY + coords.y);                
+                if(Navgrid.ContainsKey(new Vector4(localX,localY,localX,localY))) {
+                    allCubes.Add(new Vector2(localX,localY));
+                }
+                
+            }
+
+
+        }
+
+
+
+
+        return allCubes;
     }
 
 

@@ -19,8 +19,7 @@ public class WorkUnit {
 
     public GameObject parentGameobject; //te jaanoraada (prefabaa) objekts, kam pieder shis skripts
     [HideInInspector]
-    public LOBlock
-        parentLevelobject; //shii geimobjekta LOBlock komponente (ieguushu no "parentGameobject" )
+    public LOBlock parentLevelobject; //shii geimobjekta LOBlock komponente (ieguushu no "parentGameobject" )
 
     /**
      * vai darbinju var dariit
@@ -28,9 +27,9 @@ public class WorkUnit {
      */ 
     private bool on;
     [HideInInspector]
-    public Agent
-        agentWorkingOn; //kursh agjents pashlaik straada sho darbinju
-
+    public Agent agentWorkingOn; //kursh agjents pashlaik straada sho darbinju
+    [HideInInspector]
+    public Vector2 BestPositionToStandWhileWorking = new Vector2(); //pozciicija liimeni, kur jaaatrodas straadaajot, tiks uzsista, atrodot darbinju agjentam
 
 
     /**
@@ -78,11 +77,11 @@ public class WorkUnit {
         switch(WorkUnitTypeNumber) {
 
         case WorkUnitTypes._Construction:
-            parentLevelobject.ConstrPercent += parentLevelobject.ConstrTime * Time.deltaTime * 5;
+            parentLevelobject.ConstrPercent += parentLevelobject.ConstrTime * Time.deltaTime * 2.5f;
 
             break;
         case WorkUnitTypes._Destruction:
-            parentLevelobject.ConstrPercent -= parentLevelobject.DestrTime * Time.deltaTime * 5;
+            parentLevelobject.ConstrPercent -= parentLevelobject.DestrTime * Time.deltaTime * 25f;
             
             break;
         case WorkUnitTypes.ManualLabor:

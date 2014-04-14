@@ -11,7 +11,13 @@ public class WorkManager : MonoBehaviour {
     public List<WorkUnit> worklist = new List<WorkUnit>(); //visu aktuvaalo pieejamo darbinju saraksts
     public bool workAvailable;
 
+    private Level levelscript;
 
+
+
+    public void Awake(){
+        levelscript = GameObject.Find("Level").GetComponent<Level>();
+    }
 
     public void Init(){
         worklist = new List<WorkUnit>();
@@ -46,22 +52,58 @@ public class WorkManager : MonoBehaviour {
 
     }
 
-    //@deprecated -- paaraak cieshi integreets ar agjentu un ceja mekleeshanu, meklees darbinju agjenta FSMaa
-    public WorkUnit GetWork() {
+
+    /**
+     * atradiis nejaushu darbinju, kas der padotajam agjentam (pagaodaam tikai peec taa vai agjent var vai envar piekljuut) 
+     * atgrieziis darbinju un vietu, kur dariit sho darbinju 
+     */ 
+    public WorkUnit GetWork(Agent agent) {
 
 
-        /**
-         * @todo -- atrast piemeerotaako darbu (nav veel prasmes un darba prasiibas)
-         * @todo -- atrast tuvaako (dabuut listi ar deriigajiem darbiem un sakaartot peec attaaluma)
-         * tikai darbus, kur ir briivas poziicijas
-         */ 
+        List<WorkUnit> potentialJobs = new List<WorkUnit>();
+
+        //dabuu listi ar iesleegtiem/neaiznjemtiem darbiem
         foreach(WorkUnit w in worklist.OrderBy(a => System.Guid.NewGuid())) {
             if(w.IsOn() && w.agentWorkingOn == null) { 
-                return w;
+                potentialJobs.Add(w);
             }
         }
 
-        return null;
+        int agX = Mathf.FloorToInt(agent.transform.position.x);
+        int agY = Mathf.FloorToInt(agent.transform.position.y);
+
+
+        while(potentialJobs.Count > 0) {
+            WorkUnit potentialJob = potentialJobs[0];  //njem pa vienam potenciaalam darbam 
+            potentialJobs.RemoveAt(0); // POP 2 soljos :\
+
+
+            bool includingNeightborCubes = false;
+            if( (int)potentialJob.WorkUnitTypeNumber < 10){ //buuvdarbus var dariit arii no kaiminjkubikiem
+                includingNeightborCubes = true;
+            }
+
+            List<Vector2> allCubes = levelscript.AllAccessableCubesInThisRoom(potentialJob.parentLevelobject,includingNeightborCubes); //visi kubiki telpaa, kurai pieder darbs (+ visi kaiminjkubiki, ja iipashi paluudz)
+
+
+            foreach(Vector2 cube in allCubes.OrderBy(a => System.Guid.NewGuid())) {
+
+                if(levelscript.FindPath(agX,agY,Mathf.RoundToInt(cube.x),Mathf.RoundToInt(cube.y)).Count > 0 ){
+                    potentialJob.BestPositionToStandWhileWorking = cube; //pirmais nejaushais, agjentam pieejamais kubiks arii buus vieta, kur dariit sho darbinju
+                    return potentialJob;
+                }
+
+            }
+               
+
+
+
+
+        }
+
+
+
+        return null; //neatradaas neviens deriigs darbinsh ar pieejamu poziiciju, kur straadaat
 
     }
 
