@@ -290,84 +290,94 @@ public class Agent : MonoBehaviour {
             //---------------------------------------------------------------
         case AgentStates.choosingWorkDestination:
             //print("STATE:choosingWorkDestination ");
+            try{
+                 
 
-            List<WorkUnit> potentialJobs = new List<WorkUnit>();
+                List<WorkUnit> potentialJobs = new List<WorkUnit>();
 
-            int currX = Mathf.FloorToInt(transform.position.x);
-            int currY = Mathf.FloorToInt(transform.position.y);
+                int currX = Mathf.FloorToInt(transform.position.x);
+                int currY = Mathf.FloorToInt(transform.position.y);
 
-            bool workingRemotely = false; //shutka :|  spec gadiijums, kad nevar veikt darbinju darba vietaa (taa neatrodas uz navgrida), bet darbinshs tik svariigs, ka to nevar nedariit - taapeec remoteWork gadiijumaa straadaas no noraadiitaas pociizijas
-            Vector2 remoteWork = Vector2.zero; //poziicija no kuras straadaas, ja nebuus pieejam iistaa darbavieta
+                bool workingRemotely = false; //shutka :|  spec gadiijums, kad nevar veikt darbinju darba vietaa (taa neatrodas uz navgrida), bet darbinshs tik svariigs, ka to nevar nedariit - taapeec remoteWork gadiijumaa straadaas no noraadiitaas pociizijas
+                Vector2 remoteWork = Vector2.zero; //poziicija no kuras straadaas, ja nebuus pieejam iistaa darbavieta
 
-            //dabuus visus aktuaalos darbinjus, kur agjents var AIZIET | nejaushaa seciibaa
-            foreach(WorkUnit w in workManagerScript.worklist.OrderBy(a => System.Guid.NewGuid())) {
-                if(w.IsOn() && w.agentWorkingOn == null) { //tikai iesleegtie, briivie darbi
-                    int destX = Mathf.FloorToInt(w.parentGameobject.transform.position.x);
-                    int destY = Mathf.FloorToInt(w.parentGameobject.transform.position.y);
+                //dabuus visus aktuaalos darbinjus, kur agjents var AIZIET | nejaushaa seciibaa
+                foreach(WorkUnit w in workManagerScript.worklist.OrderBy(a => System.Guid.NewGuid())) {
+                    if(w.IsOn() && w.agentWorkingOn == null) { //tikai iesleegtie, briivie darbi
+                        int destX = Mathf.FloorToInt(w.parentGameobject.transform.position.x);
+                        int destY = Mathf.FloorToInt(w.parentGameobject.transform.position.y);
 
-                    if(levelscript.FindPath(currX,currY,destX,destY).Count > 0){ //ja ir celjsh no agjenta liidz darba telpai
-                        potentialJobs.Add(w);
-                    } else { //nav celja liidz darbavietais
+                        if(levelscript.FindPath(currX,currY,destX,destY).Count > 0){ //ja ir celjsh no agjenta liidz darba telpai
+                            potentialJobs.Add(w);
+                        } else { //nav celja liidz darbavietais
 
-                        if((int)w.WorkUnitTypeNumber < 10){ //BET buuvdarbos taa biezhi vien notiek
+                            if((int)w.WorkUnitTypeNumber < 10){ //BET buuvdarbos taa biezhi vien notiek
 
-                            //paarbaudiis telpas kaiminjus, ja tie ir pieejami, tad darbinsh tomeer ir pieejams
-                            //@todo -- vertikaalaam telpaam ir vairaak saanu kaiminju ?
-                            //@todo -- viena puse tiek apskatiita 1. vai tas neradiis neproporcionaalu agjentu veelmi iet straadaat no 1 puses pat, ja celjs tur ir taals ?
-                            if(levelscript.FindPath(currX,currY,destX+w.parentLevelobject.SizeX,destY).Count > 0){  //labaa puse - x+ telpas platums
-                                potentialJobs.Add(w);
-                                workingRemotely = true;
-                                remoteWork = new Vector2(destX+w.parentLevelobject.SizeX,destY); //neis uz nepiejamo kluciiti, bet straadaas no shiis poziiicijas
-                            } else if(levelscript.FindPath(currX,currY,destX-1,destY).Count > 0){  //kreisaa puse - x-1
-                                potentialJobs.Add(w);
-                                workingRemotely = true;
-                                remoteWork = new Vector2(destX-1,destY);
+                                //paarbaudiis telpas kaiminjus, ja tie ir pieejami, tad darbinsh tomeer ir pieejams
+                                //@todo -- vertikaalaam telpaam ir vairaak saanu kaiminju ?
+                                //@todo -- viena puse tiek apskatiita 1. vai tas neradiis neproporcionaalu agjentu veelmi iet straadaat no 1 puses pat, ja celjs tur ir taals ?
+                                if(levelscript.FindPath(currX,currY,destX+w.parentLevelobject.SizeX,destY).Count > 0){  //labaa puse - x+ telpas platums
+                                    potentialJobs.Add(w);
+                                    workingRemotely = true;
+                                    remoteWork = new Vector2(destX+w.parentLevelobject.SizeX,destY); //neis uz nepiejamo kluciiti, bet straadaas no shiis poziiicijas
+                                } else if(levelscript.FindPath(currX,currY,destX-1,destY).Count > 0){  //kreisaa puse - x-1
+                                    potentialJobs.Add(w);
+                                    workingRemotely = true;
+                                    remoteWork = new Vector2(destX-1,destY);
+                                }
+
+
                             }
-
 
                         }
 
                     }
-
-                }
-            }
-
-
-            workUnit = null;
-            if(potentialJobs.Count > 0){
-                workUnit = potentialJobs.ElementAt(0); //pirmais darbs (no nejaushi sakaartota saraksta)
-            } else { //nav neviena briiva,pieejama darbinja
-                CurrentState = AgentStates.idling;
-                break;
-            }
-
-            room = workUnit.parentLevelobject; //darbinja parametrs - kurai telpai vinsh pieder
-            if(room != null){  //jaaiet uz atrasto telpu
-
-                Vector2 workLocation;
-
-                if(workingRemotely){
-                    workLocation = remoteWork; //atrastaa poziicija vistuvaak darbam, jo nevar atrasties pashaa darbavietaa
-                } else {
-                    workLocation = levelscript.randomCubeInThisRoom(room); //randomcube - nejaushss kubiks atrastajaa telpaa
                 }
 
-                    
-                if(GoThere(workLocation.x, workLocation.y) == -1){ // kljuuda - agjents neatrodas uz grida
-                    CurrentState = AgentStates.offTheGrid;
+
+                workUnit = null;
+                if(potentialJobs.Count > 0){
+                    workUnit = potentialJobs.ElementAt(0); //pirmais darbs (no nejaushi sakaartota saraksta)
+                } else { //nav neviena briiva,pieejama darbinja
+                    CurrentState = AgentStates.idling;
                     break;
                 }
 
+                room = workUnit.parentLevelobject; //darbinja parametrs - kurai telpai vinsh pieder
+                if(room != null){  //jaaiet uz atrasto telpu
+
+                    Vector2 workLocation;
+
+                    if(workingRemotely){
+                        workLocation = remoteWork; //atrastaa poziicija vistuvaak darbam, jo nevar atrasties pashaa darbavietaa
+                    } else {
+                        workLocation = levelscript.randomCubeInThisRoom(room); //randomcube - nejaushss kubiks atrastajaa telpaa
+                    }
+
+                        
+                    if(GoThere(workLocation.x, workLocation.y) == -1){ // kljuuda - agjents neatrodas uz grida
+                        CurrentState = AgentStates.offTheGrid;
+                        break;
+                    }
 
 
-                CurrentState = AgentStates.traveling;
-                workUnit.ReserveWork(true,this);
-              //  print("atrada darbinju");
-            } else {
-                CurrentState = AgentStates.idling; //neko neatrada - jaaiet neko nedariit
-               // print("NEatrada darbinju");
+
+                    CurrentState = AgentStates.traveling;
+                    workUnit.ReserveWork(true,this);
+                  //  print("atrada darbinju");
+                } else {
+                    CurrentState = AgentStates.idling; //neko neatrada - jaaiet neko nedariit
+                   // print("NEatrada darbinju");
+                }
+                
+
+            } catch(System.Exception e) { // kjer pathfinding iznjeemumu, ka agjents nemaz neatrodas uz grida
+                if(e.Message == "not-on-a-grid"){
+                    CurrentState = AgentStates.offTheGrid;
+                }
+                
+                
             }
-
 
             break;
             //---------------------------------------------------------------
@@ -387,23 +397,23 @@ public class Agent : MonoBehaviour {
             }
 
             if(levelscript.Navgrid.Count > 0){ //ja ir navgridaa punkti, kur mukt
-
+                print ("provees tikt uz celja");
                 Vector2 closestPoint = new Vector2(0,0);
-                float closestDistance = 0;
+                float closestDistance = -1;
                 float x = transform.position.x;
                 float y = transform.position.y;
 
                 foreach(KeyValuePair<Vector4, float> p in levelscript.Navgrid) {
                     if(p.Key.y == y){ //meklee tuvaakos punkts tikai shajaa staavaa                    
                         float d = levelscript.MapDistanceBetweenPoints(p.Key.x,p.Key.y,x,y);//cik taalu shis navgrida punkts no agjenta
-                        if(closestDistance == 0 || d < closestDistance){
+                        if(closestDistance == -1 || d < closestDistance){
                             closestPoint = new Vector2(p.Key.x,p.Key.y); //shis ir tuvaakais navgrida punkts
                             closestDistance = d;
                         }
                     }
                 }
 
-                if(closestDistance > 0){
+                if(closestDistance > -1){ 
                 //    print("atradaam kaadu punktu, kur glaabties");
                     destinationNode = closestPoint;
                     actualRoute.Add(closestPoint); //manuaali izveidoju celju (stur tikai 1 punktu - kur skrienu glaabties)
