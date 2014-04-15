@@ -33,9 +33,15 @@ public class Level : MonoBehaviour {
     private Dictionary<string,GameObject> prefabCache = new Dictionary<string,GameObject>(); // lai katru unikaalo prefabu ielaadeetu tikai vienreiz
 
     public LevelLimits limits; //liimenjrobezhas
-    
 
+    [HideInInspector]
+    public float TimeScale = 1.0f;
+    public float TimeScaleMin = .0000001f; //MIN nedriikst buut nulle - jo kameras kustiiba tiek kompenseeta atkariibaa no timescale un 0 gadiijumaa buus kosmoss
+    public float TimeScaleMax = 5.0f;
+
+    
     void Start() {
+
 
         levelObjectHolder = GameObject.Find("LevelobjectHolder");
         agentHolder = GameObject.Find("AgentHolder");
@@ -55,7 +61,10 @@ public class Level : MonoBehaviour {
             drawPaths();
         }
 
-    
+
+        Time.timeScale = TimeScale; //maina speeles aatrumu atkariibaa no GUI skriptinjaa esoshaa slaidera veertiibas
+
+        
         //Debug.Log("There are " + FindObjectsOfType(typeof(GameObject)).Length + " gameObjects in your scene");
     }
 
@@ -185,6 +194,11 @@ public class Level : MonoBehaviour {
 
     public void SaveLevel(string levelname) {
 
+        //webleijarii nav failu rakstiisahanas iespeeja :\
+        #if UNITY_STANDALONE_WIN 
+       
+      
+
         if(levelname == "") {
             levelname = "stuff-01";
         }
@@ -227,10 +241,12 @@ public class Level : MonoBehaviour {
         print("Saglabaati visi " + numBlocks + " kluciishi");
         System.IO.File.WriteAllText("Levels/" + levelname + ".lvl", output); //nevar seivot límeni, ja ir webpleijera versija
 
+        #endif
     }
 
     public void LoadLevel(string levelname) {
-            
+        #if UNITY_STANDALONE_WIN 
+
         if(levelname == "") {
             levelname = "stuff-01";
         }
@@ -331,7 +347,7 @@ public class Level : MonoBehaviour {
         print("ir ielaadeets liimenis " + levelname + " ir  " + (numLevelobjects) + " objekti + " + numAgents + " agjenti  " + stopwatch.Elapsed);
 
 
-
+        #endif
     }
 
 
@@ -471,13 +487,14 @@ public class Level : MonoBehaviour {
         for(int i = 0; i< levelObjectHolder.transform.childCount; i++) { //ikviens levelobjekts liimenii
             Levelobject lo = levelObjectHolder.transform.GetChild(i).GetComponent<Levelobject>();
             if(lo is LOBlock) { //vai levelobjekts ir levelbloks                
-                if( lo.ConstrPercent < 5 &&  lo.Destructing) { 
+                if( lo.ConstrPercent < 1 &&  lo.Destructing) { 
                     continue; // skipo geimobjektus, kas tiek jaukti nost (kad gandriiz jau nojaukts)
                 }
                 /*
                 if( lo.ConstrPercent < 50 && lo.Constructing) { 
                     continue; 
-                } */
+                }*/
+                //te nevar likt nekaadus smalkaakus ierobezheojumus - pie cik % const un cik % destr uzskatiit, ka telpa ir ejama -- jo neviens peec tam neizsauks nevgrida paarreekjinaataaju!
                 LOBlock room = (LOBlock)lo;
                 ListOfRooms.Add(room);
                 float x = room.transform.position.x - (room.SizeX * 0.5f) + 0.5f; //atnjemu istabas izmeerus - t.i. xy moraada uz istabas apaksheejo kreiso kubicinju 

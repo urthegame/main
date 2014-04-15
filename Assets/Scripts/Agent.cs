@@ -361,6 +361,7 @@ public class Agent : MonoBehaviour {
                     destinationNode = closestPoint;
                     actualRoute.Add(closestPoint); //manuaali izveidoju celju (stur tikai 1 punktu - kur skrienu glaabties)
                     CurrentState = AgentStates.traveling; //peec ieshanas automaatiski staavoklis buus IDLING
+                    avatarAnimator.SetBool("fast", true); //manuaalie iesaaku animaaciju 
                     //print(x + "," + y + " -> " + closestPoint);
                     break;
                 } else {

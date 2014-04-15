@@ -10,6 +10,7 @@ public class Gui : MonoBehaviour {
 	private Level levelscript; //viens vieniigais Liimenja paarvaldniekskripts
 	private GlobalResources gResScript; //globaalo resursu pieskatiitaaajs, arii singltons :P
 
+   
 	private int vert;
 
    
@@ -29,6 +30,8 @@ public class Gui : MonoBehaviour {
 	public void Update(){
         mouse();
 		keyboard();
+
+      
    	}
 
     void mouse(){
@@ -89,16 +92,24 @@ public class Gui : MonoBehaviour {
 		                                               gResScript.Generation[Res.electricity],gResScript.Usage[Res.electricity],
 		                                               gResScript.Generation[Res.water],gResScript.Usage[Res.water]
 		                                               ) );
-		vert += 60;
 
+		vert += 53;
+        GUI.Box(new Rect(15,vert,90,22), string.Format("Speed: {0:0.00}x", levelscript.TimeScale));
 
-		
+        vert += 25;
+        levelscript.TimeScale = GUI.HorizontalSlider (new Rect (20,vert,80,height), levelscript.TimeScale, levelscript.TimeScaleMin, levelscript.TimeScaleMax); 
+        
+
+        
+        
+        vert += 25;
         if(GUI.Button(new Rect(20,vert,35,height),new GUIContent("S", "Save") )) {
 			levelscript.SaveLevel("");
 		}
         if(GUI.Button(new Rect(65,vert,35,height), new GUIContent("L", "Load"))) {
 			levelscript.LoadLevel("");
 		}
+
 		vert += height + vSpace;
         if(GUI.Button(new Rect(20,vert,35,height), new GUIContent("X", "Destruction tool"))) {
 			levelscript.PutObjInPlacer("delete-1");
@@ -106,6 +117,7 @@ public class Gui : MonoBehaviour {
         if(GUI.Button(new Rect(65,vert,35,height), new GUIContent("?", "Query tool"))) {
 			levelscript.PutObjInPlacer("query-1");
 		}
+
 
         
         vert += height + vSpace;
@@ -178,15 +190,19 @@ public class Gui : MonoBehaviour {
 
 
 
-
         vert += height + vSpace;
-        if(GUI.Button(new Rect(20,vert,35,height), new GUIContent("St2", "Two story Stairwell"))) {
-            levelscript.PutObjInPlacer("stairwell-12");
-        }
+        if(GUI.Button(new Rect(left,vert,25,height), new GUIContent("S1", "Single storey modular Stairwell"))) {
+            levelscript.PutObjInPlacer("stairwell-11");
+        }           
         
-        if(GUI.Button(new Rect(65,vert,35,height), new GUIContent("St3", "Three story Stairwell"))) {
+        if(GUI.Button(new Rect(left+30,vert,26,height), new GUIContent("S2", "Two storey Stairwell"))) {
+            levelscript.PutObjInPlacer("stairwell-12");
+        }           
+        
+        if(GUI.Button(new Rect(left+60,vert,26,height), new GUIContent("S3", "Three storey Stairwell"))) {
             levelscript.PutObjInPlacer("stairwell-13");
-        }
+        }           
+
 
 
 

@@ -132,12 +132,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 100004}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ee30dd1998c989439b7c2a742c9eabb, type: 3}
+  m_Script: {fileID: 11500000, guid: d6e38c5cbd0aefa428a45e31a66b95fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ConstrTime: 0
-  DestrTime: 1e+09
-  Price: 5
+  DestrTime: 10
+  Price: 0
   Constructing: 0
   Destructing: 0
   ConstrPercent: 0
@@ -145,9 +145,25 @@ MonoBehaviour:
   SizeY: 1
   SizeZ: 1
   Prefabname: groundcube-flat-1
-  FuncType: 0
+  FuncType: 2
   OffsetX: 0
   OffsetY: 0
+  waypoints:
+    passableDirections: 0a000000
+  workUnits: []
+  resourceInitInfo:
+    GenerationAir: 0
+    GenerationElectricity: 0
+    GenerationWater: 0
+    UsageAir: 0
+    UsageElectricity: 0
+    UsageWater: 0
+    AgentNeedsWater: 0
+    AgentNeedsSleep: 0
+  Working: 0
+  WantWorking: 0
+  DEBUG_ME: 0
+  AgentNeedsGeneration: []
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
