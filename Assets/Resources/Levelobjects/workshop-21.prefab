@@ -693,45 +693,22 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100024}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6e38c5cbd0aefa428a45e31a66b95fb, type: 3}
+  m_Script: {fileID: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConstrTime: 15
-  DestrTime: 15
-  Price: 35
-  Constructing: 0
-  Destructing: 0
-  ConstrPercent: 0
-  SizeX: 2
-  SizeY: 1
-  SizeZ: 1
-  Prefabname: workshop-21
-  FuncType: 0
-  OffsetX: 0
-  OffsetY: 0
-  waypoints:
-    passableDirections: 0a0000000a000000
-  workUnits:
-  - parentGameobject: {fileID: 100024}
-    parentLevelobject: {fileID: 0}
-    agentWorkingOn: {fileID: 0}
-    BestPositionToStandWhileWorking: {x: 0, y: 0}
-    WorkUnitTypeNumber: 10
-  resourceInitInfo:
-    GenerationAir: 0
-    GenerationElectricity: 0
-    GenerationWater: 0
-    UsageAir: 1
-    UsageElectricity: 1
-    UsageWater: 1
-    AgentNeedsWater: 0
-    AgentNeedsSleep: 0
-  Working: 0
-  WantWorking: 0
-  DEBUG_ME: 1
-  AgentNeedsGeneration: []
+  CurrentState: 0
+  Needs:
+    Reserve:
+    - 50
+    - 50
+    Max:
+    - 100
+    - 100
+    Shortage:
+    - 0
+    - 0
 --- !u!136 &13600000
 CapsuleCollider:
   m_ObjectHideFlags: 1

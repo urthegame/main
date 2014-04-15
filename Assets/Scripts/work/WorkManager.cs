@@ -40,7 +40,7 @@ public class WorkManager : MonoBehaviour {
     /**
      * iesleedz/izsleedz visus darbinjus, kas pieder padotajai telpai
      */ 
-    public void SetStatusOnThisBlocksJobs(bool status, LOBlock block) {
+    public void SetStatusOnThisBlocksJobs(bool status, Levelobject block) {
 
         foreach(WorkUnit w in worklist) {
             if(w.parentLevelobject == block) { //darbs pieder shim levelobjektam
@@ -137,7 +137,7 @@ public class WorkManager : MonoBehaviour {
     /**
      * izveido buuvdarbu (sho netaisa prefabam aarpus speeles, jo shis ir iislaiciigi pieejams darbs)
      */ 
-    public void CreateAndAddConstructionJob(LOBlock block, WorkUnit.WorkUnitTypes workType){
+    public void CreateAndAddConstructionJob(Levelobject block, WorkUnit.WorkUnitTypes workType){
 
         WorkUnit constructionJob = new WorkUnit();
         constructionJob.parentGameobject = block.gameObject;
@@ -150,7 +150,7 @@ public class WorkManager : MonoBehaviour {
     /**
      * izniicina visus buuvdarbus shim levelobjektam
      */ 
-    public void RemoveAllConstructionJobsForThisBlock(LOBlock block){
+    public void RemoveAllConstructionJobsForThisBlock(Levelobject block){
             
         int i = 0;
         foreach(WorkUnit w in worklist) {

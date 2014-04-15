@@ -417,7 +417,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100014}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6e38c5cbd0aefa428a45e31a66b95fb, type: 3}
+  m_Script: {fileID: 11500000, guid: d97e42189d885784a9d3e2e102b18cce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ConstrTime: 10
@@ -426,29 +426,29 @@ MonoBehaviour:
   Constructing: 0
   Destructing: 0
   ConstrPercent: 0
-  SizeX: 1
-  SizeY: 2
-  SizeZ: 1
-  Prefabname: corridor-12
-  FuncType: 0
-  OffsetX: 0
-  OffsetY: 0
   waypoints:
     passableDirections: 0a00000000000000
   workUnits: []
+  AgentNeedsGeneration: []
+  SizeX: 1
+  SizeY: 1
+  SizeZ: 1
+  Prefabname: corridor-12
+  FuncType: 0
+  DEBUG_ME: 0
   resourceInitInfo:
     GenerationAir: 0
     GenerationElectricity: 0
     GenerationWater: 0
     UsageAir: 0
-    UsageElectricity: 1
+    UsageElectricity: 0
     UsageWater: 0
     AgentNeedsWater: 0
     AgentNeedsSleep: 0
   Working: 0
   WantWorking: 0
-  DEBUG_ME: 0
-  AgentNeedsGeneration: []
+  OffsetX: 0
+  OffsetY: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

@@ -1482,40 +1482,11 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100018}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6e38c5cbd0aefa428a45e31a66b95fb, type: 3}
+  m_Script: {fileID: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConstrTime: 5
-  DestrTime: 5
-  Price: 30
-  Constructing: 0
-  Destructing: 0
-  ConstrPercent: 0
-  SizeX: 3
-  SizeY: 1
-  SizeZ: 1
-  Prefabname: base-31
-  FuncType: 0
-  OffsetX: 0
-  OffsetY: 0
-  waypoints:
-    passableDirections: 0a0000000a0000000a000000
-  workUnits: []
-  resourceInitInfo:
-    GenerationAir: 5
-    GenerationElectricity: 5
-    GenerationWater: 5
-    UsageAir: 0
-    UsageElectricity: 0
-    UsageWater: 0
-    AgentNeedsWater: 15
-    AgentNeedsSleep: 20
-  Working: 0
-  WantWorking: 0
-  DEBUG_ME: 0
-  AgentNeedsGeneration: []
 --- !u!136 &13600000
 CapsuleCollider:
   m_ObjectHideFlags: 1

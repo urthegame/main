@@ -72,7 +72,7 @@ public class Agent : MonoBehaviour {
     public AgentNeeds Needs; //datu struktuura, kur glabaajaas cik agjentam ir katrs resurss
 
     // globaalaas FSM mainiigie nav droshi lietosahanaa nekur citur!!11
-    private LOBlock currentRoom = null; // null vai telpa, kur atrodas cilveeks, to maina lielais FSM un tikai, galapunktos
+    private Levelobject currentRoom = null; // null vai telpa, kur atrodas cilveeks, to maina lielais FSM un tikai, galapunktos
     private int isCraving = -1; //kuru vajadziibu gaaja apmierinaat
     private float idlingFor; // cik ilgi slinkos
     private WorkUnit workUnit;  //ko darbinsh, ko dara (vai iet dariit) null, ja pashlaik neko nedara
@@ -196,7 +196,7 @@ public class Agent : MonoBehaviour {
      */ 
     private void thinkAbout() {
 
-        LOBlock room = null;
+        Levelobject room = null;
         
 
         switch(CurrentState) {

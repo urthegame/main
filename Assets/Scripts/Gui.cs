@@ -301,25 +301,21 @@ public class Gui : MonoBehaviour {
 
 				GUI.Box(new Rect(Screen.width - 10 - 130,10,130,50), "?\n" + QueryTarget.name);
 
-				if(QueryTarget is LOBlock){ //levelbloks (kam ir iesl./izsl.funkcionalitaate)
-
-					LOBlock itIsActuallyLOBlock = (LOBlock)QueryTarget;
-
                     string offText = "OFF";
                     string onText = "on";
-					if( itIsActuallyLOBlock.Working ){
+                if( QueryTarget.Working ){
                          offText = "off";
                          onText = "ON";
                     }
 
                     if(GUI.Button(new Rect(Screen.width - 10 - 130,65,35,20), offText)) {
-                        itIsActuallyLOBlock.setWorkingStatus(false,true);
+                        QueryTarget.setWorkingStatus(false,true);
                     }
                     if(GUI.Button(new Rect(Screen.width - 10 - 130 + 45 ,65,35,20),onText)) {
-                        itIsActuallyLOBlock.setWorkingStatus(true,true);
+                        QueryTarget.setWorkingStatus(true,true);
                     }
 						
-					}
+					
 				}
 			
 		} catch {

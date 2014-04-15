@@ -347,6 +347,9 @@ MonoBehaviour:
     XB: 15
     YA: -15
     YB: 0
+  TimeScale: 1
+  TimeScaleMin: 1.00000001e-07
+  TimeScaleMax: 5
 --- !u!114 &1111164274
 MonoBehaviour:
   m_ObjectHideFlags: 0

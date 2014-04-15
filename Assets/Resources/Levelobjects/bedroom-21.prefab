@@ -954,40 +954,11 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100016}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6e38c5cbd0aefa428a45e31a66b95fb, type: 3}
+  m_Script: {fileID: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConstrTime: 10
-  DestrTime: 10
-  Price: 20
-  Constructing: 0
-  Destructing: 0
-  ConstrPercent: 0
-  SizeX: 2
-  SizeY: 1
-  SizeZ: 1
-  Prefabname: bedroom-21
-  FuncType: 0
-  OffsetX: 0
-  OffsetY: 0
-  waypoints:
-    passableDirections: 0a0000000a000000
-  workUnits: []
-  resourceInitInfo:
-    GenerationAir: 0
-    GenerationElectricity: 0
-    GenerationWater: 0
-    UsageAir: 0
-    UsageElectricity: 1
-    UsageWater: 0
-    AgentNeedsWater: 0
-    AgentNeedsSleep: 20
-  Working: 0
-  WantWorking: 0
-  DEBUG_ME: 0
-  AgentNeedsGeneration: []
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

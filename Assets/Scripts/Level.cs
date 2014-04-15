@@ -16,7 +16,7 @@ public class Level : MonoBehaviour {
 
     public bool DebugDrawNavgrid = true;
     public Dictionary<Vector4,float> Navgrid = new Dictionary<Vector4, float>(); //cik maksaa (un vai vispaar ir iespeejams) celjs no x,y uz citu x,y (shie 4 xyxy tiek iekodeeeti vector4, aspraatiigi, es zinu )
-    public List<LOBlock> ListOfRooms; //saraksts ar visiem liimenii esoshajiem leveloblokiem jeb telpam
+    public List<Levelobject> ListOfRooms; //saraksts ar visiem liimenii esoshajiem leveloblokiem jeb telpam
 
     private GameObject levelObjectHolder;
     private GameObject agentHolder;
@@ -41,7 +41,6 @@ public class Level : MonoBehaviour {
 
     
     void Start() {
-
 
         levelObjectHolder = GameObject.Find("LevelobjectHolder");
         agentHolder = GameObject.Find("AgentHolder");
@@ -69,7 +68,6 @@ public class Level : MonoBehaviour {
     }
 
    
-
     /**
      * ielaadee prefabu un paliek zem PLACER objekta, lai biidiidu apkaart kopaa ar PLEISERA objektu
      */ 
@@ -85,7 +83,6 @@ public class Level : MonoBehaviour {
 
     
         Levelobject script = levelobject.GetComponent<Levelobject>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus
-
         //jaapadod ir globaalaa poziicija, taapeec jaaliek tieshi zem PLEISERA, tad shis prefabs ieguus savu lokaalo poziiciju 0,0,0  => tieshi tur, kur vecaaks
         levelobject.transform.position = new Vector3(placer.transform.position.x + script.OffsetX,
                                                  placer.transform.position.y + script.OffsetY,
@@ -447,7 +444,7 @@ public class Level : MonoBehaviour {
         } else if(orderMode == 1) {  //random
 
             /**
-             * @bullshit -- shii randomizaacija ir meeesls - jaalieto orderby..newguid   piem.:   foreach(LOBlock r in levelscript.ListOfRooms.OrderBy(a => System.Guid.NewGuid())){
+             * @bullshit -- shii randomizaacija ir meeesls - jaalieto orderby..newguid   piem.:   foreach(Levelobject r in levelscript.ListOfRooms.OrderBy(a => System.Guid.NewGuid())){
              */ 
             
             for(int i = 0; i< levelObjectHolder.transform.childCount; i++) { //ikviens levelobjekts liimenii
@@ -459,14 +456,10 @@ public class Level : MonoBehaviour {
         foreach(KeyValuePair<string,Levelobject> x in sorted.OrderBy(key => key.Key)) {
 
             Levelobject lo = x.Value.GetComponent<Levelobject>();
-
-            if(lo is LOBlock) { //vai levelobjekts ir levelbloks                
-                LOBlock itIsActuallyLOBlock = (LOBlock)lo; //diivains taipkaasts (inlainaa man nesanaaca ); //provees iesleegt, ja tam ir jaabuut iesleegtam
-                if(itIsActuallyLOBlock.WantWorking) {//provees iesleegt tikai tad, ja tam ir jaabuut iesleegtam
-                    itIsActuallyLOBlock.setWorkingStatus(itIsActuallyLOBlock.WantWorking, false);
+                
+            if(lo.WantWorking) {//provees iesleegt tikai tad, ja tam ir jaabuut iesleegtam
+                lo.setWorkingStatus(lo.WantWorking, false);
                 }
-            }
-
         }
 
 
@@ -476,7 +469,7 @@ public class Level : MonoBehaviour {
 
         pathCache = new Dictionary<Vector4, List<Vector2>>(); //noreseto atrsto celju keshu
         Navgrid = new Dictionary<Vector4, float>(); //noreseto
-        ListOfRooms = new List<LOBlock>();//pie viena ieguus aktuaalaako levelobjektu sarakstu 
+        ListOfRooms = new List<Levelobject>();//pie viena ieguus aktuaalaako levelobjektu sarakstu 
 
         Dictionary<Vector2,int> directionsInCubes = new Dictionary<Vector2, int>(); //ikvienam blokam (x,y ) liimeenii, kam vinja prefabaa ir noraaditi iespeejamie virzieni (Waypoints.dirs), tiek ielikti te
 
@@ -485,17 +478,16 @@ public class Level : MonoBehaviour {
          * A) vispirms noskaidroju kuri kubiki iejami un tiks izmantoti paathfaindingaa, vinju virzieni tiek salikti datu struktuuraa
          */
         for(int i = 0; i< levelObjectHolder.transform.childCount; i++) { //ikviens levelobjekts liimenii
-            Levelobject lo = levelObjectHolder.transform.GetChild(i).GetComponent<Levelobject>();
-            if(lo is LOBlock) { //vai levelobjekts ir levelbloks                
-                if( lo.ConstrPercent < 1 &&  lo.Destructing) { 
+            Levelobject room = levelObjectHolder.transform.GetChild(i).GetComponent<Levelobject>();
+              
+            if( room.ConstrPercent < 1 &&  room.Destructing) { 
                     continue; // skipo geimobjektus, kas tiek jaukti nost (kad gandriiz jau nojaukts)
                 }
                 /*
-                if( lo.ConstrPercent < 50 && lo.Constructing) { 
+                if( room.ConstrPercent < 50 && room.Constructing) { 
                     continue; 
                 }*/
                 //te nevar likt nekaadus smalkaakus ierobezheojumus - pie cik % const un cik % destr uzskatiit, ka telpa ir ejama -- jo neviens peec tam neizsauks nevgrida paarreekjinaataaju!
-                LOBlock room = (LOBlock)lo;
                 ListOfRooms.Add(room);
                 float x = room.transform.position.x - (room.SizeX * 0.5f) + 0.5f; //atnjemu istabas izmeerus - t.i. xy moraada uz istabas apaksheejo kreiso kubicinju 
                 float y = room.transform.position.y - (room.SizeY * 0.5f) + 0.5f;
@@ -517,7 +509,7 @@ public class Level : MonoBehaviour {
 
                     }   
                 }
-            }
+            
         }
 
         /**
@@ -552,7 +544,7 @@ public class Level : MonoBehaviour {
             }
 
             /*
-        foreach(LOBlock room in ListOfRooms) {
+        foreach(Levelobject room in ListOfRooms) {
                 
             float x = room.transform.position.x - (room.SizeX * 0.5f) + 0.5f;
             float y = room.transform.position.y - (room.SizeY * 0.5f) + 0.5f;
@@ -881,19 +873,19 @@ public class Level : MonoBehaviour {
     }
 
     /**
-     * atgriezh telpu (LOBlock) vai null, kuraa ietilpst padotaas XY koordinaates
+     * atgriezh telpu (Levelobject) vai null, kuraa ietilpst padotaas XY koordinaates
      * 
      * 
      * 
      */
-    public LOBlock roomAtThisPosition(float x, float y) {
+    public Levelobject roomAtThisPosition(float x, float y) {
                 
         int numLevelblocks = ListOfRooms.Count;
 
 
         for(int i = 0; i < numLevelblocks; i++) {
 
-            LOBlock r = ListOfRooms[i];
+            Levelobject r = ListOfRooms[i];
             float halfWidth = r.SizeX / 2f;
             float halfHeight = r.SizeY / 2f;
 
@@ -911,9 +903,9 @@ public class Level : MonoBehaviour {
      * atgriezh istabu vai null - kur var apmierinaat padoto vajadziibu
      *  ja vajadziiba ir -1, tad dod nejaushu telpu
      */ 
-    public LOBlock roomWhereIcanDoThis(int need) {
+    public Levelobject roomWhereIcanDoThis(int need) {
 
-        LOBlock room = null;
+        Levelobject room = null;
 
         int numLevelblocks = ListOfRooms.Count;
         if(numLevelblocks == 0) {
@@ -923,7 +915,7 @@ public class Level : MonoBehaviour {
         if(need == -1) { //nav noraadiita vajadziiba - dos nejaushu telpu
             room = ListOfRooms[Random.Range(0, numLevelblocks)];
         } else { //meklees istabu, kas apmierina pieprasiito vajadziibu           
-            foreach(LOBlock r in ListOfRooms.OrderBy(a => System.Guid.NewGuid())) {
+            foreach(Levelobject r in ListOfRooms.OrderBy(a => System.Guid.NewGuid())) {
                 if(r.AgentNeedsGeneration[need] > 0) { //telpa rada apskataamo agjentresursu
                     room = r;
                     break;
@@ -941,7 +933,7 @@ public class Level : MonoBehaviour {
      * atgriezh abosluutaas XY koordinaates 1 nejausha bloka koordinaates, kursh ietilpst padotajaa telpaa
      * nedod kubikus, kas nav navgridaa
      */ 
-    public Vector2 randomCubeInThisRoom(LOBlock room) {
+    public Vector2 randomCubeInThisRoom(Levelobject room) {
 
                     
         List<Vector2> accessableCubes = AllAccessableCubesInThisRoom(room); 
@@ -959,7 +951,7 @@ public class Level : MonoBehaviour {
     /**
      * 
      */
-    public List<Vector2> AllAccessableCubesInThisRoom(LOBlock room, bool includeNeighbors = false){
+    public List<Vector2> AllAccessableCubesInThisRoom(Levelobject room, bool includeNeighbors = false){
 
         List<Vector2> allCubes = new List<Vector2> ();
         Vector2 coords = new Vector2(room.transform.position.x, room.transform.position.y); //telpas saakumpunkts

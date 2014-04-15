@@ -3,15 +3,16 @@ using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 
-public class LODelete : Levelobject {
+public class LODelete : MonoBehaviour {
 	
 
 	public void Awake(){
-		baseInit();
+		//baseInit();
 	}
 
-	public override void PlaceOnGrid(int mode){
+	public  void PlaceOnGrid(int mode){
 
+        /*
 		if(currentCollisions.Count > 0 ){
 		//	print ("Kaut kas tiks izdzeests (atvechaju) ");
 
@@ -34,17 +35,9 @@ public class LODelete : Levelobject {
 		} else {
 			//print ("Hmm, nav nekaa ko dzeest, :\\  ");
 		}
-
+    */
 	}
 
-	public override void PlacedInPlacer(){}
-	public override void RemovedFromPlacer(){}
-	//public override void PlaceOnGrid(int mode){}
-	public override void RemovedFromGrid(){}
-	public override void TouchedAnother(){}
-	public override void StopTouchedAnother(){}
-	public override void InitFromString(string str){}
-	public override string InitToString(){return "";}
-
+	
 	
 }
