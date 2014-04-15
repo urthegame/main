@@ -19,6 +19,8 @@ public class LOQuery : Levelobject {
 	
 	public override void PlaceOnGrid(int mode){
 		
+        //@refactor -- chekot uz kura levelobjekta atrodas lietojot levelskripta roomAtThisPosition metodi
+
 		if(currentCollisions.Count > 0 ){
 
 			guiscript.QueryMode = true;

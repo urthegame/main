@@ -118,6 +118,67 @@ public class Gui : MonoBehaviour {
 			levelscript.PutObjInPlacer("query-1");
 		}
 
+        vert += height + vSpace;
+        float w4 = 20;
+        float w4Dist = 2;
+        int w4Num = 0;
+        if(GUI.Button(new Rect(17+ (w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("1", "1x1"))) {
+            levelscript.PutObjInPlacer("corridor-11");
+        }        
+        if(GUI.Button(new Rect(17+(w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("2", "2x1"))) {
+            levelscript.PutObjInPlacer("corridor-21");
+        }
+        if(GUI.Button(new Rect(17+(w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("3", "3x1"))) {
+            levelscript.PutObjInPlacer("corridor-31");
+        }
+        if(GUI.Button(new Rect(17+(w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("4", "4x1"))) {
+            levelscript.PutObjInPlacer("corridor-41");
+        }
+
+        vert += height + vSpace;
+        w4Num = 0;
+        if(GUI.Button(new Rect(17+ (w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("1", "1x2"))) {
+            levelscript.PutObjInPlacer("corridor-12");
+        }        
+        if(GUI.Button(new Rect(17+(w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("2", "2x2"))) {
+            levelscript.PutObjInPlacer("corridor-22");
+        }
+        if(GUI.Button(new Rect(17+(w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("3", "3x2"))) {
+            levelscript.PutObjInPlacer("corridor-32");
+        }
+        if(GUI.Button(new Rect(17+(w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("4", "4x2"))) {
+            levelscript.PutObjInPlacer("corridor-42");
+        }
+
+        vert += height + vSpace;
+        w4Num = 0;
+        if(GUI.Button(new Rect(17+ (w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("1", "1x3"))) {
+            levelscript.PutObjInPlacer("corridor-13");
+        }        
+        if(GUI.Button(new Rect(17+(w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("2", "2x3"))) {
+           // levelscript.PutObjInPlacer("corridor-23");
+        }
+        if(GUI.Button(new Rect(17+(w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("3", "3x3"))) {
+            //levelscript.PutObjInPlacer("corridor-33");
+        }
+        if(GUI.Button(new Rect(17+(w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("4", "4x3"))) {
+           // levelscript.PutObjInPlacer("corridor-43");
+        }
+
+        vert += height + vSpace;
+        w4Num = 0;
+        if(GUI.Button(new Rect(17+ (w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("1", "1x4"))) {
+            levelscript.PutObjInPlacer("corridor-14");
+        }        
+        if(GUI.Button(new Rect(17+(w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("2", "2x4"))) {
+           // levelscript.PutObjInPlacer("corridor-24");
+        }
+        if(GUI.Button(new Rect(17+(w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("3", "3x4"))) {
+           // levelscript.PutObjInPlacer("corridor-34");
+        }
+        if(GUI.Button(new Rect(17+(w4Dist+w4)*w4Num++,vert,w4,height), new GUIContent("4", "4x4"))) {
+           // levelscript.PutObjInPlacer("corridor-44");
+        }
 
         
         vert += height + vSpace;

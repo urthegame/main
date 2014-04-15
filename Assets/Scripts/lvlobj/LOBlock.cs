@@ -187,6 +187,11 @@ public class LOBlock : Levelobject {
 			}
 		}
 		
+
+        //@refactor -- chekot vai nesasktas ar citiem objektiem, lietojot levelskripta roomAtThisPosition metodi
+        // (katram shiis telpas kubikam)
+
+
 		if(currentCollisions.Count > 0 ){
 			print ("She nedriikst likt bloka !");
 		} else {

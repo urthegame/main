@@ -15,6 +15,9 @@ public class LODelete : Levelobject {
 		if(currentCollisions.Count > 0 ){
 		//	print ("Kaut kas tiks izdzeests (atvechaju) ");
 
+            //@refactor -- chekot uz kura levelobjekta atrodas lietojot levelskripta roomAtThisPosition metodi
+
+
 
 			//ies caur visiem levelobjektiem, ar ko pashlaik saskaraas un tos izniicijaas
 			List<GameObject> collidingGameObjects = new List<GameObject>(currentCollisions.Keys); //jaadabuu atsleedzinjas un tad jaaitere (nevis pa taisno, kaa taadam barbaram)
