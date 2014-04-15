@@ -28,6 +28,7 @@ public class Level : MonoBehaviour {
     private Dictionary<Vector4, List<Vector2>> pathCache = new Dictionary<Vector4, List<Vector2>>(); //piekeshos katru atrasto celju, notiiriis paarziimeejot navgridu
 
     private Vector3 lastPos;
+    private Vector3 lastPosPrecise;
     public bool objectInPlacer = false; //pleiseris ir konteineris, ko biida apkaart ar peli - priekshskatiijuma versija
     private int numLevelobjects = 0;
     private Dictionary<string,GameObject> prefabCache = new Dictionary<string,GameObject>(); // lai katru unikaalo prefabu ielaadeetu tikai vienreiz
@@ -134,6 +135,7 @@ public class Level : MonoBehaviour {
             int roundx = Mathf.RoundToInt(hit.point.x);
             int roundy = Mathf.RoundToInt(hit.point.y);
             lastPos = new Vector3(roundx, roundy, 0); 
+            lastPosPrecise = new Vector3(hit.point.x, hit.point.y, 0); 
             placer.transform.position = lastPos;
         }
 
@@ -165,7 +167,7 @@ public class Level : MonoBehaviour {
 
 
         if(Input.GetMouseButtonDown(2)) { // 2 => klik mid 
-            print(lastPos);
+            print(lastPos + " " + lastPosPrecise);
         }
 
 
@@ -543,22 +545,7 @@ public class Level : MonoBehaviour {
                 continue;
             }
 
-            /*
-        foreach(Levelobject room in ListOfRooms) {
-                
-            float x = room.transform.position.x - (room.SizeX * 0.5f) + 0.5f;
-            float y = room.transform.position.y - (room.SizeY * 0.5f) + 0.5f;
-        
-            int numCubes = room.waypoints.passableDirections.Length; 
-            if(numCubes != room.SizeX * room.SizeY) {
-                continue; 
-            }
-        */
-
-        
-           // int currentCube = 0;
-          //  for(int b=0; b<room.SizeY; b++) {
-            //    for(int a=0; a<room.SizeX; a++) {
+         
         
             bool cubeIsPassable = false;
 
@@ -889,8 +876,8 @@ public class Level : MonoBehaviour {
             float halfWidth = r.SizeX / 2f;
             float halfHeight = r.SizeY / 2f;
 
-            if(r.transform.position.x + halfWidth >= x && r.transform.position.x - halfWidth <= x && 
-                r.transform.position.y + halfHeight >= y && r.transform.position.y - halfHeight <= y) { // vienkaarsha AABB kooliiziju detekcija, telpas koordinaate ir taas centraa, taapeec +/- pusgarums/platums
+            if(r.transform.position.x + halfWidth > x && r.transform.position.x - halfWidth <= x && 
+                r.transform.position.y + halfHeight > y && r.transform.position.y - halfHeight <= y) { // vienkaarsha AABB kooliiziju detekcija, telpas koordinaate ir taas centraa, taapeec +/- pusgarums/platums
                 return r;
             }
         }
@@ -954,14 +941,14 @@ public class Level : MonoBehaviour {
     public List<Vector2> AllAccessableCubesInThisRoom(Levelobject room, bool includeNeighbors = false){
 
         List<Vector2> allCubes = new List<Vector2> ();
-        Vector2 coords = new Vector2(room.transform.position.x, room.transform.position.y); //telpas saakumpunkts
+        Vector2 coords = new Vector2(room.transform.position.x - room.SizeX/2f, 
+                                     room.transform.position.y - room.SizeY/2f); //punkts telpas labajaa apakseheejaa stuuriiti
        
-
         for(int b=0; b<room.SizeY; b++) {
             for(int a=0; a<room.SizeX; a++) {
                 
-                int localX = Mathf.FloorToInt(a + coords.x); //apskataamaa kubika koordinaates
-                int localY = Mathf.FloorToInt(b + coords.y);
+                int localX = Mathf.FloorToInt(a + coords.x + 0.5f); //apskataamaa kubika koordinaates
+                int localY = Mathf.FloorToInt(b + coords.y + 0.5f); //pieskaitu 0.5 pirms FLOORoju, citaadi rodas negliita nobiide
 
                 if(Navgrid.ContainsKey(new Vector4(localX,localY,localX,localY))) { //vai navgridaa ir shis punkts x,y,x,y )
                     allCubes.Add(new Vector2(localX,localY));
@@ -974,41 +961,39 @@ public class Level : MonoBehaviour {
         //+ visi robezhkubicinji (no diagonal chicks)
         if(includeNeighbors){
 
-            for(int b=0; b<room.SizeY; b++) { //skatos no augshas uz leju
+            for(int b=0; b<room.SizeY; b++) { //eju no augshas uz leju
 
                 //kubiks pa kreisi
-                int localX = Mathf.FloorToInt(-1 + coords.x);
-                int localY = Mathf.FloorToInt(b + coords.y);                
+                int localX = Mathf.FloorToInt(-1 + coords.x+ 0.5f);
+                int localY = Mathf.FloorToInt(b + coords.y+ 0.5f);                
                 if(Navgrid.ContainsKey(new Vector4(localX,localY,localX,localY))) {
                     allCubes.Add(new Vector2(localX,localY));
                 }
-
 
                 //kubiks pa labi
-                localX = Mathf.FloorToInt(room.SizeX + coords.x);
-                localY = Mathf.FloorToInt(b + coords.y);                
+                localX = Mathf.FloorToInt(room.SizeX + coords.x+ 0.5f);
+                localY = Mathf.FloorToInt(b + coords.y+ 0.5f);                
                 if(Navgrid.ContainsKey(new Vector4(localX,localY,localX,localY))) {
                     allCubes.Add(new Vector2(localX,localY));
                 }
-
             }
 
 
             for(int a=0; a<room.SizeX; a++) { //horizontaali
                 
                 //kubiks uz augshu
-                int localX = Mathf.FloorToInt(a + coords.x);
-                int localY = Mathf.FloorToInt(-1 + coords.y);                
+                int localX = Mathf.FloorToInt(a + coords.x+ 0.5f);
+                int localY = Mathf.FloorToInt(-1 + coords.y+ 0.5f);                
                 if(Navgrid.ContainsKey(new Vector4(localX,localY,localX,localY))) {
                     allCubes.Add(new Vector2(localX,localY));
                 }
                 
 
                 //kubiks uz leju
-                localX = Mathf.FloorToInt(a + coords.x);
-                localY = Mathf.FloorToInt(room.SizeY + coords.y);                
+                localX = Mathf.FloorToInt(a + coords.x+ 0.5f);
+                localY = Mathf.FloorToInt(room.SizeY + coords.y+ 0.5f);                
                 if(Navgrid.ContainsKey(new Vector4(localX,localY,localX,localY))) {
-                    allCubes.Add(new Vector2(localX,localY));
+                   allCubes.Add(new Vector2(localX,localY));
                 }
                 
             }
@@ -1020,6 +1005,28 @@ public class Level : MonoBehaviour {
 
 
         return allCubes;
+    }
+
+    /**
+     * vai shii levelobjekta nevins kubiks neatrodas uz kaada cita levelobjekta [jebkura kluciisha]
+     */ 
+    public bool IsThisSpotFree(Levelobject newRoom){
+
+        float x = newRoom.transform.position.x - (newRoom.SizeX/2f);
+        float y = newRoom.transform.position.y - (newRoom.SizeY/2f);
+
+        for(int b=0; b<newRoom.SizeY; b++) {
+            for(int a=0; a<newRoom.SizeX; a++) {
+
+                if(roomAtThisPosition(x+a,y+b) != null){
+                    //shajaa poziicijaa ir atrasts levelobjekts
+                    return false;
+                }
+            }
+        }
+
+        return true;
+
     }
 
 
@@ -1060,12 +1067,15 @@ public class Level : MonoBehaviour {
  * objekti, kam ir paara skaits vieniibu pa x vai y, attieciigajaa virzienaa tiek offsetoti pa 0.5 - lai visi objekti pieliptu pie rezhgja
  * shaadi visi objekti neatkariigi no lieluma ieguust gliitas, apaljas koordinaates 
  * 
+ * taatad grida liiniju krustpunktos ir ..0.5, bet grida ruutinjas viduu ir ir apaljas koordinaates
+ * 
  * 
  * par liimenjobjektu atrashanaas vietu
  * paarveershot peles koordinaates uz liimenjkoordinaateem, stars kolidee ar LevelBasePlane (8. slaanis), kas atrodas +1 pa Z asi, bet visi levelobjekti dziivo uz Z=0 - lai tie nekolideeto ar sho plakni
  * 
  * veel par liiminjobjektiem:
- * to atrashanaas punkts ir liimenjobjekta centra - taapeec pirms lietot liimenjobjekta vai taa kubika koordinaates saistiibaa ar navgridu (ja liimenjobjekts ir vairaakus kubikus liels) taa koordinaates ir jaanoapaljo uz INT (floor)
+ * to atrashanaas punkts ir liimenjobjekta CENTRAA 
+ *      - taapeec pirms lietot liimenjobjekta vai taa kubika koordinaates saistiibaa ar navgridu (ja liimenjobjekts ir vairaakus kubikus liels) taa koordinaates ir jaanoapaljo uz INT (floor)
  * tie tiek nobiidiiti pa x un y asiim 0.5 vai 0 vieniibas - atkariibaa no izmeera attieciigajaa virzienaa: 
  *      1,3,5... izmeera kluciishi netiek nobiidiiti tajaa asii, kur ir shis nepaara skaita izmeers
  *      1,4,6... izmeeru kluciishi tiek nobiidiiti par +0.5 tajaa asii, kur ir shis izmeers

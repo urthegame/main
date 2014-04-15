@@ -126,9 +126,6 @@ public class Levelobject : MonoBehaviour {
 
 	
 
-	protected Dictionary<GameObject,bool> currentCollisions = new Dictionary<GameObject,bool>(); //retardeets dikcionaars, kur glabaa visus levelobjektus ar ko shis levelobjekts kolidee (svariigs tikai KEY, ignoreeju VAL)
-
-
 
     void Awake () {
         
@@ -221,7 +218,42 @@ public class Levelobject : MonoBehaviour {
                 everyOtherFrameCounter = 0;
             }
         }
-        
+
+
+
+        if(DEBUG_ME) {
+
+
+            float x = transform.position.x - (SizeX/2f);
+            float y = transform.position.y - (SizeY/2f);
+            Vector3 pos = new Vector3(x,y,0);
+        //    print(pos);
+
+            Color color = new Color(0.09F, 0.991F, 0.099F, 1F);
+           // Debug.DrawLine (new Vector3(x+0.15f,y+0.15f,0), new Vector3(x-0.15f,y-0.15f,0),color);
+          //  Debug.DrawLine (new Vector3(x+0.15f,y-0.10f,0), new Vector3(x-0.15f,y+0.10f,0),color);
+
+
+            color = new Color(0.99F, 0.991F, 0.09F, 1F);
+
+            for(int b=0; b<SizeY; b++) {
+                for(int a=0; a<SizeX; a++) {
+                    Debug.DrawLine (new Vector3(x+a+0.1f,y+b+0.1f,0), new Vector3(x+a-0.1f,y+b-0.1f,0),color);
+                    Debug.DrawLine (new Vector3(x+a+0.1f,y+b-0.1f,0), new Vector3(x+a-0.1f,y+b+0.1f,0),color);
+                }
+            } 
+
+
+            color = new Color(0.1F, 0.9F, 0.3F, 1F);
+            foreach(Vector2 p in levelscript.AllAccessableCubesInThisRoom(this,true )){
+                Debug.DrawLine (new Vector3(p.x+0.1f,p.y+0.1f,0), new Vector3(p.x,p.y,0),color);
+                Debug.DrawLine (new Vector3(p.x+0.11f,p.y+0.11f,0), new Vector3(p.x+0.01f,p.y-0.01f,0),color);
+                Debug.DrawLine (new Vector3(p.x+0.12f,p.y+0.12f,0), new Vector3(p.x+0.02f,p.y-0.02f,0),color);
+                Debug.DrawLine (new Vector3(p.x+0.13f,p.y+0.13f,0), new Vector3(p.x+0.03f,p.y-0.03f,0),color);
+            }
+            //*/
+
+        }
         
     }
     
@@ -255,7 +287,7 @@ public class Levelobject : MonoBehaviour {
         // (katram shiis telpas kubikam)
         
         
-        if(currentCollisions.Count > 0 ){
+        if(!levelscript.IsThisSpotFree(this) ){
             print ("She nedriikst likt bloka !");
         } else {
             //print ("Bloks tiek novietots uz laukuma (tochna) ");
