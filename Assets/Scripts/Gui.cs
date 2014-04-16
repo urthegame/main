@@ -56,7 +56,6 @@ public class Gui : MonoBehaviour {
                     //pieseivo speeles aatrumu un kameras poziiciju, tikai ja neesam jau iekshaa zuumaa (saglabaaju peedeejos lietotaaja izveeleetos parametrus, pat vairaaku seciigu zuumu gadiijumaa)
                     levelscript.TimeScaleHistoric = levelscript.TimeScale;
                     camerascript.LastUserCamPos = camerascript.transform.position;
-                    print("save pos/time");
                 } else {
                     stopQueryMode();
                 }
@@ -67,9 +66,10 @@ public class Gui : MonoBehaviour {
                 levelscript.TimeScale = 0.25f; // paleenina aatrumu
 
             } else {
-                stopQueryMode();
+                if(QueryMode) { //ja nav atrasta telpa un ieprieksh bija , tikai tad ir nepiecieshams noresetot (citaadi noreseto kameras poziiciju, kas vispaar nav uzsetota un ir slikti )
+                    stopQueryMode();
+                }
             }
-            
         }
 
     }

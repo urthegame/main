@@ -140,9 +140,8 @@ public class Camctrl : MonoBehaviour {
     }
 
     public void UnZoomFromRoom() {
-        print("unzoom");
         autoExcluseiveMoveEnabled = false;
-        autoMoveTime = 1.4f;
+        autoMoveTime = 0.8f;
         autoMovePosition = LastUserCamPos;
 
     }
