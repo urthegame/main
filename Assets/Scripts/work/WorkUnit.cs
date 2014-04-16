@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 /**
@@ -19,7 +19,7 @@ public class WorkUnit {
 
     public GameObject parentGameobject; //te jaanoraada (prefabaa) objekts, kam pieder shis skripts
     [HideInInspector]
-    public Levelobject parentLevelobject; //shii geimobjekta Levelobject komponente (ieguushu no "parentGameobject" )
+    public Room parentLevelobject; //shii geimobjekta Levelobject komponente (ieguushu no "parentGameobject" )
 
     /**
      * vai darbinju var dariit
@@ -47,7 +47,7 @@ public class WorkUnit {
 
 
         if(parentGameobject != null) {
-            parentLevelobject = parentGameobject.GetComponent<Levelobject>();
+            parentLevelobject = parentGameobject.GetComponent<Room>();
         }
 
 

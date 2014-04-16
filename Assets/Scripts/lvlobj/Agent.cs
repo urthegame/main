@@ -31,15 +31,9 @@ public class AgentNeeds {
 
 }
 
-public class Agent : MonoBehaviour {
+public class Agent : BaseLevelThing {
 
     private Animator avatarAnimator;
-
-    static private Level levelscript;
-    static private WorkManager workManagerScript;
-//    private Transform thoughtbubble;
- //   private TextMesh tbText;
-//    private bool tbOn;
 
     //paarvietoshanaas FSM mainiigie
     private List<Vector2> actualRoute = new List<Vector2>();//aktuaalaakais varonja celjsh 
@@ -72,7 +66,7 @@ public class Agent : MonoBehaviour {
     public AgentNeeds Needs; //datu struktuura, kur glabaajaas cik agjentam ir katrs resurss
 
     // globaalaas FSM mainiigie nav droshi lietosahanaa nekur citur!!11
-    private Levelobject currentRoom = null; // null vai telpa, kur atrodas cilveeks, to maina lielais FSM un tikai, galapunktos
+    private Room currentRoom = null; // null vai telpa, kur atrodas cilveeks, to maina lielais FSM un tikai, galapunktos
     private int isCraving = -1; //kuru vajadziibu gaaja apmierinaat
     private float idlingFor; // cik ilgi slinkos
     private WorkUnit workUnit;  //ko darbinsh, ko dara (vai iet dariit) null, ja pashlaik neko nedara
@@ -80,33 +74,21 @@ public class Agent : MonoBehaviour {
     private float offTheGridFor; //cik ilgi muljljaajaas un netiek atpakalj telpaa
 
     void Awake() {
+
+        baseInit();
+
         avatarAnimator = transform.FindChild("cubeman").
            transform.FindChild("cubeman-size").
            transform.FindChild("cubeman-animation").GetComponent<Animator>();
 
    
 
-        if(levelscript == null) {
-            levelscript = GameObject.Find("Level").GetComponent<Level>();
-            workManagerScript = GameObject.Find("Level").GetComponent<WorkManager>(); 
-        }
-        /*
-        thoughtbubble = transform.FindChild("thoughtbubble");
-        tbOn = true;
-       // thoughtbubble.renderer.enabled = false;
-        tbText = thoughtbubble.FindChild("text").GetComponent<TextMesh>();
-        tbText.text = "+" + Random.Range(1,9999);
-        */
-
         agentColor = new Color(Random.Range(0.1f, 0.5f), Random.Range(0.1f, 0.5f), Random.Range(0.1f, 0.5f), 1f);
       
-       
-
         nominalSpeed *= Random.Range(0.7f, 1.3f); //atshkjiriigi standarta aatrumi katram agjentam     
         nominalTurningSpeed *= Random.Range(0.7f, 1.3f); 
         speed = nominalSpeed;
         turningSpeed = nominalTurningSpeed;
-
 
         Needs = new AgentNeeds();
     }
@@ -196,7 +178,7 @@ public class Agent : MonoBehaviour {
      */ 
     private void thinkAbout() {
 
-        Levelobject room = null;
+        Room room = null;
         
 
         switch(CurrentState) {
@@ -655,7 +637,7 @@ public class Agent : MonoBehaviour {
     }
 
     //serializeeshanas funkcha - atgriezh visus parametrus CSV stringaa
-    public string InitToString(){
+    override public string InitToString(){
 
         return string.Format(" {0} {1} {2} {3} {4} {5} {6}", 
                              agentColor.r,
@@ -673,7 +655,7 @@ public class Agent : MonoBehaviour {
     }
 
     //deserializeeshana
-    public void InitFromString(string str){
+    override public void InitFromString(string str){
         string[] c = str.Split(' '); //sadala pa komponenteem:  nosaukums,x,y,z un tad shim levelobjektam svariigaas lietas
         //taatad skipojam pirmos 4 (un mees skaitam no nulles)
 
@@ -688,6 +670,16 @@ public class Agent : MonoBehaviour {
 
     }
 
+
+
+    
+    
+    public override void PlacedInPlacer(){}
+    public override void RemovedFromPlacer(){}
+    
+    
+    public override void PlaceOnGrid(int mode){}
+    public override void RemovedFromGrid(){}
 
 
 }

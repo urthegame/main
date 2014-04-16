@@ -74,6 +74,32 @@ NavMeshSettings:
     widthInaccuracy: 16.666666
     heightInaccuracy: 10
   m_NavMesh: {fileID: 0}
+--- !u!1 &239676841
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 239676842}
+  m_Layer: 0
+  m_Name: GadgetHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &239676842
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 239676841}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1111164272}
 --- !u!1 &251728197
 GameObject:
   m_ObjectHideFlags: 0
@@ -324,8 +350,10 @@ Transform:
   - {fileID: 389551069}
   - {fileID: 1980238892}
   - {fileID: 251728198}
+  - {fileID: 239676842}
   - {fileID: 867474149}
   - {fileID: 1305573267}
+  - {fileID: 1812829466}
   - {fileID: 1891909503}
   m_Father: {fileID: 0}
 --- !u!114 &1111164273
@@ -339,9 +367,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f38e7ab3ec385d14ab126a9dbb860960, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DebugDrawNavgrid: 1
+  DebugDrawNavgrid: 0
   ListOfRooms: []
+  LastPosGrid: {x: 0, y: 0, z: 0}
+  LastPosDecGrid: {x: 0, y: 0, z: 0}
   objectInPlacer: 0
+  gadgetEditMode: 0
   limits:
     XA: -15
     XB: 15
@@ -350,6 +381,10 @@ MonoBehaviour:
   TimeScale: 1
   TimeScaleMin: 1.00000001e-07
   TimeScaleMax: 5
+  TimeScaleHistoric: 0
+  gridUnity: 0
+  gridDecimal: 0
+  gridDecimalY: 0
 --- !u!114 &1111164274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -455,6 +490,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbe255cd3b91bf145980e102f18ee59f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LastUserCamPos: {x: 0, y: 0, z: 0}
 --- !u!1 &1794140598
 GameObject:
   m_ObjectHideFlags: 0
@@ -517,6 +553,45 @@ Light:
   m_ShadowAngle: 0
   m_IndirectIntensity: 1
   m_AreaSize: {x: 1, y: 1}
+--- !u!1 &1812829465
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1812829466}
+  - 65: {fileID: 1812829467}
+  m_Layer: 10
+  m_Name: FloorBasePlane
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1812829466
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1812829465}
+  m_LocalRotation: {x: .707106829, y: 0, z: 0, w: .707106829}
+  m_LocalPosition: {x: 0, y: -3.55999994, z: 0}
+  m_LocalScale: {x: 100, y: 2, z: 0}
+  m_Children: []
+  m_Father: {fileID: 1111164272}
+--- !u!65 &1812829467
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1812829465}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1869506014
 GameObject:
   m_ObjectHideFlags: 0

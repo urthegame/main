@@ -94,7 +94,7 @@ public class Camctrl : MonoBehaviour {
             z -= zoomSpeedDistance * (Time.deltaTime / levelscript.TimeScale);
 
         }
-        z = Mathf.Clamp(z,-30f,-2f); //ierobezho kameras attaalumu no liimenja plaknes
+        z = Mathf.Clamp(z,-15f,-2f); //ierobezho kameras attaalumu no liimenja plaknes
         cam.fieldOfView = calculateFOV(z);
         //*/
 

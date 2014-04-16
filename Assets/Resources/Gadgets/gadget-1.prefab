@@ -13,7 +13,7 @@ GameObject:
   - 23: {fileID: 2300000}
   - 114: {fileID: 11400000}
   m_Layer: 0
-  m_Name: query-1
+  m_Name: gadget-1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26,8 +26,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 1.08000004, y: -7.21999979, z: 0}
+  m_LocalScale: {x: .100000001, y: .100000001, z: .100000001}
   m_Children: []
   m_Father: {fileID: 0}
 --- !u!23 &2300000
@@ -42,7 +42,7 @@ Renderer:
   m_LightmapIndex: 255
   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
   m_Materials:
-  - {fileID: 2100000, guid: 57c263acebda368498d4fe5e5f2271fe, type: 2}
+  - {fileID: 2100000, guid: 3f52bf69faadf694ba91a5e08b4a9bec, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -78,9 +78,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a236c26ddd878b446ac2c59ee23fe49b, type: 3}
+  m_Script: {fileID: 11500000, guid: edd13dac435a38641a3a2abaa10221dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SizeX: 1
+  SizeY: 1
+  SizeZ: 1
+  Prefabname: kaads aizmirsis mani paarsaukt, ibio!
+  OffsetX: 0
+  OffsetY: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

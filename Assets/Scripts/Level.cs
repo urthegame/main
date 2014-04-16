@@ -16,10 +16,11 @@ public class Level : MonoBehaviour {
 
     public bool DebugDrawNavgrid = true;
     public Dictionary<Vector4,float> Navgrid = new Dictionary<Vector4, float>(); //cik maksaa (un vai vispaar ir iespeejams) celjs no x,y uz citu x,y (shie 4 xyxy tiek iekodeeeti vector4, aspraatiigi, es zinu )
-    public List<Levelobject> ListOfRooms; //saraksts ar visiem liimenii esoshajiem leveloblokiem jeb telpam
+    public List<Room> ListOfRooms; //saraksts ar visiem liimenii esoshajiem leveloblokiem jeb telpam
 
-    private GameObject levelObjectHolder;
+    private GameObject roomHolder;
     private GameObject agentHolder;
+    private GameObject gadgetHolder;
     private GameObject destroyHolder;
     private GameObject placer;
     private Gui guiscript; //vieniigais/globalais GUI skripts
@@ -29,11 +30,19 @@ public class Level : MonoBehaviour {
 
 
     [HideInInspector]
-    public Vector3 lastPos;
-    private Vector3 lastPosPrecise;
+    public Vector3 LastPosGrid;
+    private Vector3 LastPosGridPrecise;
+    [HideInInspector]
+    public Vector3 LastPosDecGrid;
+    private Vector3 LastPosDecGridPrecise;
     [HideInInspector]
     public bool objectInPlacer = false; //pleiseris ir konteineris, ko biida apkaart ar peli - priekshskatiijuma versija
-    private int numLevelobjects = 0;
+    [HideInInspector]
+    public bool gadgetEditMode; //ja TRUE, tad redigjee levelobjektos esoshos priekshmetus, ja FALSE tad redigjee pashus levelobjektus
+
+    private int numRooms = 0;
+    private int numAgents = 0;
+    private int numGadgets = 0;
     private Dictionary<string,GameObject> prefabCache = new Dictionary<string,GameObject>(); // lai katru unikaalo prefabu ielaadeetu tikai vienreiz
 
     public LevelLimits limits; //liimenjrobezhas
@@ -49,13 +58,19 @@ public class Level : MonoBehaviour {
     // lai kustinaatu objektus neatkariigi no speeles aatruma  delta time ir jaaizdala ar tiemscale:
     // (Time.deltaTime / levelscript.TimeScale) 
 
+
+    public bool gridUnity; //vai ziimeet vieniibas gridu - levelobjektiem, ziimee plaknee, kas atrodas pretii kamerai
+    public bool gridDecimal; //vai ziimeet decmaalgridu  - objektiem telpaa, ziimee uz levelobjekta griidas
+    public float gridDecimalY;  //kuraa staavaa, Y koordinaate, ziimet | sho apdeito GUI skripts
+
     
     void Start() {
 
         TimeScaleHistoric = TimeScale;
 
-        levelObjectHolder = GameObject.Find("LevelobjectHolder");
+        roomHolder = GameObject.Find("LevelobjectHolder");
         agentHolder = GameObject.Find("AgentHolder");
+        gadgetHolder = GameObject.Find("GadgetHolder");
         destroyHolder = GameObject.Find("DestroyHolder");
         placer = GameObject.Find("Placer");
         guiscript = GameObject.Find("GUI").GetComponent<Gui>();
@@ -94,8 +109,8 @@ public class Level : MonoBehaviour {
             Quaternion.identity) as GameObject;
 
     
-        Levelobject script = levelobject.GetComponent<Levelobject>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus
-       
+        Room script = levelobject.GetComponent<Room>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus
+        Gadget gadgetscript = levelobject.GetComponent<Gadget>(); //gadzhetiem ir shis skripts, meklee abus, bet dabuus tikai vienu
 
         //jaapadod ir globaalaa poziicija, taapeec jaaliek tieshi zem PLEISERA, tad shis prefabs ieguus savu lokaalo poziiciju 0,0,0  => tieshi tur, kur vecaaks
         levelobject.transform.position = new Vector3(placer.transform.position.x + script.OffsetX,
@@ -104,7 +119,7 @@ public class Level : MonoBehaviour {
         //offset_: poziicijaam x un y pieshauj 0,5, ja izmeers ir paara skaitlis(skat komentaaru faila apakshaa)
 
         levelobject.transform.parent = placer.transform; 
-        levelobject.name = script.Prefabname + " " + (numLevelobjects + 1);
+        levelobject.name = script.Prefabname + " " + (numRooms + 1);
         //levelobject.GetComponent<levelobject>().klucha_tips = "njigunjegu";  //@todo
 
 
@@ -130,7 +145,7 @@ public class Level : MonoBehaviour {
     public void emptyPlacer() {
         foreach(Transform childTransform in placer.transform) {
             //placer
-            childTransform.GetComponent<Levelobject>().RemovedFromPlacer(); //pazinjoju levelobjektam, ka tas tiek aizvaakts no PLEISERA
+            childTransform.GetComponent<Room>().RemovedFromPlacer(); //pazinjoju levelobjektam, ka tas tiek aizvaakts no PLEISERA
             Destroy(childTransform.gameObject);
         }
         objectInPlacer = false;
@@ -144,12 +159,28 @@ public class Level : MonoBehaviour {
     
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
+
+       
+        //vienmeer cheko poziiciju pret vieniibas gridu 
         if(Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << 8)) { // 1<<8 ir 8.slaanja bitmaska - neredzama plakne, kur lipinaat klaati limenobjektus
             int roundx = Mathf.RoundToInt(hit.point.x);
             int roundy = Mathf.RoundToInt(hit.point.y);
-            lastPos = new Vector3(roundx, roundy, 0); 
-            lastPosPrecise = new Vector3(hit.point.x, hit.point.y, 0); 
-            placer.transform.position = lastPos;
+            LastPosGrid = new Vector3(roundx, roundy, 0); 
+            LastPosGridPrecise = new Vector3(hit.point.x, hit.point.y, 0); 
+            placer.transform.position = LastPosGrid;
+        }
+
+        //dazhreiz tikai cheko poziiciju pret decimaalgridu
+        if(gadgetEditMode) {//gadzhetu redigjeeshanas redzhiiims
+            if(Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << 10)) { // 10. slaanis ir neredzama plakne FloorBasePlane | GUI skripts to noliek apskataamaa levelobjekta griidas augstumaa
+                float roundx = hit.point.x;
+                float roundy = hit.point.y;
+                float roundz = hit.point.z;
+                LastPosDecGrid = new Vector3(roundx, roundy, roundz); 
+                LastPosDecGridPrecise = new Vector3(hit.point.x, hit.point.y,hit.point.z); 
+                placer.transform.position = LastPosGrid;
+            }
+
         }
 
 
@@ -158,7 +189,7 @@ public class Level : MonoBehaviour {
 
             if(objectInPlacer) { //PLEISERII ir ielaadeeds prefabs
                 Transform levelobject = placer.transform.GetChild(0); //pienjemu, ka tikai viens objekts tiek likts vienlaiciigi
-                Levelobject script = levelobject.GetComponent<Levelobject>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus
+                Room script = levelobject.GetComponent<Room>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus
 
                 script.PlaceOnGrid(0); //katrs bloks pats izlems, ko dariit, kad tas tiek klikskshkinaats uz grida (ja bloks tiek novietots, tad tas tiks aizvaakts no PLEISERA)
                 CalculateNavgrid();//kaut kas iespeejams ir mainiijies, jaaparreekjina
@@ -166,7 +197,7 @@ public class Level : MonoBehaviour {
                 if(placer.transform.childCount == 0) { 
 
                     objectInPlacer = false; //bloks tika novietots (vai aizvaakts or smnt) un nu PLEISERIS ir tukshss
-                    numLevelobjects++; //droshs paliek droshs - palielinaashu skaitiitaaju (pat ja kluciitis netika novietots liimenii)
+                    numRooms++; //droshs paliek droshs - palielinaashu skaitiitaaju (pat ja kluciitis netika novietots liimenii)
                 }
 
 
@@ -180,7 +211,7 @@ public class Level : MonoBehaviour {
 
 
         if(Input.GetMouseButtonDown(2)) { // 2 => klik mid 
-            print(lastPos + " " + lastPosPrecise);
+            print(LastPosGrid + ":" + LastPosGridPrecise + " deci: " + LastPosDecGrid + ":" + LastPosDecGridPrecise );
         }
 
 
@@ -189,14 +220,34 @@ public class Level : MonoBehaviour {
             
     void drawGrid() {
                 
-        float go = 0.5f; //grid offset (objekti ir tiek pozicioneeti centraa, taapeec rezhgjis jaanobiida, yaddayaddayadda ... )
-        Color color = new Color(0.8F, 0.8F, 0.8F, 0.5F);
+        if(gridUnity){ //vieniibas grids
 
-        for(int x = limits.XA; x< limits.XB; x++) {
-            for(int y = limits.YA; y< limits.YB; y++) {
-                Debug.DrawLine(new Vector3(x + go, y + go, -0.5f), new Vector3(x + go, y - 1 + go, -0.5f), color);
-                Debug.DrawLine(new Vector3(x + go, y + go, -0.5f), new Vector3(x - 1 + go, y + go, -0.5f), color);
+            float go = 0.5f; //grid offset (objekti ir tiek pozicioneeti centraa, taapeec rezhgjis jaanobiida, yaddayaddayadda ... )
+            Color color = new Color(0.8F, 0.8F, 0.8F, 0.9F);
 
+            for(int x = limits.XA; x< limits.XB; x++) {
+                for(int y = limits.YA; y< limits.YB; y++) {
+                    Debug.DrawLine(new Vector3(x + go, y + go, -0.5f), new Vector3(x + go, y - 1 + go, -0.5f), color);
+                    Debug.DrawLine(new Vector3(x + go, y + go, -0.5f), new Vector3(x - 1 + go, y + go, -0.5f), color);
+
+                }
+            }
+        }
+
+        if(gridDecimal){ //decimaalgrids
+            float scale = 0.1f;
+           // float scale = 0.25f;
+            float go = 0; //scale / 2f; //grid offset 
+            Color color = new Color(0.8F, 0.8F, 0.8F, 0.9F);
+            float Y = gridDecimalY;
+
+
+            for(float x = limits.XA; x< limits.XB; x+=scale) {
+                for(float z = -0.5f; z< 0.5f; z+=scale) {
+                    Debug.DrawLine(new Vector3(x + go, Y, z+go), new Vector3(x + go, Y, z+go+scale), color);
+                    Debug.DrawLine(new Vector3(x + go, Y, z+go), new Vector3(x + go-scale, Y, z+go), color);
+                    
+                }
             }
         }
 
@@ -206,7 +257,7 @@ public class Level : MonoBehaviour {
 
     public void SaveLevel(string levelname) {
 
-        //webleijarii nav failu rakstiisahanas iespeeja :\
+        //webpleijerii nav failu rakstiisahanas iespeeja :\
         #if UNITY_STANDALONE_WIN 
        
       
@@ -218,12 +269,11 @@ public class Level : MonoBehaviour {
         int i = 0;
         string output = "";
         output += gResScript.Money + "\n"; //pirmaa rinda globaalaas lietass
-        foreach(Transform lvlobj in levelObjectHolder.transform) {
+        foreach(Transform lvlobj in roomHolder.transform) {
 
-            Levelobject script = lvlobj.GetComponent<Levelobject>();
+            BaseLevelThing script = lvlobj.GetComponent<BaseLevelThing>();
             string prefabname = script.Prefabname;
             string extraParams = script.InitToString(); //papildparametru strings, ja levelobjekta papildskipts ir pacenties taadus dabuut, ja ne tad tukssh strings
-
 
             //tips x y z \n
             output += prefabname + " " + lvlobj.position.x + " " + lvlobj.position.y + " " + lvlobj.position.z + extraParams + "\n";
@@ -231,26 +281,29 @@ public class Level : MonoBehaviour {
         }
         int numBlocks = i;
 
-
-        output += "agents\n";
-
-
-        foreach(Transform agent in agentHolder.transform) {
-            
-            Agent script = agent.GetComponent<Agent>();
-
-            string extraParams = script.InitToString(); //papildparametru strings, ja levelobjekta papildskipts ir pacenties taadus dabuut, ja ne tad tukssh strings
-            
-            
-            //tips x y z \n
-            output += "Avatar " + Mathf.RoundToInt(agent.position.x) + " " + 
-                Mathf.RoundToInt(agent.position.y) + " " + 
-                Mathf.RoundToInt(agent.position.z) + extraParams + "\n";
+        i = 0;
+        foreach(Transform lvlobj in agentHolder.transform) {
+            BaseLevelThing script = lvlobj.GetComponent<BaseLevelThing>();
+            string prefabname = script.Prefabname;
+            string extraParams = script.InitToString(); 
+            output += prefabname + " " + lvlobj.position.x + " " + lvlobj.position.y + " " + lvlobj.position.z + extraParams + "\n";
             i++;
         }
+        int numAgents = i;
+
+        i = 0;
+        foreach(Transform lvlobj in gadgetHolder.transform) {
+            BaseLevelThing script = lvlobj.GetComponent<BaseLevelThing>();
+            string prefabname = script.Prefabname;
+            string extraParams = script.InitToString(); 
+            output += prefabname + " " + lvlobj.position.x + " " + lvlobj.position.y + " " + lvlobj.position.z + extraParams + "\n";
+            i++;
+        }
+        int numGadgets = i;
 
 
-        print("Saglabaati visi " + numBlocks + " kluciishi");
+
+        print("Saglabaati visas " + numBlocks + " telpas ar visiem " + numGadgets + " un " + numAgents + "agjentiem" );
         System.IO.File.WriteAllText("Levels/" + levelname + ".lvl", output); //nevar seivot límeni, ja ir webpleijera versija
 
         #endif
@@ -269,10 +322,19 @@ public class Level : MonoBehaviour {
 
 
         //dzeesh levelobjektus
-        while(levelObjectHolder.transform.childCount > 0){
-            Transform childTransform = levelObjectHolder.transform.GetChild(0);
+        while(roomHolder.transform.childCount > 0){
+            Transform childTransform = roomHolder.transform.GetChild(0);
             childTransform.transform.name = childTransform.transform.name+"+DELETE";
             childTransform.transform.parent = destroyHolder.transform; //jaaieliek pagaidu konteinerii, jo Destroy notiks tikai naakamajaa kadraa, bet man vajag iisto konteineri tukshu ljoti driiz - jo navgrida paarreekjinaataajs skatiisies tur esoshos objektus
+            childTransform.transform.position = new Vector3(-1000,9999,9999);
+            Destroy(childTransform.gameObject);
+        }
+        //dzeesh gadzhetus taadaa pashaa veidaa kaa telpas
+        while(gadgetHolder.transform.childCount > 0){
+            Transform childTransform = gadgetHolder.transform.GetChild(0);
+            childTransform.transform.name = childTransform.transform.name+"+DELETE";
+            childTransform.transform.parent = destroyHolder.transform; 
+            childTransform.transform.position = new Vector3(-1000,9999,9999);
             Destroy(childTransform.gameObject);
         }
 
@@ -280,7 +342,8 @@ public class Level : MonoBehaviour {
         foreach(Transform agent in agentHolder.transform) {
             Destroy(agent.gameObject);
         }
-        numLevelobjects = 0;
+
+        numRooms = 0;
         gResScript.Init();
         guiscript.Init();
         workManagerScript.Init();
@@ -297,10 +360,7 @@ public class Level : MonoBehaviour {
       
         //atlikushaas rindas ir levelobjekti | skip(1) ... burtiski noskipo pirmo elementu
         foreach(string l in lvlLines.Skip(1)) {
-            if(l == "agents") {  //sastop rindinju, kur rakstiits "agents" - sakas agjentu nodalja seivfailaa
-                break;
-            }
-
+          
             string[] c = l.Split(' '); //sadala pa komponenteem:  nosaukums,x,y,z, + tonna ar objektiem specifiskiem parametriem
                         
             //print (l);
@@ -311,43 +371,47 @@ public class Level : MonoBehaviour {
             //print (type + "=  " + x + ":" + y + ":" + z );
 
 
-            GameObject prefab = loadLevelobjectPrefab(prefabName);     
+            GameObject prefab = loadLevelobjectPrefab(prefabName); 
             GameObject levelobject = Instantiate(
                 prefab, 
                 new Vector3(x, y, z),
                 Quaternion.identity) as GameObject;
                         
-            Levelobject script = levelobject.GetComponent<Levelobject>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus                      
-            levelobject.transform.parent = levelObjectHolder.transform; 
-            levelobject.name = script.Prefabname + " " + (numLevelobjects + 1);
-            numLevelobjects++;
-            levelobject.gameObject.layer = 9; //levelobjektu leijeris
+            BaseLevelThing script = levelobject.GetComponent<BaseLevelThing>();
+
+
+
+
+
+            if(script.GetType().ToString() == "Room"){ //peec skripta nosaku kaada veida prefabs vinhs ir un kur ir jaanoliek hierarhijaa
+                levelobject.transform.parent = roomHolder.transform; 
+                levelobject.name = script.Prefabname + " " + (numRooms + 1);
+                levelobject.gameObject.layer = 9; //telpu leijeris -- paareejiem prefabiem nav nepiecieshams
+                numRooms++;    
+
+            } else if(script.GetType().ToString() == "Agent"){
+                levelobject.transform.parent = agentHolder.transform; 
+                levelobject.name = script.Prefabname + " " + (numAgents + 1);
+                numAgents++;
+
+            } else if(script.GetType().ToString() == "Gadget"){
+                levelobject.transform.parent = gadgetHolder.transform; 
+                levelobject.name = script.Prefabname + " " + (numGadgets + 1);
+                numGadgets++;
+
+            } else {
+                print("Unrecognized prefab type: " + script.GetType().ToString() + "  actual line: " + l); //neatpaziistu skripta klasiiti
+            }
+
+
 
             script.InitFromString(l);
-            script.PlaceOnGrid(1); //zinjoju blokam, ka tas novietots speeles laukumaa
+            script.PlaceOnGrid(1); //zinjoju prefaba skriptam, ka prefabs novietots speeles laukumaa
+
+
+            
         }
 
-    
-        int numAgents = 0;
-        //agjenti 
-        foreach(string l in lvlLines.Skip(1 + numLevelobjects + 1)) {
-            numAgents++;
-            string[] c = l.Split(' '); //sadala pa komponenteem:  nosaukums,x,y,z, + tonna ar agjentam specifiskiem parametriem
-            string prefabName = c[0];
-            float x = float.Parse(c[1]);
-            float y = float.Parse(c[2]);
-            float z = float.Parse(c[3]);
-
-            GameObject prefab = Resources.Load(prefabName) as GameObject; 
-            GameObject agent = Instantiate(
-                prefab, 
-                new Vector3(x, y, z),
-                Quaternion.identity) as GameObject;
-            agent.transform.parent = agentHolder.transform;
-            Agent script = agent.GetComponent<Agent>();
-            script.InitFromString(l);
-
-        }
 
         CheckWorkingStatusEveryBlock(1); //kad vissi levelobjekti novietoti, varu sleegt tos iekshaa; ir/vai jaasleedz iekshaa, shis statuss jau ir uzsetots levelobjektaa
         CheckWorkingStatusEveryBlock(1); //divreiz, jo paarbauda ljoti nesistemaatiski un, ja gjenerators ir peedeejais objekts, tad var gadiities, ka neiesleedz nevienu levelobjektu, jo nav elektriibas >:)
@@ -356,7 +420,7 @@ public class Level : MonoBehaviour {
 
 
         stopwatch.Stop();
-        print("ir ielaadeets liimenis " + levelname + " ir  " + (numLevelobjects) + " objekti + " + numAgents + " agjenti  " + stopwatch.Elapsed);
+        print("ir ielaadeets liimenis " + levelname + " ir  " + (numRooms) + " telpas ar " + numGadgets + " lietaam un " + numAgents + " agjentiem  " + stopwatch.Elapsed);
 
 
         #endif
@@ -366,7 +430,25 @@ public class Level : MonoBehaviour {
     //@note -- ir aizdomas, ka shii keshoshana ir bezjeedziiga, junitijs pats piekesho atveertus prefabus
     public GameObject loadLevelobjectPrefab(string prefabName) {
         if(!prefabCache.ContainsKey(prefabName)) {
-            prefabCache[prefabName] = Resources.Load("Levelobjects/" + prefabName) as GameObject;
+
+            //ljoti haxxxoriigs veids kaa, nezinot subdirektoriju, ielaadeeju prefabus
+            GameObject prefab = Resources.Load("Rooms/" + prefabName) as GameObject;
+
+            if(prefab == null){ //nebija levelobjektu diraaa, skatiis pie gadzhetiem
+                prefab = Resources.Load("Gadgets/" + prefabName) as GameObject;
+            }
+
+            if(prefab == null){ //nebija levelobjektu diraaa, skatiis pie gadzhetiem
+                prefab = Resources.Load("Agents/" + prefabName) as GameObject;
+            }
+
+            //PS, ja te nav tad buus ERRORS, lai taa paliek!
+           
+                
+            prefabCache[prefabName] = prefab;
+
+
+
         }
         return prefabCache[prefabName];
     }
@@ -409,10 +491,10 @@ public class Level : MonoBehaviour {
                     positionInGrid,
                     Quaternion.identity) as GameObject;
                 
-                Levelobject script = levelobject.GetComponent<Levelobject>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus                      
-                levelobject.transform.parent = levelObjectHolder.transform; 
-                levelobject.name = script.Prefabname + " " + (numLevelobjects + 1);
-                numLevelobjects++;
+                Room script = levelobject.GetComponent<Room>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus                      
+                levelobject.transform.parent = roomHolder.transform; 
+                levelobject.name = script.Prefabname + " " + (numRooms + 1);
+                numRooms++;
                 levelobject.gameObject.layer = 9; //levelobjektu leijeris
                 
                 script.PlaceOnGrid(1); //zinjoju blokam, ka tas novietots speeles laukumaa
@@ -422,7 +504,7 @@ public class Level : MonoBehaviour {
         }
 
 
-
+        CalculateNavgrid();
 
     }
 
@@ -448,12 +530,12 @@ public class Level : MonoBehaviour {
         //print("paraustiis klokjus");
 
 
-        Dictionary<string,Levelobject> sorted = new Dictionary<string, Levelobject>();
+        Dictionary<string,Room> sorted = new Dictionary<string, Room>();
 
         if(orderMode == 0) { //hronologjiski
 
-            for(int i = 0; i< levelObjectHolder.transform.childCount; i++) { //ikviens levelobjekts liimenii
-                Levelobject lo = levelObjectHolder.transform.GetChild(i).GetComponent<Levelobject>();
+            for(int i = 0; i< roomHolder.transform.childCount; i++) { //ikviens levelobjekts liimenii
+                Room lo = roomHolder.transform.GetChild(i).GetComponent<Room>();
                 sorted.Add(i.ToString("D10"), lo); // D10 ir zeropadings, 10 cipari kopaa | taatad strings sorteesies tieshi taadaa pashaa seciibaa kaa saakotneejais INT
             }
         } else if(orderMode == 1) {  //random
@@ -462,15 +544,15 @@ public class Level : MonoBehaviour {
              * @bullshit -- shii randomizaacija ir meeesls - jaalieto orderby..newguid   piem.:   foreach(Levelobject r in levelscript.ListOfRooms.OrderBy(a => System.Guid.NewGuid())){
              */ 
             
-            for(int i = 0; i< levelObjectHolder.transform.childCount; i++) { //ikviens levelobjekts liimenii
-                Levelobject lo = levelObjectHolder.transform.GetChild(i).GetComponent<Levelobject>();
+            for(int i = 0; i< roomHolder.transform.childCount; i++) { //ikviens levelobjekts liimenii
+                Room lo = roomHolder.transform.GetChild(i).GetComponent<Room>();
                 sorted.Add(Random.Range(1000, 9999) + "-" + i, lo); //atsleega ir nejaushs, tachu garanteeti unikaals strings
             }
         }
 
-        foreach(KeyValuePair<string,Levelobject> x in sorted.OrderBy(key => key.Key)) {
+        foreach(KeyValuePair<string,Room> x in sorted.OrderBy(key => key.Key)) {
 
-            Levelobject lo = x.Value.GetComponent<Levelobject>();
+            Room lo = x.Value.GetComponent<Room>();
                 
             if(lo.WantWorking) {//provees iesleegt tikai tad, ja tam ir jaabuut iesleegtam
                 lo.setWorkingStatus(lo.WantWorking, false);
@@ -484,7 +566,7 @@ public class Level : MonoBehaviour {
 
         pathCache = new Dictionary<Vector4, List<Vector2>>(); //noreseto atrsto celju keshu
         Navgrid = new Dictionary<Vector4, float>(); //noreseto
-        ListOfRooms = new List<Levelobject>();//pie viena ieguus aktuaalaako levelobjektu sarakstu 
+        ListOfRooms = new List<Room>();//pie viena ieguus aktuaalaako levelobjektu sarakstu 
 
         Dictionary<Vector2,int> directionsInCubes = new Dictionary<Vector2, int>(); //ikvienam blokam (x,y ) liimeenii, kam vinja prefabaa ir noraaditi iespeejamie virzieni (Waypoints.dirs), tiek ielikti te
 
@@ -492,8 +574,8 @@ public class Level : MonoBehaviour {
         /**
          * A) vispirms noskaidroju kuri kubiki iejami un tiks izmantoti paathfaindingaa, vinju virzieni tiek salikti datu struktuuraa
          */
-        for(int i = 0; i< levelObjectHolder.transform.childCount; i++) { //ikviens levelobjekts liimenii
-            Levelobject room = levelObjectHolder.transform.GetChild(i).GetComponent<Levelobject>();
+        for(int i = 0; i< roomHolder.transform.childCount; i++) { //ikviens levelobjekts liimenii
+            Room room = roomHolder.transform.GetChild(i).GetComponent<Room>();
               
             if( room.ConstrPercent < 1 &&  room.Destructing) { 
                     continue; // skipo geimobjektus, kas tiek jaukti nost (kad gandriiz jau nojaukts)
@@ -876,16 +958,15 @@ public class Level : MonoBehaviour {
      * atgriezh telpu (Levelobject) vai null, kuraa ietilpst padotaas XY koordinaates
      * 
      * 
-     * 
      */
-    public Levelobject roomAtThisPosition(float x, float y) {
+    public Room roomAtThisPosition(float x, float y) {
                 
         int numLevelblocks = ListOfRooms.Count;
 
 
         for(int i = 0; i < numLevelblocks; i++) {
 
-            Levelobject r = ListOfRooms[i];
+            Room r = ListOfRooms[i];
             float halfWidth = r.SizeX / 2f;
             float halfHeight = r.SizeY / 2f;
 
@@ -903,9 +984,9 @@ public class Level : MonoBehaviour {
      * atgriezh istabu vai null - kur var apmierinaat padoto vajadziibu
      *  ja vajadziiba ir -1, tad dod nejaushu telpu
      */ 
-    public Levelobject roomWhereIcanDoThis(int need) {
+    public Room roomWhereIcanDoThis(int need) {
 
-        Levelobject room = null;
+        Room room = null;
 
         int numLevelblocks = ListOfRooms.Count;
         if(numLevelblocks == 0) {
@@ -915,7 +996,7 @@ public class Level : MonoBehaviour {
         if(need == -1) { //nav noraadiita vajadziiba - dos nejaushu telpu
             room = ListOfRooms[Random.Range(0, numLevelblocks)];
         } else { //meklees istabu, kas apmierina pieprasiito vajadziibu           
-            foreach(Levelobject r in ListOfRooms.OrderBy(a => System.Guid.NewGuid())) {
+            foreach(Room r in ListOfRooms.OrderBy(a => System.Guid.NewGuid())) {
                 if(r.AgentNeedsGeneration[need] > 0) { //telpa rada apskataamo agjentresursu
                     room = r;
                     break;
@@ -933,7 +1014,7 @@ public class Level : MonoBehaviour {
      * atgriezh abosluutaas XY koordinaates 1 nejausha bloka koordinaates, kursh ietilpst padotajaa telpaa
      * nedod kubikus, kas nav navgridaa
      */ 
-    public Vector2 randomCubeInThisRoom(Levelobject room) {
+    public Vector2 randomCubeInThisRoom(Room room) {
 
                     
         List<Vector2> accessableCubes = AllAccessableCubesInThisRoom(room); 
@@ -951,7 +1032,7 @@ public class Level : MonoBehaviour {
     /**
      * 
      */
-    public List<Vector2> AllAccessableCubesInThisRoom(Levelobject room, bool includeNeighbors = false){
+    public List<Vector2> AllAccessableCubesInThisRoom(Room room, bool includeNeighbors = false){
 
         List<Vector2> allCubes = new List<Vector2> ();
         Vector2 coords = new Vector2(room.transform.position.x - room.SizeX/2f, 
@@ -1023,7 +1104,7 @@ public class Level : MonoBehaviour {
     /**
      * vai shii levelobjekta nevins kubiks neatrodas uz kaada cita levelobjekta [jebkura kluciisha]
      */ 
-    public bool IsThisSpotFree(Levelobject newRoom){
+    public bool IsThisSpotFree(Room newRoom){
 
         float x = newRoom.transform.position.x - (newRoom.SizeX/2f);
         float y = newRoom.transform.position.y - (newRoom.SizeY/2f);
@@ -1048,11 +1129,11 @@ public class Level : MonoBehaviour {
      */ 
     public void AddAgent(){
         
-        GameObject prefab = Resources.Load("Avatar") as GameObject; 
+        GameObject prefab = loadLevelobjectPrefab("avatar-1");
         GameObject agent = Instantiate(
             prefab, 
             //new Vector3(0, -4, 0),
-            lastPos,
+            LastPosGrid,
             Quaternion.identity) as GameObject;
         agent.transform.parent = agentHolder.transform;
         Agent script = agent.GetComponent<Agent>();
@@ -1074,7 +1155,7 @@ public class Level : MonoBehaviour {
 }
 
 /**
- * par gridu
+ * par vieniibas (unity) gridu liimenjobjektiem
  * grids tiek ziimeets +0.5 pa x un y asi
  * objektu poziicijas tiek glabaatas peec to centraalajaam koordinaateem
  * objekti, kam ir paara skaits vieniibu pa x vai y, attieciigajaa virzienaa tiek offsetoti pa 0.5 - lai visi objekti pieliptu pie rezhgja

@@ -66,7 +66,7 @@ public enum FuncTypes {
     ground, //ambience n stuff
 }
 
-public class Levelobject : MonoBehaviour {
+public class Room : BaseLevelThing {
 
 
     public float ConstrTime = 1; //cik sekundes ilgi buuvee
@@ -86,14 +86,8 @@ public class Levelobject : MonoBehaviour {
     public float[] AgentNeedsGeneration; //masiivs, kas nosaka, cik katru agjentresursu telpa rada
 
     
-    //skripts pieder prefabam un shos parametrus nomaina manuaali caur inspektoru - izveidojot prefabu un pieshkjirot tam sho skriptu
-    //**svariigi**
-    public int SizeX = 1;
-    public int SizeY = 1;
-    public int SizeZ = 1;
-    public string Prefabname = "kaads aizmirsis mani paarsaukt, ibio!";
-    public FuncTypes FuncType;  //funkcionaalais tips; jaaizveelas no enuma
 
+    public FuncTypes FuncType;  //funkcionaalais tips; jaaizveelas no enuma
     public bool DEBUG_ME = false;
 
     
@@ -107,35 +101,20 @@ public class Levelobject : MonoBehaviour {
     public bool WantWorking; //speeleetaajs veelaas sho telpu iesleegtu
 
 
-    private bool placedOnGrid; //vai novietots liimenii (pirms tam tiek vazaats apkaart PLEISERII)
-    
-    private Dictionary<Levelobject,bool> neighbors; //visi unikaalie, kardinaalie kaiminji (NO diagonal chicks!)
+    private Dictionary<Room,bool> neighbors; //visi unikaalie, kardinaalie kaiminji (NO diagonal chicks!)
     private int everyOtherFrameCounter;
     
    
-	protected static GlobalResources gResScript; //globaalo resursu pieskatiitaaajs - singltons 
-    protected static WorkManager workManagerScript;//darbinju pieskatiitaajs - arii singltons
-	protected static Level levelscript; //viens vieniigais Liimenja paarvaldniekskripts
-
-	
-	//shie parametri tiks apreekjinaati
-    [HideInInspector]
-	public float OffsetX; // vai vinjam vajag pabiidiities par puslaucinju (vajag, ja vinjam ir paara skaitlis izmeeraa)
-    [HideInInspector]
-	public float OffsetY;
-
-	
-
-
     void Awake () {
         
        
-        
+        baseInit();
+
         //masu inicializacija
         Generation = new Dictionary<Res, float>();
         Usage = new Dictionary<Res, float>(); 
         blockinfos = new Dictionary<string, TextMesh>();
-        neighbors = new Dictionary<Levelobject,bool>(); 
+        neighbors = new Dictionary<Room,bool>(); 
         
         foreach (Res r in Enum.GetValues(typeof(Res))){
             Generation[r] = 0;
@@ -159,15 +138,7 @@ public class Levelobject : MonoBehaviour {
         WantWorking = true;
 
 
-        OffsetX =  0.5f* ((SizeX+1f)%2f);
-        OffsetY =  -0.5f* ((SizeY+1f)%2f);
-        
-        if(gResScript == null){ // piestartee statiskaas references un singltoniem
-            gResScript  = GameObject.Find("Level").GetComponent<GlobalResources>(); 
-            workManagerScript = GameObject.Find("Level").GetComponent<WorkManager>(); 
-            levelscript = GameObject.Find("Level").GetComponent<Level>();
-        }
-        
+      
         
         if(ConstrTime > 0){ 
             ConstrTime = 60 / ConstrTime; //lai buuveeshanas ilgums buutu sekundees (lai var reizinaat ar delta_time)
@@ -258,7 +229,7 @@ public class Levelobject : MonoBehaviour {
     }
     
     
-    public void PlaceOnGrid(int mode){
+    override public void PlaceOnGrid(int mode){
         
         GameObject level = GameObject.Find("LevelobjectHolder");
         
@@ -282,10 +253,7 @@ public class Levelobject : MonoBehaviour {
             }
         }
         
-        
-        //@refactor -- chekot vai nesasktas ar citiem objektiem, lietojot levelskripta roomAtThisPosition metodi
-        // (katram shiis telpas kubikam)
-        
+
         
         if(!levelscript.IsThisSpotFree(this) ){
             print ("She nedriikst likt bloka !");
@@ -393,7 +361,7 @@ public class Levelobject : MonoBehaviour {
         
     }
     
-    public void RemovedFromGrid(){
+    override public void RemovedFromGrid(){
         
         
         workManagerScript.RemoveAllConstructionJobsForThisBlock(this); //jaapaartrauc visi celtnieciibas darbi, if-any
@@ -422,7 +390,7 @@ public class Levelobject : MonoBehaviour {
     private void findAndInformNeighbors(){
         //print ("meklee kaiminjus");
         
-        neighbors = new Dictionary<Levelobject, bool>(); //aizpilda visu sarakstu par jaunu (vienkaarshaak nekaa skipot jau zinaamos)
+        neighbors = new Dictionary<Room, bool>(); //aizpilda visu sarakstu par jaunu (vienkaarshaak nekaa skipot jau zinaamos)
         int levelobjectLayer = 1 << 9;
         
         //pa labi
@@ -433,7 +401,7 @@ public class Levelobject : MonoBehaviour {
             //  print ("got right " + hit.transform.name);
             
             //draudzeejaas tikai ar citiem levelobjektiem, ja objektam nav shii skripta, tas ir nesvariigs klucis un nav pelniijis tikt pieskaitiits pie kaiminjiem :P
-            Levelobject otherRoom = hit.transform.gameObject.GetComponent<Levelobject>(); 
+            Room otherRoom = hit.transform.gameObject.GetComponent<Room>(); 
             if(otherRoom){
                 if (!neighbors.ContainsKey(otherRoom)){ //paarbauda vai shis kaiminsh jau nav sarakstaa (diivains bugs ielaadeejot saglabaatu liimeni)
                     neighbors.Add(otherRoom,true);
@@ -445,7 +413,7 @@ public class Levelobject : MonoBehaviour {
         p1 = new Vector3(transform.position.x+distance/2f,transform.position.y,transform.position.z);
         foreach( RaycastHit hit in Physics.SphereCastAll(p1,radius, Vector3.left,distance,levelobjectLayer) ){
             //print ("got left " + hit.transform.name);
-            Levelobject otherRoom = hit.transform.gameObject.GetComponent<Levelobject>(); 
+            Room otherRoom = hit.transform.gameObject.GetComponent<Room>(); 
             if(otherRoom){
                 if (!neighbors.ContainsKey(otherRoom)){
                     neighbors.Add(otherRoom,true);
@@ -458,7 +426,7 @@ public class Levelobject : MonoBehaviour {
         p1 = new Vector3(transform.position.x,transform.position.y-distance/2f,transform.position.z);
         foreach( RaycastHit hit in Physics.SphereCastAll(p1,radius, Vector3.up,distance,levelobjectLayer) ){
             //print ("got top " + hit.transform.name);
-            Levelobject otherRoom = hit.transform.gameObject.GetComponent<Levelobject>(); 
+            Room otherRoom = hit.transform.gameObject.GetComponent<Room>(); 
             if(otherRoom){
                 if (!neighbors.ContainsKey(otherRoom)){
                     neighbors.Add(otherRoom,true);
@@ -471,7 +439,7 @@ public class Levelobject : MonoBehaviour {
         p1 = new Vector3(transform.position.x,transform.position.y+distance/2f,transform.position.z);
         foreach( RaycastHit hit in Physics.SphereCastAll(p1,radius, Vector3.down,distance,levelobjectLayer) ){
             //  print ("got bottom " + hit.transform.name);
-            Levelobject otherRoom = hit.transform.gameObject.GetComponent<Levelobject>(); 
+            Room otherRoom = hit.transform.gameObject.GetComponent<Room>(); 
             if(otherRoom){
                 if (!neighbors.ContainsKey(otherRoom)){
                     neighbors.Add(otherRoom,true);
@@ -482,13 +450,13 @@ public class Levelobject : MonoBehaviour {
         //print (transform.name + " has found " + neighbors.Count + " neighbors" );
         
         //visiem jaunapzinaatajiem kaiminjiem pazinjoshu par sevi, lai tie ieliek savaas kaiminjlistees
-        foreach (Levelobject neighbor in neighbors.Keys){
+        foreach (Room neighbor in neighbors.Keys){
             neighbor.addNeighbor(this);
         }
     }
     
     //mans kaiminsh, kursh ir mani atradis, iepaziistina ar sevi; pievienoju vinju savam kaiminjsarakstam
-    public void addNeighbor(Levelobject neighbor){
+    public void addNeighbor(Room neighbor){
         
         if (!neighbors.ContainsKey(neighbor)) { 
             neighbors.Add(neighbor,true);
@@ -598,7 +566,7 @@ public class Levelobject : MonoBehaviour {
         
     }
     
-    public void InitFromString(string str){
+    override public void InitFromString(string str){
         string[] c = str.Split(' '); 
         /**sadala pa komponenteem:  nosaukums,x,y,z un tad shim levelobjektam svariigaas lietas
         * taatad skipojam pirmos 4 (un mees skaitam no nulles)
@@ -623,7 +591,7 @@ public class Levelobject : MonoBehaviour {
      *          pirmos 4 visu kluchu kopiigos parametrus seivotaajs pats pieliks
      * @note -- strings saakas ar atstarpi
      */ 
-    public string InitToString(){
+    override public string InitToString(){
         
         return string.Format(" {0} {1} {2} {3}", WantWorking,                                            
                              Destructing,
@@ -647,14 +615,14 @@ public class Levelobject : MonoBehaviour {
     /**
      * levelskripts izsauc sho
      */ 
-    public  void PlacedInPlacer(){
+    override public void PlacedInPlacer(){
         
     }
 
     /**
      * levelskripts izsauc sho
      */ 
-    public  void RemovedFromPlacer(){
+    override public void RemovedFromPlacer(){
         
     }
     
