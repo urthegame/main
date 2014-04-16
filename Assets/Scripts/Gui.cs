@@ -9,6 +9,7 @@ public class Gui : MonoBehaviour {
 	private GUIStyle skin;
 	private Level levelscript; //viens vieniigais Liimenja paarvaldniekskripts
 	private GlobalResources gResScript; //globaalo resursu pieskatiitaaajs, arii singltons :P
+    private Camctrl camerascript;
 
    
 	private int vert;
@@ -18,6 +19,7 @@ public class Gui : MonoBehaviour {
 	public void Awake(){
 		levelscript = GameObject.Find("Level").GetComponent<Level>(); //no-bullshit singleton
 		gResScript  = GameObject.Find("Level").GetComponent<GlobalResources>(); //no-bullshit singleton
+        camerascript  = GameObject.Find("Camera").GetComponent<Camctrl>(); //no-bullshit singleton
 
 		Init ();
 	}
@@ -37,6 +39,47 @@ public class Gui : MonoBehaviour {
     void mouse(){
 
 
+        if(IsMouseOverGui()) { 
+            return;
+        }
+
+
+        
+        if(Input.GetMouseButtonDown(1)) { // 0 => klik rait
+
+
+            Levelobject room = levelscript.roomAtThisPosition(levelscript.lastPos.x,levelscript.lastPos.y);
+            if(room != null){
+
+
+                if(!QueryMode){
+                    //pieseivo speeles aatrumu un kameras poziiciju, tikai ja neesam jau iekshaa zuumaa (saglabaaju peedeejos lietotaaja izveeleetos parametrus, pat vairaaku seciigu zuumu gadiijumaa)
+                    levelscript.TimeScaleHistoric = levelscript.TimeScale;
+                    camerascript.LastUserCamPos = camerascript.transform.position;
+                    print("save pos/time");
+                } else {
+                    stopQueryMode();
+                }
+
+                QueryMode = true;
+                QueryTarget = room.GetComponent<Levelobject>();
+                camerascript.ZoomToRoom(room.transform.position.x,room.transform.position.y);
+                levelscript.TimeScale = 0.25f; // paleenina aatrumu
+
+            } else {
+                stopQueryMode();
+            }
+            
+        }
+
+    }
+
+    void stopQueryMode(){
+        levelscript.emptyPlacer();
+        QueryMode = false;
+        QueryTarget = null;
+        camerascript.UnZoomFromRoom();
+        levelscript.TimeScale = levelscript.TimeScaleHistoric; //atjauno aatrumu
     }
 
 	
@@ -55,8 +98,8 @@ public class Gui : MonoBehaviour {
 			levelscript.PutObjInPlacer("delete-1");
 		}
 		
-		if (Input.GetKeyDown(KeyCode.Escape)){
-			levelscript.emptyPlacer();
+		if (Input.GetKeyDown(KeyCode.Escape)){			
+            stopQueryMode();
 		}
 		
 
@@ -180,101 +223,7 @@ public class Gui : MonoBehaviour {
            // levelscript.PutObjInPlacer("corridor-44");
         }
 
-        
-        vert += height + vSpace;
-        if(GUI.Button(new Rect(20,vert,80,height), new GUIContent("Base", "Triple Base unit"))) {
-            levelscript.PutObjInPlacer("base-31");
-        }
 
-		vert += height + vSpace;
-        if(GUI.Button(new Rect(left,vert,23,height), new GUIContent("A", "Air generator"))) {
-			levelscript.PutObjInPlacer("air-gen-11");
-		}       	
-
-        if(GUI.Button(new Rect(left+28,vert,23,height), new GUIContent("E", "Electricity generator"))) {
-            levelscript.PutObjInPlacer("electr-gen-22");
-        }           
-
-        if(GUI.Button(new Rect(left+58,vert,23,height), new GUIContent("W", "Water generator"))) {
-            levelscript.PutObjInPlacer("water-gen-12");
-        }           
-
-        
-
-        vert += height + vSpace;
-        if(GUI.Button(new Rect(20,vert,35,height), new GUIContent("B1", "Single Bedroom"))) {
-            levelscript.PutObjInPlacer("bedroom-11");
-        }
-
-        if(GUI.Button(new Rect(65,vert,35,height), new GUIContent("B2", "Double Bedroom"))) {
-            levelscript.PutObjInPlacer("bedroom-21");
-        }
-
-
-
-        vert += height + vSpace;
-        if(GUI.Button(new Rect(20,vert,80,height), new GUIContent("Canteen", "Canteen"))) {
-            levelscript.PutObjInPlacer("canteen-21");
-        }
-
-
-        vert += height + vSpace;
-        if(GUI.Button(new Rect(20,vert,35,height), new GUIContent("S1", "Single Storage"))) {
-            levelscript.PutObjInPlacer("storage-11");
-        }
-        
-        if(GUI.Button(new Rect(65,vert,35,height), new GUIContent("S2", "Double Storage"))) {
-            levelscript.PutObjInPlacer("storage-21");
-        }
-
-
-
-
-		vert += height + vSpace;
-        if(GUI.Button(new Rect(20,vert,80,height),  new GUIContent("Workshop", "Workshop"))) {
-			levelscript.PutObjInPlacer("workshop-21");
-		}
-
-        vert += height + vSpace;
-        if(GUI.Button(new Rect(left,vert,25,height), new GUIContent("C1", "Single Corridor"))) {
-            levelscript.PutObjInPlacer("corridor-11");
-        }           
-        
-        if(GUI.Button(new Rect(left+30,vert,26,height), new GUIContent("C2", "Double Corridor"))) {
-            levelscript.PutObjInPlacer("corridor-21");
-        }           
-        
-        if(GUI.Button(new Rect(left+60,vert,26,height), new GUIContent("C3", "Triple Corridor"))) {
-            levelscript.PutObjInPlacer("corridor-31");
-        }           
-
-
-
-
-        vert += height + vSpace;
-        if(GUI.Button(new Rect(left,vert,25,height), new GUIContent("S1", "Single storey modular Stairwell"))) {
-            levelscript.PutObjInPlacer("stairwell-11");
-        }           
-        
-        if(GUI.Button(new Rect(left+30,vert,26,height), new GUIContent("S2", "Two storey Stairwell"))) {
-            levelscript.PutObjInPlacer("stairwell-12");
-        }           
-        
-        if(GUI.Button(new Rect(left+60,vert,26,height), new GUIContent("S3", "Three storey Stairwell"))) {
-            levelscript.PutObjInPlacer("stairwell-13");
-        }           
-
-
-
-
-        vert += height + vSpace;
-        if(GUI.Button(new Rect(20,vert,35,height), new GUIContent("G1", "Ground cube"))) {
-            levelscript.PutObjInPlacer("groundcube-1");
-        }
-        
-        if(GUI.Button(new Rect(65,vert,35,height), new GUIContent("GF", "Flat Ground"))) {
-            levelscript.PutObjInPlacer("groundcube-flat-1");
-        }
 
 
 

@@ -27,8 +27,11 @@ public class Level : MonoBehaviour {
     private WorkManager workManagerScript;//singltons 
     private Dictionary<Vector4, List<Vector2>> pathCache = new Dictionary<Vector4, List<Vector2>>(); //piekeshos katru atrasto celju, notiiriis paarziimeejot navgridu
 
-    private Vector3 lastPos;
+
+    [HideInInspector]
+    public Vector3 lastPos;
     private Vector3 lastPosPrecise;
+    [HideInInspector]
     public bool objectInPlacer = false; //pleiseris ir konteineris, ko biida apkaart ar peli - priekshskatiijuma versija
     private int numLevelobjects = 0;
     private Dictionary<string,GameObject> prefabCache = new Dictionary<string,GameObject>(); // lai katru unikaalo prefabu ielaadeetu tikai vienreiz
@@ -37,11 +40,19 @@ public class Level : MonoBehaviour {
 
     [HideInInspector]
     public float TimeScale = 1.0f;
+    [HideInInspector]
     public float TimeScaleMin = .0000001f; //MIN nedriikst buut nulle - jo kameras kustiiba tiek kompenseeta atkariibaa no timescale un 0 gadiijumaa buus kosmoss
+    [HideInInspector]
     public float TimeScaleMax = 5.0f;
+    [HideInInspector]
+    public float TimeScaleHistoric; //dazhreiz piespiedu kaartaa mainu aatrumu un te pieseivoju ieprieksheejo
+    // lai kustinaatu objektus neatkariigi no speeles aatruma  delta time ir jaaizdala ar tiemscale:
+    // (Time.deltaTime / levelscript.TimeScale) 
 
     
     void Start() {
+
+        TimeScaleHistoric = TimeScale;
 
         levelObjectHolder = GameObject.Find("LevelobjectHolder");
         agentHolder = GameObject.Find("AgentHolder");
@@ -84,6 +95,8 @@ public class Level : MonoBehaviour {
 
     
         Levelobject script = levelobject.GetComponent<Levelobject>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus
+       
+
         //jaapadod ir globaalaa poziicija, taapeec jaaliek tieshi zem PLEISERA, tad shis prefabs ieguus savu lokaalo poziiciju 0,0,0  => tieshi tur, kur vecaaks
         levelobject.transform.position = new Vector3(placer.transform.position.x + script.OffsetX,
                                                  placer.transform.position.y + script.OffsetY,
