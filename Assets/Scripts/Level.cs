@@ -109,8 +109,7 @@ public class Level : MonoBehaviour {
             Quaternion.identity) as GameObject;
 
     
-        Room script = levelobject.GetComponent<Room>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus
-        Gadget gadgetscript = levelobject.GetComponent<Gadget>(); //gadzhetiem ir shis skripts, meklee abus, bet dabuus tikai vienu
+        BaseLevelThing script = levelobject.GetComponent<BaseLevelThing>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus
 
         //jaapadod ir globaalaa poziicija, taapeec jaaliek tieshi zem PLEISERA, tad shis prefabs ieguus savu lokaalo poziiciju 0,0,0  => tieshi tur, kur vecaaks
         levelobject.transform.position = new Vector3(placer.transform.position.x + script.OffsetX,
@@ -145,7 +144,7 @@ public class Level : MonoBehaviour {
     public void emptyPlacer() {
         foreach(Transform childTransform in placer.transform) {
             //placer
-            childTransform.GetComponent<Room>().RemovedFromPlacer(); //pazinjoju levelobjektam, ka tas tiek aizvaakts no PLEISERA
+            childTransform.GetComponent<BaseLevelThing>().RemovedFromPlacer(); //pazinjoju levelobjektam, ka tas tiek aizvaakts no PLEISERA
             Destroy(childTransform.gameObject);
         }
         objectInPlacer = false;

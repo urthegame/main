@@ -66,6 +66,8 @@ public enum FuncTypes {
     ground, //ambience n stuff
 }
 
+
+
 public class Room : BaseLevelThing {
 
 
@@ -80,7 +82,7 @@ public class Room : BaseLevelThing {
     //[HideInInspector]
     public float ConstrPercent;  //cik % uzcelts/nojaukts
 
-
+    public RoomRoles Role;
     public Waypoints waypoints;  //prefabaa noraadaami weipointi   
     public WorkUnit[] workUnits; //prefabaa noraadaami telpaa daraamie darbinji
     public float[] AgentNeedsGeneration; //masiivs, kas nosaka, cik katru agjentresursu telpa rada
@@ -134,7 +136,8 @@ public class Room : BaseLevelThing {
         AgentNeedsGeneration = new float[AgentNeeds.numTypes];
         AgentNeedsGeneration[(int)AgentNeeds.Types.Water] = resourceInitInfo.AgentNeedsWater;
         AgentNeedsGeneration[(int)AgentNeeds.Types.Sleep] = resourceInitInfo.AgentNeedsSleep;
-        
+
+        Role = new RoomRoles(this);
         WantWorking = true;
 
 
@@ -197,7 +200,7 @@ public class Room : BaseLevelThing {
 
             float x = transform.position.x - (SizeX/2f);
             float y = transform.position.y - (SizeY/2f);
-            Vector3 pos = new Vector3(x,y,0);
+          //  Vector3 pos = new Vector3(x,y,0);
         //    print(pos);
 
             Color color = new Color(0.09F, 0.991F, 0.099F, 1F);
@@ -625,7 +628,6 @@ public class Room : BaseLevelThing {
     override public void RemovedFromPlacer(){
         
     }
-    
 
 
 }

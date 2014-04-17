@@ -13,6 +13,8 @@ public class Gui : MonoBehaviour {
     private int vert;
     private int lastRoomLookedAt;
 
+
+
     public void Awake() {
         levelscript = GameObject.Find("Level").GetComponent<Level>(); //no-bullshit singleton
         gResScript = GameObject.Find("Level").GetComponent<GlobalResources>(); //no-bullshit singleton
@@ -46,10 +48,16 @@ public class Gui : MonoBehaviour {
 
 
             Room room = levelscript.roomAtThisPosition(levelscript.LastPosGrid.x, levelscript.LastPosGrid.y);
+
+            if(room != null && room.FuncType == FuncTypes.ground){ //atrasta telpa, bet taa ir zemes kluciitis, ignoreejam
+                room = null; 
+            }
+
             if(room != null) {
 
                 if(room.GetHashCode() == lastRoomLookedAt){ //atkaaroti spiezh labo peli uz vienas telpas, taatad grib izsleegt kverijreezhiimu
                     stopQueryMode();
+                    lastRoomLookedAt = -1;
                     return;
                 }
                 lastRoomLookedAt = room.GetHashCode();
@@ -160,14 +168,7 @@ public class Gui : MonoBehaviour {
             levelscript.LoadLevel("");
         }
 
-        vert += height + vSpace;
-        if(GUI.Button(new Rect(20, vert, 35, height), new GUIContent("X", "Destruction tool"))) {
-            levelscript.PutObjInPlacer("delete-1");
-        }
-        if(GUI.Button(new Rect(65, vert, 35, height), new GUIContent("?", "Query tool"))) {
-            levelscript.PutObjInPlacer("query-1");
-        }
-
+       
         vert += height + vSpace;
         if(GUI.Button(new Rect(20, vert, 35, height), new GUIContent("G1", "Toggle unity grid"))) {
             levelscript.gridUnity = !levelscript.gridUnity;
@@ -251,15 +252,11 @@ public class Gui : MonoBehaviour {
         vert += height;
 
 
-        //visaam pogaam ir shis tuultip (katrai savs teksts)
-        GUI.Label(new Rect(20, vert + 10, 130, 20), GUI.tooltip);
+      
 
         //backgoundbox
         GUI.Box(new Rect(10, 10, 100, vert), "Ur");
 
-
-        //-----------
-        //infobloka (query) autputs, ja te paliks par sarezhgjiitu, tad vajadzees paartaisiit, lai katrs kluciitis taisa savu query GUI
 
     
 
@@ -267,31 +264,87 @@ public class Gui : MonoBehaviour {
         try {
             if(QueryMode) { //tagad tiek apskatiits
 
-                GUI.Box(new Rect(Screen.width - 10 - 130, 10, 130, 50), "?\n" + QueryTarget.name);
+                left = Screen.width - 10 - 130;
+                vert = 10;
 
+                GUI.Box(new Rect(left, vert, 130, 330), "?\n" + QueryTarget.name);
+
+
+                vert += 40;
+                GUI.Box(new Rect(left+5, vert, 130-10, 55), string.Format("A: {0}/{1}\nE: {2}/{3}\nW: {4}/{5}",
+                                                                    QueryTarget.Generation[Res.air], QueryTarget.Usage[Res.air],
+                                                                    QueryTarget.Generation[Res.electricity], QueryTarget.Usage[Res.electricity],
+                                                                    QueryTarget.Generation[Res.water], QueryTarget.Usage[Res.water]
+                                                                    ));
+                
+
+                vert += 60;
+                
                 string offText = "OFF";
+                string offTooltipText = "Turn Room off; currently not working";
                 string onText = "on";
+                string onTooltipText = "Turn Room on; currently not working";
                 if(QueryTarget.Working) {
                     offText = "off";
+                    offTooltipText = "Turn Room off; currently working";
                     onText = "ON";
+                    onTooltipText = "Turn Room on; currently working";
                 }
 
-                if(GUI.Button(new Rect(Screen.width - 10 - 130, 65, 35, 20), offText)) {
+
+               
+                if(GUI.Button(new Rect(left+5, vert, 35, 20), new GUIContent(offText, offTooltipText))) {
                     QueryTarget.setWorkingStatus(false, true);
                 }
-                if(GUI.Button(new Rect(Screen.width - 10 - 130 + 45, 65, 35, 20), onText)) {
+                if(GUI.Button(new Rect(left + 45+5, vert, 35, 20), new GUIContent(onText, onTooltipText))) {
                     QueryTarget.setWorkingStatus(true, true);
                 }
-                if(GUI.Button(new Rect(Screen.width - 10 - 130 + 90, 65, 35, 20), "X")) {
+                
+               
+                if(GUI.Button(new Rect(left + 5 + 90, vert, 30, 20), new GUIContent("X", "Remove room"))) {
                     QueryTarget.RemovedFromGrid();
-                }        
-                    
+                }  
+
+
+
+                int i=0;
+                foreach(string roleName in RoomRoles.Names){
+                    vert += 25;
+                    string emph = "";
+                    if(QueryTarget.Role.Selected == i){ //diseiblo pogu jau izveeleetajai telpas lomai
+                        GUI.enabled = false;
+                        emph = "++";
+                    }
+
+                    if(QueryTarget.Role.Selected > 0 && i != 0){ //ja ir izveeleeta telpa, tad drikst tikai UNASSIGNED (nullto) izveeleeties
+                        GUI.enabled = false;
+                    }
+                    if(GUI.Button(new Rect(left+5, vert, 120, 20), new GUIContent(emph + roleName + emph, "Set Room to \"" + roleName + "\"" ))) {
+                        QueryTarget.Role.SetRole(i); //nomaina telpas lomu
+                    }  
+                    GUI.enabled = true;
+                    i++;
+                }
+
+
+                vert += 30;
+                GUI.Box(new Rect(left+5, vert, 130-10, 55), string.Format("Worklist: \n"));
+                
+
+
+             
             }
             
         } catch {
 
             QueryMode = false; //apskataamais levelobjets tika izniicinaats inforiiku neinformeejot :(
         }
+
+
+        
+        //visaam pogaam ir shis tuultips (katrai savs teksts)
+        GUI.Label(new Rect(Screen.width / 2f  , 15, 130, 60), GUI.tooltip);
+
 
     }
 

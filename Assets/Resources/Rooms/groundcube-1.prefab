@@ -157,6 +157,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d97e42189d885784a9d3e2e102b18cce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SizeX: 1
+  SizeY: 1
+  SizeZ: 1
+  Prefabname: groundcube-1
+  OffsetX: 0
+  OffsetY: 0
   ConstrTime: 0
   DestrTime: 10
   Price: 0
@@ -167,10 +173,6 @@ MonoBehaviour:
     passableDirections: 
   workUnits: []
   AgentNeedsGeneration: []
-  SizeX: 1
-  SizeY: 1
-  SizeZ: 1
-  Prefabname: groundcube-1
   FuncType: 1
   DEBUG_ME: 0
   resourceInitInfo:
@@ -184,8 +186,6 @@ MonoBehaviour:
     AgentNeedsSleep: 0
   Working: 0
   WantWorking: 0
-  OffsetX: 0
-  OffsetY: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
