@@ -309,7 +309,6 @@ public class Agent : BaseLevelThing {
         case AgentStates.traveling:
             // print("STATE:traveling");
             //kad agjents buus nonaacis galaa, tad vinja staavokli nomainiis moveAbout() metodee nevis sheit; nomainiis uz "arriving"
-          
 
             break;
            //---------------------------------------------------------------
@@ -512,6 +511,7 @@ public class Agent : BaseLevelThing {
             }
         }
 
+        //print("destinationNode" + destinationNode + " turning: " + isTurning +  " walking: " +  isWalking + " isScaling: " + isScaling);
 
         //griezhas pret meerkji (kameer nav pagriezies) | griezhas tikai pa Y asi (personaazhs staav uz x z plaknes )
         if(isTurning) {
@@ -559,9 +559,11 @@ public class Agent : BaseLevelThing {
 
         if(isScaling) {
 
+         //   print ("scaling distance " + Vector3.Distance(transform.position, destinationNode) + " = "  + transform.position + " + " +  destinationNode );
 
-
-            if(Vector3.Distance(transform.position, destinationNode) < 0.05f) { //vecaa metode atnaakshanas noteikshanai, ja buus probleemas, vajadzees uzlabot uz skatiishanos vai neiet projaam, nevis tuvumu meerkjim
+            float a = Mathf.Abs(transform.position.y);
+            float b = Mathf.Abs(destinationNode.y);
+            if(  Mathf.Max(a,b) - Mathf.Min(a,b)  < 0.05f) { ///ja shvaks freimreits, tad var paskriet garaam, ja rodas shii probleema, vajag skatiities arii virzienu - ja attaalinaas no meerkja, tad automaatiski => atrodas uz meerkja
                 isScaling = false;
                 nextRouteNodeIsSet = false;
                 transform.position = destinationNode; //ir atnaacis
@@ -596,7 +598,6 @@ public class Agent : BaseLevelThing {
         int destY = Mathf.FloorToInt(y);
 
         actualRoute = new List<Vector2>();
-
         try {
             actualRoute = levelscript.FindPath(currX, currY, destX, destY);   
             return 0;

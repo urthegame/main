@@ -1,5 +1,7 @@
 using UnityEngine;
+using System.IO;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Gui : MonoBehaviour {
 
@@ -13,12 +15,46 @@ public class Gui : MonoBehaviour {
     private int vert;
     private int lastRoomLookedAt;
 
+    private Dictionary<string,bool[]> gadgetPrefabs = new Dictionary<string, bool[]>(); //kaa sauc gadgeta prefabu | kaadaas telpaas tas var atrasties
+
 
 
     public void Awake() {
         levelscript = GameObject.Find("Level").GetComponent<Level>(); //no-bullshit singleton
         gResScript = GameObject.Find("Level").GetComponent<GlobalResources>(); //no-bullshit singleton
         camerascript = GameObject.Find("Camera").GetComponent<Camctrl>(); //no-bullshit singleton
+
+        /*
+        #if UNITY_EDITOR
+        DirectoryInfo dir = new DirectoryInfo("Assets/Resources/Gadgets");
+        FileInfo[] info = dir.GetFiles("*.prefab");
+        string prefablist = "";
+        foreach(FileInfo file in dir.GetFiles("*.prefab")){
+            string gadgetName = file.Name.Replace(".prefab","");
+            prefablist += "\"gadgetName\",\n";
+        }
+        print(prefablist); ///  <3--------- sho autputu jaaieliek zemaak defineetajaa masiivaa "visu gadhetprefabu nosaukumi"
+        #endif
+        //*/
+
+
+
+        /**
+         * vajag manuaali ierakstiit visus gadzhetu prefabu nosaukumus
+         * ielaadees katru prefabu, lai no taa skripta uzzinaatu
+         * kaadaam telpu lomaam (room.roles) shis gadgets ir deriigs
+         */ 
+        string[] allPrefabsInGadgetDirectoryBecauseICantGetThisListAtWebplayerRuntime = {
+            "gadget-1",
+            "gadget-2",
+        };
+
+     
+        foreach(string name in allPrefabsInGadgetDirectoryBecauseICantGetThisListAtWebplayerRuntime){
+            GameObject prefab = levelscript.loadLevelobjectPrefab(name);
+            Gadget gadgetscript = prefab.GetComponent<Gadget>();
+            gadgetPrefabs.Add(name,gadgetscript.suitableForRooms); //pievienoju savai gadzhetu listei 
+        }
 
         Init();
     }
@@ -267,7 +303,7 @@ public class Gui : MonoBehaviour {
                 left = Screen.width - 10 - 130;
                 vert = 10;
 
-                GUI.Box(new Rect(left, vert, 130, 330), "?\n" + QueryTarget.name);
+                GUI.Box(new Rect(left, vert, 130, 430), "?\n" + QueryTarget.name);
 
 
                 vert += 40;
@@ -319,12 +355,31 @@ public class Gui : MonoBehaviour {
                     if(QueryTarget.Role.Selected > 0 && i != 0){ //ja ir izveeleeta telpa, tad drikst tikai UNASSIGNED (nullto) izveeleeties
                         GUI.enabled = false;
                     }
+
                     if(GUI.Button(new Rect(left+5, vert, 120, 20), new GUIContent(emph + roleName + emph, "Set Room to \"" + roleName + "\"" ))) {
                         QueryTarget.Role.SetRole(i); //nomaina telpas lomu
                     }  
+
                     GUI.enabled = true;
                     i++;
                 }
+
+                vert += 15;
+
+                /**
+                 * @todo -- taisiit 2 pogas katraa rindaa
+                 */ 
+                foreach(KeyValuePair<string,bool[]> g in gadgetPrefabs) {
+                    if(!g.Value[QueryTarget.Role.Selected]){ //vai shiis prefabs ir deriigs shai telpas lomai (QueryTarget.Role.Selected)
+                        continue;
+                    }
+
+                    vert += 25;
+                    if(GUI.Button(new Rect(left+5, vert, 120, 20), new GUIContent(g.Key, "Place \"" + g.Key + "\" in this room" ))) {
+                        levelscript.PutObjInPlacer(g.Key);
+                    }
+                }
+
 
 
                 vert += 30;
