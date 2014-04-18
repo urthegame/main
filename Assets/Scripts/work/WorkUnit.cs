@@ -10,8 +10,10 @@ using System.Collections;
 public class WorkUnit {
 
     public enum WorkUnitTypes {  
-        _Construction = 1,  //sho izveidos automaatiski katrai telpai, nav nepiecieshams prefabaa veidot shii tipa darbinjus
-        _Destruction = 2,   // --"---"--- 
+        _ConstructionRoom = 1,  //sho izveidos automaatiski katrai telpai, nav nepiecieshams prefabaa veidot shii tipa darbinjus
+        _DestructionRoom = 2,   // --"---"--- 
+        _ConstructionGadget = 3,  //automaatiski izveodojams darbinsh gadzheta veidoshanai (gadzhets pieder telpai)
+        _DestructionGadget = 4,   //
 
     // pirmie 10 tiek uzskatiiti par speciaalajiem darbiem, kas nav atkariigi no telpas resursies un iesl./izsl.
         ManualLabor = 10,  
@@ -19,7 +21,7 @@ public class WorkUnit {
 
     public GameObject parentGameobject; //te jaanoraada (prefabaa) objekts, kam pieder shis skripts
     [HideInInspector]
-    public Room parentLevelobject; //shii geimobjekta Levelobject komponente (ieguushu no "parentGameobject" )
+    public Room parentLevelobject; //shii geimobjekta "Room" komponente (ieguushu no "parentGameobject" )
 
     /**
      * vai darbinju var dariit
@@ -76,12 +78,21 @@ public class WorkUnit {
         
         switch(WorkUnitTypeNumber) {
 
-        case WorkUnitTypes._Construction:
+        case WorkUnitTypes._ConstructionRoom:
             parentLevelobject.ConstrPercent += parentLevelobject.ConstrTime * Time.deltaTime * 2.5f;
 
             break;
-        case WorkUnitTypes._Destruction:
+        case WorkUnitTypes._DestructionRoom:
             parentLevelobject.ConstrPercent -= parentLevelobject.DestrTime * Time.deltaTime * 25f;
+            
+            break;
+
+        case WorkUnitTypes._ConstructionGadget:
+            //todo
+            
+            break;
+        case WorkUnitTypes._DestructionGadget:
+            //todo
             
             break;
         case WorkUnitTypes.ManualLabor:

@@ -108,6 +108,7 @@ public class Gui : MonoBehaviour {
 
                 QueryMode = true;
                 QueryTarget = room.GetComponent<Room>();
+                levelscript.lastRoomTargeted = QueryTarget;
                 camerascript.ZoomToRoom(room.transform.position.x, room.transform.position.y - (room.SizeY / 2f) + 1.5f); // centree uz punktu nvieniibas virs griidas 
                 levelscript.TimeScale = 0.25f; // paleenina aatrumu
                 levelscript.gridDecimalY = QueryTarget.transform.position.y - (QueryTarget.SizeY / 2f) + 0.055f; // Y kordinaate apskataamaa levelobjekta griidai + modelja griidas augstums 0.05f
@@ -377,6 +378,7 @@ public class Gui : MonoBehaviour {
                     vert += 25;
                     if(GUI.Button(new Rect(left+5, vert, 120, 20), new GUIContent(g.Key, "Place \"" + g.Key + "\" in this room" ))) {
                         levelscript.PutObjInPlacer(g.Key);
+                        levelscript.gadgetEditMode = true; //gadzhetu rezhiims - stikos pie mazaa grida nevis lielaaa
                     }
                 }
 

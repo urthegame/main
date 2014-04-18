@@ -135,9 +135,9 @@ public class WorkManager : MonoBehaviour {
 
 
     /**
-     * izveido buuvdarbu (sho netaisa prefabam aarpus speeles, jo shis ir iislaiciigi pieejams darbs)
+     * izveido buuvdarbu (sho netaisa prefabam caur Unity inspektoru, jo shis ir iislaiciigi pieejams darbs)
      */ 
-    public void CreateAndAddConstructionJob(Room block, WorkUnit.WorkUnitTypes workType){
+    public void CreateAndAddConstructionJob(Room block, Gadget gadget, WorkUnit.WorkUnitTypes workType){
 
         WorkUnit constructionJob = new WorkUnit();
         constructionJob.parentGameobject = block.gameObject;
@@ -151,7 +151,7 @@ public class WorkManager : MonoBehaviour {
      * izniicina visus buuvdarbus shim levelobjektam
      */ 
     public void RemoveAllConstructionJobsForThisBlock(Room block){
-            
+        print("droshi zini, ka visus konstrukcijas darbinjus ? kaa ar gadzhetu konstrukcijaam ?");
         int i = 0;
         foreach(WorkUnit w in worklist) {
             

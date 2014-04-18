@@ -39,8 +39,10 @@ public class Level : MonoBehaviour {
     public bool objectInPlacer = false; //pleiseris ir konteineris, ko biida apkaart ar peli - priekshskatiijuma versija
     [HideInInspector]
     public bool gadgetEditMode; //ja TRUE, tad redigjee levelobjektos esoshos priekshmetus, ja FALSE tad redigjee pashus levelobjektus
+    [HideInInspector]
+    public Room lastRoomTargeted; //telpa kuraa tiek pirkti gadzheti - sho maina GUIskriptss
 
-    private int numRooms = 0;
+    private int numRooms = 0; //tikai aptuveni apjomi, lieto unikaaliem nosakumiem, neivs patiesai apjoma ntoeikshanai
     private int numAgents = 0;
     private int numGadgets = 0;
     private Dictionary<string,GameObject> prefabCache = new Dictionary<string,GameObject>(); // lai katru unikaalo prefabu ielaadeetu tikai vienreiz
@@ -60,8 +62,9 @@ public class Level : MonoBehaviour {
 
 
     public bool gridUnity; //vai ziimeet vieniibas gridu - levelobjektiem, ziimee plaknee, kas atrodas pretii kamerai
-    public bool gridDecimal; //vai ziimeet decmaalgridu  - objektiem telpaa, ziimee uz levelobjekta griidas
-    public float gridDecimalY;  //kuraa staavaa, Y koordinaate, ziimet | sho apdeito GUI skripts
+    public bool gridDecimal; //vai ziimeet decmaalgridu  - objektiem telpaa, ziimee uz telpas griidas
+    public float gridDecimalY;  //kuraa staavaa, Y koordinaate, ziimet decimaalgridu | sho apdeito GUI skripts
+    private float GridDecimalScale = 0.1f; //cik liels ir decimaalgrida ruutojums 
 
     
     void Start() {
@@ -148,6 +151,7 @@ public class Level : MonoBehaviour {
             Destroy(childTransform.gameObject);
         }
         objectInPlacer = false;
+        gadgetEditMode = false; //vienmeer sho rezhiimu atcelj, iesleegs tikai, ja ievietos pleiserii gadzhetu
     }
     
     void mouse() {
@@ -172,15 +176,28 @@ public class Level : MonoBehaviour {
         //dazhreiz tikai cheko poziiciju pret decimaalgridu
         if(gadgetEditMode) {//gadzhetu redigjeeshanas redzhiiims
             if(Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << 10)) { // 10. slaanis ir neredzama plakne FloorBasePlane | GUI skripts to noliek apskataamaa levelobjekta griidas augstumaa
-                float roundx = hit.point.x;
-                float roundy = hit.point.y;
-                float roundz = hit.point.z;
+                float roundx = Mathf.RoundToInt(hit.point.x / GridDecimalScale) * GridDecimalScale + GridDecimalScale / 2f;//x un z asiim pieskaita offsetu - pus ruutinju - lai atrastos grida ruutinjas viduu
+                float roundy = Mathf.RoundToInt(hit.point.y / GridDecimalScale) * GridDecimalScale; //Y nedod offsetu, jo tam ir jaaatrodas mazliet virs zemes (telpas griidas biezums)
+                float roundz = Mathf.RoundToInt(hit.point.z / GridDecimalScale) * GridDecimalScale + GridDecimalScale / 2f;
+
+                /**
+                 * te jaaapskataas vai gadzhets nelien aarpus robezhaam (njemot veeraa gadzheta izmeerus)
+                 * gan uz blakus telpaam gan uz priekshu/aizmuguri
+                 * 
+                 * ja poziicija nav OK, tad neapdeitot LastPosDecGrid
+                 */ 
+
                 LastPosDecGrid = new Vector3(roundx, roundy, roundz); 
                 LastPosDecGridPrecise = new Vector3(hit.point.x, hit.point.y,hit.point.z); 
-                placer.transform.position = LastPosGrid;
+
+
             }
 
+
+
+            placer.transform.position = LastPosDecGrid;
         }
+        
 
 
         if(Input.GetMouseButtonDown(0)) { // 0 => klik left 
@@ -188,7 +205,12 @@ public class Level : MonoBehaviour {
 
             if(objectInPlacer) { //PLEISERII ir ielaadeeds prefabs
                 Transform levelobject = placer.transform.GetChild(0); //pienjemu, ka tikai viens objekts tiek likts vienlaiciigi
-                Room script = levelobject.GetComponent<Room>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus
+                BaseLevelThing script = levelobject.GetComponent<BaseLevelThing>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus
+
+                if(script.GetType().ToString() == "Gadget"){
+                    Gadget gadgetscript = (Gadget)script;
+                    gadgetscript.parentRoom = lastRoomTargeted; //ja tiek likts gadzhets (nevis telpa) tad gadhetam pasaka kurai telpai tas pieder 
+                }
 
                 script.PlaceOnGrid(0); //katrs bloks pats izlems, ko dariit, kad tas tiek klikskshkinaats uz grida (ja bloks tiek novietots, tad tas tiks aizvaakts no PLEISERA)
                 CalculateNavgrid();//kaut kas iespeejams ir mainiijies, jaaparreekjina
@@ -234,17 +256,17 @@ public class Level : MonoBehaviour {
         }
 
         if(gridDecimal){ //decimaalgrids
-            float scale = 0.1f;
-           // float scale = 0.25f;
+
+            
             float go = 0; //scale / 2f; //grid offset 
             Color color = new Color(0.8F, 0.8F, 0.8F, 0.9F);
             float Y = gridDecimalY;
 
 
-            for(float x = limits.XA; x< limits.XB; x+=scale) {
-                for(float z = -0.5f; z< 0.5f; z+=scale) {
-                    Debug.DrawLine(new Vector3(x + go, Y, z+go), new Vector3(x + go, Y, z+go+scale), color);
-                    Debug.DrawLine(new Vector3(x + go, Y, z+go), new Vector3(x + go-scale, Y, z+go), color);
+            for(float x = limits.XA; x< limits.XB; x+=GridDecimalScale) {
+                for(float z = -0.5f; z< 0.5f; z+=GridDecimalScale) {
+                    Debug.DrawLine(new Vector3(x + go, Y, z+go), new Vector3(x + go, Y, z+go+GridDecimalScale), color);
+                    Debug.DrawLine(new Vector3(x + go, Y, z+go), new Vector3(x + go-GridDecimalScale, Y, z+go), color);
                     
                 }
             }
@@ -1136,6 +1158,8 @@ public class Level : MonoBehaviour {
             Quaternion.identity) as GameObject;
         agent.transform.parent = agentHolder.transform;
         Agent script = agent.GetComponent<Agent>();
+        agent.name = script.Prefabname + " " + (numAgents + 1);
+        numAgents++;
         script.Init();
 
     }

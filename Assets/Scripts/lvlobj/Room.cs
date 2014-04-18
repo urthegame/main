@@ -71,16 +71,7 @@ public enum FuncTypes {
 public class Room : BaseLevelThing {
 
 
-    public float ConstrTime = 1; //cik sekundes ilgi buuvee
-    public float DestrTime = 1; //cik sekundes ilgi jauc nostii
-    public int Price = 0; //cik eiras maksaa uzbuuveesahana
-    
-    [HideInInspector]
-    public bool Constructing; //vai celj
-    [HideInInspector]
-    public bool Destructing; //vai tomeer jauc nost
-    //[HideInInspector]
-    public float ConstrPercent;  //cik % uzcelts/nojaukts
+
 
     public RoomRoles Role;
     public Waypoints waypoints;  //prefabaa noraadaami weipointi   
@@ -233,9 +224,7 @@ public class Room : BaseLevelThing {
     
     
     override public void PlaceOnGrid(int mode){
-        
-        GameObject level = GameObject.Find("LevelobjectHolder");
-        
+
         
         if(mode == 0){ //manuaali peivienotajiem levelobjektiem paarbaudiis vai nav novietots aarpus liimenja robezhaam
             if(transform.position.x-(SizeX * 0.5f) + 1 < levelscript.limits.XA){
@@ -270,13 +259,13 @@ public class Room : BaseLevelThing {
                 gResScript.Money -= Price;
             }
             
-            //nonuljljo Z poziiciju un rotaaciju - jo ir VIENS objekts, kam shie parametri NEZKAPEEC uzsetojas uz NIECIIGAAM veeriibaam (piem.: -9.313226E-10)
+            //nonuljljo Z poziiciju un rotaaciju - jo ir VIENS objekts, kam shie parametri NEZKAPEEC uzsetojas uz NIECIIGAAM veeriibaam (piem.: -9.313226E-10) un tas rada milziigas probleemas
             transform.position = new Vector3(transform.position.x,transform.position.y,0);
             transform.rotation = Quaternion.Euler(0,0,0);
             
             findAndInformNeighbors();
             
-            transform.parent = level.transform; //novieto liimenjobjektu konteinerii, kur dziivo liimenim piederoshie objekti       
+            transform.parent = roomHolder.transform; //novieto liimenjobjektu konteinerii, kur dziivo liimenim piederoshie objekti       
             transform.gameObject.layer = 9; //levelobjektu leijeris
             Destroy(transform.gameObject.GetComponent<Rigidbody>()); // kameer levelobjekts ir PLEISHOLDERII, tam pieder rigidbodijs, lai var koliizijas kolideet, nu tas vairs nav nepiecieshams
             
@@ -326,7 +315,7 @@ public class Room : BaseLevelThing {
                     //darbinju neveido
                     ConstrPercent = 100; //100 procenti, taatad naakamajaa UPDATE funkchaa konstrukcija tiks finalizeeta
                 } else {
-                    workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Construction );
+                    workManagerScript.CreateAndAddConstructionJob(this,null,WorkUnit.WorkUnitTypes._ConstructionRoom );
                 }
             }
             
@@ -336,7 +325,7 @@ public class Room : BaseLevelThing {
                 if(DestrTime == 0){
                     DestrTime = 0;
                 } else {
-                    workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Destruction );
+                    workManagerScript.CreateAndAddConstructionJob(this,null,WorkUnit.WorkUnitTypes._DestructionRoom );
                 }
                 
             }
@@ -373,7 +362,7 @@ public class Room : BaseLevelThing {
             ConstrPercent = 0; // ja konstrukcijas laiks ir nulle, tad uzsit 0 procentuis (naakamais UPDATE finalizees un aizvaaks sho kluciiti)
         } else {
             //ja ir konstrukcijas laiks, tad jaaveido darbinsh
-            workManagerScript.CreateAndAddConstructionJob(this,WorkUnit.WorkUnitTypes._Destruction );
+            workManagerScript.CreateAndAddConstructionJob(this,null,WorkUnit.WorkUnitTypes._DestructionRoom );
         }
         
         setWorkingStatus(false,true);//jaaizsleedz pirms aizvaakshanas, lai var atskaitiit savus resursus no globaalaa kopuma

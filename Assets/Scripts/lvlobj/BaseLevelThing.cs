@@ -3,6 +3,18 @@ using System.Collections;
 
 public abstract class BaseLevelThing : MonoBehaviour {
 
+
+    public float ConstrTime = 1; //cik sekundes ilgi buuvee
+    public float DestrTime = 1; //cik sekundes ilgi jauc nostii
+    public int Price = 0; //cik eiras maksaa uzbuuveesahana
+    
+    [HideInInspector]
+    public bool Constructing; //vai celj
+    [HideInInspector]
+    public bool Destructing; //vai tomeer jauc nost
+    //[HideInInspector]
+    public float ConstrPercent;  //cik % uzcelts/nojaukts
+
     //skripts pieder prefabam un shos parametrus nomaina manuaali caur inspektoru - izveidojot prefabu un pieshkjirot tam sho skriptu
     public int SizeX = 1;
     public int SizeY = 1;
@@ -14,6 +26,9 @@ public abstract class BaseLevelThing : MonoBehaviour {
     protected static WorkManager workManagerScript;//darbinju pieskatiitaajs - arii singltons
     protected static Level levelscript; //viens vieniigais Liimenja paarvaldniekskripts
 
+    protected static GameObject roomHolder;
+    protected static GameObject agentHolder;
+    protected static GameObject gadgetHolder;
 
     
     //shie parametri tiks apreekjinaati
@@ -38,6 +53,10 @@ public abstract class BaseLevelThing : MonoBehaviour {
             gResScript  = GameObject.Find("Level").GetComponent<GlobalResources>(); 
             workManagerScript = GameObject.Find("Level").GetComponent<WorkManager>(); 
             levelscript = GameObject.Find("Level").GetComponent<Level>();
+
+            roomHolder = GameObject.Find("LevelobjectHolder");
+            agentHolder = GameObject.Find("AgentHolder");
+            gadgetHolder = GameObject.Find("GadgetHolder");
         }
 
     }
