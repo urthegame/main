@@ -20,7 +20,6 @@ public class Gui : MonoBehaviour {
     private float rightPlaqueHeight;
     private float leftPlaqueHeight;
 
-    public GUISkin highlightBox; 
 
 //    private Dictionary<string,bool[]> gadgetPrefabs = new Dictionary<string, bool[]>(); //kaa sauc gadgeta prefabu | kaadaas telpaas tas var atrasties
 
@@ -30,7 +29,6 @@ public class Gui : MonoBehaviour {
         levelscript = GameObject.Find("Level").GetComponent<Level>(); //no-bullshit singleton
         gResScript = GameObject.Find("Level").GetComponent<GlobalResources>(); //no-bullshit singleton
         camerascript = GameObject.Find("Camera").GetComponent<Camctrl>(); //no-bullshit singleton
-        highlightBox = Resources.Load("highlightBox") as GUISkin;
 
         /*
         #if UNITY_EDITOR  <-- shii direktiiva nestraadaa (u)
@@ -368,23 +366,6 @@ public class Gui : MonoBehaviour {
         //visaam pogaam ir shis tuultips (katrai savs teksts)
         GUI.Label(new Rect(Screen.width / 2f  , 15, 130, 60), GUI.tooltip);
 
-
-
-
-        //top left point of rectangle
-        Vector3 boxPosHiLeftWorld = new Vector3(0.5f, -5, 0);
-        //bottom right point of rectangle
-        Vector3 boxPosLowRightWorld = new Vector3(1.5f, 0, 0);
-        
-        Vector3 boxPosHiLeftCamera = Camera.main.WorldToScreenPoint(boxPosHiLeftWorld);
-        Vector3 boxPosLowRightCamera = Camera.main.WorldToScreenPoint(boxPosLowRightWorld);
-
-        float w = boxPosHiLeftCamera.x - boxPosLowRightCamera.x;
-        float h = boxPosHiLeftCamera.y - boxPosLowRightCamera.y;
-        
-
-        GUI.skin = highlightBox;
-        GUI.Box(new Rect(boxPosHiLeftCamera.x, Screen.height - boxPosHiLeftCamera.y, w, h),"");
 
 
     }
