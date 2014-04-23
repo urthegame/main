@@ -5,10 +5,12 @@ using System.Collections.Generic;
 
 public class Gui : MonoBehaviour {
 
+    [HideInInspector]
     public bool QueryMode; //inforiiks sho uzsetos, lai GUIskripts raadiita vinja sagatavoto info
+    [HideInInspector]
     public Room QueryTarget; //inforiika apskataamais levelobjets
 
-    private GUIStyle skin;
+    //private GUIStyle skin;
     private Level levelscript; //viens vieniigais Liimenja paarvaldniekskripts
     private GlobalResources gResScript; //globaalo resursu pieskatiitaaajs, arii singltons :P
     private Camctrl camerascript;
@@ -18,7 +20,9 @@ public class Gui : MonoBehaviour {
     private float rightPlaqueHeight;
     private float leftPlaqueHeight;
 
-    private Dictionary<string,bool[]> gadgetPrefabs = new Dictionary<string, bool[]>(); //kaa sauc gadgeta prefabu | kaadaas telpaas tas var atrasties
+    public GUISkin highlightBox; 
+
+//    private Dictionary<string,bool[]> gadgetPrefabs = new Dictionary<string, bool[]>(); //kaa sauc gadgeta prefabu | kaadaas telpaas tas var atrasties
 
 
 
@@ -26,6 +30,7 @@ public class Gui : MonoBehaviour {
         levelscript = GameObject.Find("Level").GetComponent<Level>(); //no-bullshit singleton
         gResScript = GameObject.Find("Level").GetComponent<GlobalResources>(); //no-bullshit singleton
         camerascript = GameObject.Find("Camera").GetComponent<Camctrl>(); //no-bullshit singleton
+        highlightBox = Resources.Load("highlightBox") as GUISkin;
 
         /*
         #if UNITY_EDITOR  <-- shii direktiiva nestraadaa (u)
@@ -55,7 +60,7 @@ public class Gui : MonoBehaviour {
      
         foreach(string name in allPrefabsInGadgetDirectoryBecauseICantGetThisListAtWebplayerRuntime){
             GameObject prefab = levelscript.loadLevelobjectPrefab(name);
-            Gadget gadgetscript = prefab.GetComponent<Gadget>();
+           // Gadget gadgetscript = prefab.GetComponent<Gadget>();
         }
 
         Init();
@@ -230,7 +235,7 @@ public class Gui : MonoBehaviour {
             levelscript.PutObjInPlacer("corridor-41");
         }
 
-        vert += height + vSpace;
+        vert += height + vSpace - 7;
         w4Num = 0;
         if(GUI.Button(new Rect(17 + (w4Dist + w4) * w4Num++, vert, w4, height), new GUIContent("1", "1x2"))) {
             levelscript.PutObjInPlacer("corridor-12");
@@ -245,7 +250,7 @@ public class Gui : MonoBehaviour {
             levelscript.PutObjInPlacer("corridor-42");
         }
 
-        vert += height + vSpace;
+        vert += height + vSpace - 7;
         w4Num = 0;
         if(GUI.Button(new Rect(17 + (w4Dist + w4) * w4Num++, vert, w4, height), new GUIContent("1", "1x3"))) {
             levelscript.PutObjInPlacer("corridor-13");
@@ -260,7 +265,7 @@ public class Gui : MonoBehaviour {
             // levelscript.PutObjInPlacer("corridor-43");
         }
 
-        vert += height + vSpace;
+        vert += height + vSpace - 7;
         w4Num = 0;
         if(GUI.Button(new Rect(17 + (w4Dist + w4) * w4Num++, vert, w4, height), new GUIContent("1", "1x4"))) {
             levelscript.PutObjInPlacer("corridor-14");
@@ -279,9 +284,13 @@ public class Gui : MonoBehaviour {
            
 
         vert += height + vSpace;
-        if(GUI.Button(new Rect(20, vert, 35, height), new GUIContent("gadget", "Gadget MkI"))) {
+        if(GUI.Button(new Rect(20, vert, 35, height), new GUIContent("g1", "Gadget MkI"))) {
             levelscript.PutObjInPlacer("gadget-1");
         }
+        if(GUI.Button(new Rect(65, vert, 35, height), new GUIContent("g2", "Gadget MkII"))) {
+            levelscript.PutObjInPlacer("gadget-2");
+        }
+
 
         vert += height;
 
@@ -358,6 +367,24 @@ public class Gui : MonoBehaviour {
         
         //visaam pogaam ir shis tuultips (katrai savs teksts)
         GUI.Label(new Rect(Screen.width / 2f  , 15, 130, 60), GUI.tooltip);
+
+
+
+
+        //top left point of rectangle
+        Vector3 boxPosHiLeftWorld = new Vector3(0.5f, -5, 0);
+        //bottom right point of rectangle
+        Vector3 boxPosLowRightWorld = new Vector3(1.5f, 0, 0);
+        
+        Vector3 boxPosHiLeftCamera = Camera.main.WorldToScreenPoint(boxPosHiLeftWorld);
+        Vector3 boxPosLowRightCamera = Camera.main.WorldToScreenPoint(boxPosLowRightWorld);
+
+        float w = boxPosHiLeftCamera.x - boxPosLowRightCamera.x;
+        float h = boxPosHiLeftCamera.y - boxPosLowRightCamera.y;
+        
+
+        GUI.skin = highlightBox;
+        GUI.Box(new Rect(boxPosHiLeftCamera.x, Screen.height - boxPosHiLeftCamera.y, w, h),"");
 
 
     }
