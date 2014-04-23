@@ -38,9 +38,7 @@ public class Level : MonoBehaviour {
     [HideInInspector]
     public bool objectInPlacer = false; //pleiseris ir konteineris, ko biida apkaart ar peli - priekshskatiijuma versija
     [HideInInspector]
-    public bool gadgetEditMode; //ja TRUE, tad redigjee levelobjektos esoshos priekshmetus, ja FALSE tad redigjee pashus levelobjektus
-    [HideInInspector]
-    public Room lastRoomTargeted; //telpa kuraa tiek pirkti gadzheti - sho maina GUIskriptss
+    public Room lastRoomTargeted; //telpa kuraa tiek piezuumota - sho maina GUIskriptss
 
     private int numRooms = 0; //tikai aptuveni apjomi, lieto unikaaliem nosakumiem, neivs patiesai apjoma ntoeikshanai
     private int numAgents = 0;
@@ -63,7 +61,6 @@ public class Level : MonoBehaviour {
 
     public bool gridUnity; //vai ziimeet vieniibas gridu - levelobjektiem, ziimee plaknee, kas atrodas pretii kamerai
     public bool gridDecimal; //vai ziimeet decmaalgridu  - objektiem telpaa, ziimee uz telpas griidas
-    public float gridDecimalY;  //kuraa staavaa, Y koordinaate, ziimet decimaalgridu | sho apdeito GUI skripts
     private float GridDecimalScale = 0.1f; //cik liels ir decimaalgrida ruutojums 
 
     
@@ -153,7 +150,6 @@ public class Level : MonoBehaviour {
             Destroy(childTransform.gameObject);
         }
         objectInPlacer = false;
-        gadgetEditMode = false; //vienmeer sho rezhiimu atcelj, iesleegs tikai, ja ievietos pleiserii gadzhetu
         placer.transform.position = new Vector3(0,0,0); //jaanoreseto pleiseris, citaad itajaa dazhreiz uzkraajaas nobiides pz Z asi
     }
     
@@ -176,6 +172,7 @@ public class Level : MonoBehaviour {
             placer.transform.position = LastPosGrid;
         }
 
+        /* @todo -- paartaisiit jauno decimaalgridu
         //dazhreiz tikai cheko poziiciju pret decimaalgridu
         if(gadgetEditMode) {//gadzhetu redigjeeshanas redzhiiims
             if(Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << 10)) { // 10. slaanis ir neredzama plakne FloorBasePlane | GUI skripts to noliek apskataamaa levelobjekta griidas augstumaa
@@ -185,12 +182,12 @@ public class Level : MonoBehaviour {
 
             
 
-                /**
+                / **
                  * te jaaapskataas vai gadzhets nelien aarpus robezhaam (njemot veeraa gadzheta izmeerus)
                  * gan uz blakus telpaam gan uz priekshu/aizmuguri
                  * 
                  * ja poziicija nav OK, tad neapdeitot LastPosDecGrid
-                 */ 
+                 * / 
 
                 LastPosDecGrid = new Vector3(roundx, roundy, roundz); 
                 LastPosDecGridPrecise = new Vector3(hit.point.x, hit.point.y,hit.point.z); 
@@ -203,7 +200,7 @@ public class Level : MonoBehaviour {
 
             placer.transform.position = LastPosDecGrid;
         }
-        
+        */
 
 
         if(Input.GetMouseButtonDown(0)) { // 0 => klik left 
@@ -269,17 +266,16 @@ public class Level : MonoBehaviour {
 
             
             float go = 0; //scale / 2f; //grid offset 
-            Color color = new Color(0.8F, 0.8F, 0.8F, 0.9F);
-            float Y = gridDecimalY;
+            Color color = new Color(0.8F, 0.8F, 0.8F, 0.75F);
 
-
-            for(float x = limits.XA; x< limits.XB; x+=GridDecimalScale) {
-                for(float z = -0.5f; z< 0.5f; z+=GridDecimalScale) {
-                    Debug.DrawLine(new Vector3(x + go, Y, z+go), new Vector3(x + go, Y, z+go+GridDecimalScale), color);
-                    Debug.DrawLine(new Vector3(x + go, Y, z+go), new Vector3(x + go-GridDecimalScale, Y, z+go), color);
+            for(float x = limits.XA-0.5f; x< limits.XB; x+=GridDecimalScale) {
+                for(float y = limits.YA-0.5f; y< limits.YB; y+=GridDecimalScale) {
+                    Debug.DrawLine(new Vector3(x + go, y + go, -0.5f), new Vector3(x + go, y - GridDecimalScale + go, -0.5f), color);
+                    Debug.DrawLine(new Vector3(x + go, y + go, -0.5f), new Vector3(x - GridDecimalScale + go, y + go, -0.5f), color);
                     
                 }
             }
+
         }
 
 
@@ -469,8 +465,12 @@ public class Level : MonoBehaviour {
                 prefab = Resources.Load("Gadgets/" + prefabName) as GameObject;
             }
 
-            if(prefab == null){ //nebija levelobjektu diraaa, skatiis pie gadzhetiem
+            if(prefab == null){ // skatiis citaa subdiraa
                 prefab = Resources.Load("Agents/" + prefabName) as GameObject;
+            }
+
+            if(prefab == null){ // ljoti neticamais gadiijums:  nav subdiraa
+                prefab = Resources.Load(prefabName) as GameObject;
             }
 
             //PS, ja te nav tad buus ERRORS, lai taa paliek!

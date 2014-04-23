@@ -71,9 +71,6 @@ public enum FuncTypes {
 public class Room : BaseLevelThing {
 
 
-
-
-    public RoomRoles Role;
     public Waypoints waypoints;  //prefabaa noraadaami weipointi   
     public WorkUnit[] workUnits; //prefabaa noraadaami telpaa daraamie darbinji
     public float[] AgentNeedsGeneration; //masiivs, kas nosaka, cik katru agjentresursu telpa rada
@@ -128,7 +125,6 @@ public class Room : BaseLevelThing {
         AgentNeedsGeneration[(int)AgentNeeds.Types.Water] = resourceInitInfo.AgentNeedsWater;
         AgentNeedsGeneration[(int)AgentNeeds.Types.Sleep] = resourceInitInfo.AgentNeedsSleep;
 
-        Role = new RoomRoles(this);
         WantWorking = true;
 
 

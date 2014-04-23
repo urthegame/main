@@ -28,7 +28,7 @@ public class Gui : MonoBehaviour {
         camerascript = GameObject.Find("Camera").GetComponent<Camctrl>(); //no-bullshit singleton
 
         /*
-        #if UNITY_EDITOR
+        #if UNITY_EDITOR  <-- shii direktiiva nestraadaa (u)
         DirectoryInfo dir = new DirectoryInfo("Assets/Resources/Gadgets");
         FileInfo[] info = dir.GetFiles("*.prefab");
         string prefablist = "";
@@ -56,7 +56,6 @@ public class Gui : MonoBehaviour {
         foreach(string name in allPrefabsInGadgetDirectoryBecauseICantGetThisListAtWebplayerRuntime){
             GameObject prefab = levelscript.loadLevelobjectPrefab(name);
             Gadget gadgetscript = prefab.GetComponent<Gadget>();
-            gadgetPrefabs.Add(name,gadgetscript.suitableForRooms); //pievienoju savai gadzhetu listei 
         }
 
         Init();
@@ -113,12 +112,7 @@ public class Gui : MonoBehaviour {
                 QueryTarget = room.GetComponent<Room>();
                 levelscript.lastRoomTargeted = QueryTarget;
                 camerascript.ZoomToRoom(room.transform.position.x, room.transform.position.y - (room.SizeY / 2f) + 1.5f); // centree uz punktu nvieniibas virs griidas 
-                levelscript.TimeScale = 0.25f; // paleenina aatrumu
-                levelscript.gridDecimalY = QueryTarget.transform.position.y - (QueryTarget.SizeY / 2f) + 0.055f; // Y kordinaate apskataamaa levelobjekta griidai + modelja griidas augstums 0.05f
-                levelscript.gridDecimal = true;
-                levelscript.gadgetEditMode = true;
-                GameObject.Find("FloorBasePlane").transform.position = new Vector3(0,levelscript.gridDecimalY,0); //neredzamaa plaaksne, kas kjers peli un dos koordinaates uz shii levelobjekta griidas
-                
+                levelscript.TimeScale = 0.25f; // paleenina aatrumu                
 
             } else {
                 if(QueryMode) { //ja nav atrasta telpa un ieprieksh bija , tikai tad ir nepiecieshams noresetot (citaadi noreseto kameras poziiciju, kas vispaar nav uzsetota un ir slikti )
@@ -135,9 +129,6 @@ public class Gui : MonoBehaviour {
         QueryTarget = null;
         camerascript.UnZoomFromRoom();
         levelscript.TimeScale = levelscript.TimeScaleHistoric; //atjauno aatrumu
-        levelscript.gridDecimal = false;
-        levelscript.gadgetEditMode = false;
-
     }
     
     void keyboard() {
@@ -147,12 +138,9 @@ public class Gui : MonoBehaviour {
         }
         
         
-        
-        if(Input.GetKeyDown(KeyCode.Slash)) {
-            levelscript.PutObjInPlacer("query-1");
-        }
+
         if(Input.GetKeyDown(KeyCode.Delete)) {
-            levelscript.PutObjInPlacer("delete-1");
+            levelscript.PutObjInPlacer("digg-1");
         }
         
         if(Input.GetKeyDown(KeyCode.Escape)) {          
@@ -216,6 +204,12 @@ public class Gui : MonoBehaviour {
         if(GUI.Button(new Rect(65, vert, 35, height), new GUIContent("G10", "Toggle decimal grid"))) {
             levelscript.gridDecimal = !levelscript.gridDecimal;
         }
+
+        vert += height + vSpace;
+        if(GUI.Button(new Rect(20, vert, 35, height), new GUIContent("Digg", "Delete ground cube (or any other stucture)"))) {
+            levelscript.PutObjInPlacer("digg-1");
+        }
+       
 
 
 
@@ -306,7 +300,7 @@ public class Gui : MonoBehaviour {
 
                 left = Screen.width - 10 - 130;
                 vert = 10;
-                rightPlaqueHeight = 430;
+                rightPlaqueHeight = 190;
                 GUI.Box(new Rect(left, vert, 130, rightPlaqueHeight), "?\n" + QueryTarget.name);
 
 
@@ -345,47 +339,9 @@ public class Gui : MonoBehaviour {
 
 
 
-                int i=0;
-                foreach(string roleName in RoomRoles.Names){
-                    vert += 25;
-                    string emph = "";
-                    if(QueryTarget.Role.Selected == i){ //diseiblo pogu jau izveeleetajai telpas lomai
-                        GUI.enabled = false;
-                        emph = "++";
-                    }
-
-                    if(QueryTarget.Role.Selected > 0 && i != 0){ //ja ir izveeleeta telpa, tad drikst tikai UNASSIGNED (nullto) izveeleeties
-                        GUI.enabled = false;
-                    }
-
-                    if(GUI.Button(new Rect(left+5, vert, 120, 20), new GUIContent(emph + roleName + emph, "Set Room to \"" + roleName + "\"" ))) {
-                        QueryTarget.Role.SetRole(i); //nomaina telpas lomu
-                    }  
-
-                    GUI.enabled = true;
-                    i++;
-                }
-
-                vert += 15;
-
-                /**
-                 * @todo -- taisiit 2 pogas katraa rindaa
-                 */ 
-                foreach(KeyValuePair<string,bool[]> g in gadgetPrefabs) {
-                    if(!g.Value[QueryTarget.Role.Selected]){ //vai shiis prefabs ir deriigs shai telpas lomai (QueryTarget.Role.Selected)
-                        continue;
-                    }
-
-                    vert += 25;
-                    if(GUI.Button(new Rect(left+5, vert, 120, 20), new GUIContent(g.Key, "Place \"" + g.Key + "\" in this room" ))) {
-                        levelscript.PutObjInPlacer(g.Key);
-                        levelscript.gadgetEditMode = true; //gadzhetu rezhiims - stikos pie mazaa grida nevis lielaaa
-                    }
-                }
-
-
-
                 vert += 30;
+
+               
                 GUI.Box(new Rect(left+5, vert, 130-10, 55), string.Format("Worklist: \n"));
                 
 

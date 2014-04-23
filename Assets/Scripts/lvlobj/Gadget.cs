@@ -5,12 +5,6 @@ public class Gadget : BaseLevelThing {
 
     public Room parentRoom; //kurai telpai shis gadzhets pieder
 
-    public bool[] suitableForRooms = new bool[RoomRoles.Names.Length];//noraada true/false katrai telpas lomai - vai shis gadzhets var atrasties attieciigajaa telpaa
-    //svarigi ir nomainiit katraa gadzheta prefabaa, katru reizi, kad nomainaas telpu lomu skaits, nosaukumi
-
-
-
-
     void Awake() {
         baseInit();
        
