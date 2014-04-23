@@ -15,6 +15,9 @@ public class Gui : MonoBehaviour {
     private int vert;
     private int lastRoomLookedAt;
 
+    private float rightPlaqueHeight;
+    private float leftPlaqueHeight;
+
     private Dictionary<string,bool[]> gadgetPrefabs = new Dictionary<string, bool[]>(); //kaa sauc gadgeta prefabu | kaadaas telpaas tas var atrasties
 
 
@@ -303,8 +306,8 @@ public class Gui : MonoBehaviour {
 
                 left = Screen.width - 10 - 130;
                 vert = 10;
-
-                GUI.Box(new Rect(left, vert, 130, 430), "?\n" + QueryTarget.name);
+                rightPlaqueHeight = 430;
+                GUI.Box(new Rect(left, vert, 130, rightPlaqueHeight), "?\n" + QueryTarget.name);
 
 
                 vert += 40;
@@ -313,8 +316,6 @@ public class Gui : MonoBehaviour {
                                                                     QueryTarget.Generation[Res.electricity], QueryTarget.Usage[Res.electricity],
                                                                     QueryTarget.Generation[Res.water], QueryTarget.Usage[Res.water]
                                                                     ));
-                
-
                 vert += 60;
                 
                 string offText = "OFF";
@@ -415,7 +416,7 @@ public class Gui : MonoBehaviour {
 
         //labaa puse
         if(QueryMode) {
-            if(Input.mousePosition.x > Screen.width - 140 && Input.mousePosition.y > Screen.height - 90) { //pagalam vienkaarshi, veelaak vajadzees praatiigaaku DRY risinaajumu
+            if(Input.mousePosition.x > Screen.width - 140 && Input.mousePosition.y > Screen.height - rightPlaqueHeight) { //pagalam vienkaarshi, veelaak vajadzees praatiigaaku DRY risinaajumu
                 return true;
             }
         }

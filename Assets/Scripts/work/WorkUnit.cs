@@ -21,7 +21,8 @@ public class WorkUnit {
 
     public GameObject parentGameobject; //te jaanoraada (prefabaa) objekts, kam pieder shis skripts
     [HideInInspector]
-    public Room parentLevelobject; //shii geimobjekta "Room" komponente (ieguushu no "parentGameobject" )
+    public Room parentRoom; //telpa, kam pieder shis darbs; automaatiski ieguushu no (ieguushu no "parentGameobject" )
+    public Gadget parentGadget; //gadzhets, kam pieder shis darbs, (gadzhets pieder parentRoom)  ja shis ir null,tad darbs pieder pa tiesho telpai nevis gadzhetam
 
     /**
      * vai darbinju var dariit
@@ -49,7 +50,7 @@ public class WorkUnit {
 
 
         if(parentGameobject != null) {
-            parentLevelobject = parentGameobject.GetComponent<Room>();
+            parentRoom = parentGameobject.GetComponent<Room>();
         }
 
 
@@ -79,11 +80,11 @@ public class WorkUnit {
         switch(WorkUnitTypeNumber) {
 
         case WorkUnitTypes._ConstructionRoom:
-            parentLevelobject.ConstrPercent += parentLevelobject.ConstrTime * Time.deltaTime * 2.5f;
+            parentRoom.ConstrPercent += parentRoom.ConstrTime * Time.deltaTime * 2.5f;
 
             break;
         case WorkUnitTypes._DestructionRoom:
-            parentLevelobject.ConstrPercent -= parentLevelobject.DestrTime * Time.deltaTime * 25f;
+            parentRoom.ConstrPercent -= parentRoom.DestrTime * Time.deltaTime * 25f;
             
             break;
 

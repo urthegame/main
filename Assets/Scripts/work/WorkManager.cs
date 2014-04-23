@@ -43,7 +43,7 @@ public class WorkManager : MonoBehaviour {
     public void SetStatusOnThisBlocksJobs(bool status, Room block) {
 
         foreach(WorkUnit w in worklist) {
-            if(w.parentLevelobject == block) { //darbs pieder shim levelobjektam
+            if(w.parentRoom == block) { //darbs pieder shim levelobjektam
                 w.setOn(status);
             }
         }
@@ -83,7 +83,7 @@ public class WorkManager : MonoBehaviour {
                 includingNeightborCubes = true;
             }
 
-            List<Vector2> allCubes = levelscript.AllAccessableCubesInThisRoom(potentialJob.parentLevelobject,includingNeightborCubes); //visi kubiki telpaa, kurai pieder darbs (+ visi kaiminjkubiki, ja iipashi paluudz)
+            List<Vector2> allCubes = levelscript.AllAccessableCubesInThisRoom(potentialJob.parentRoom,includingNeightborCubes); //visi kubiki telpaa, kurai pieder darbs (+ visi kaiminjkubiki, ja iipashi paluudz)
 
 
             foreach(Vector2 cube in allCubes.OrderBy(a => System.Guid.NewGuid())) {
@@ -141,6 +141,7 @@ public class WorkManager : MonoBehaviour {
 
         WorkUnit constructionJob = new WorkUnit();
         constructionJob.parentGameobject = block.gameObject;
+
         constructionJob.WorkUnitTypeNumber = workType;
         constructionJob.setOn(true);
         AddWork(constructionJob);
@@ -155,7 +156,7 @@ public class WorkManager : MonoBehaviour {
         int i = 0;
         foreach(WorkUnit w in worklist) {
             
-            if(w.parentLevelobject == block && (int)w.WorkUnitTypeNumber < 10) { //shai telpai piederoshs Buuvdarbs darbinsh
+            if(w.parentRoom == block && (int)w.WorkUnitTypeNumber < 10) { //shai telpai piederoshs Buuvdarbs darbinsh
                 w.setOn(false,true); //svariigi izsleegt, citaadi nabaga agjents straadaas liidz darbalaika beigaam
                 worklist.RemoveAt(i);
                 
@@ -166,6 +167,12 @@ public class WorkManager : MonoBehaviour {
 
             i++;
         }
+
+    }
+
+
+
+    public void RemoveAllConstructionJobsForThisGadget(Gadget gadget){
 
     }
 

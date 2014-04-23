@@ -13,10 +13,45 @@ public class Gadget : BaseLevelThing {
 
     void Awake() {
         baseInit();
+       
+
     }
 
     void Update() {
     
+
+        
+        if(placedOnGrid){
+            
+            if(Constructing){
+                
+                //ConstrPercent += ConstrTime * Time.deltaTime;
+                //konstrukcijas procentus inkrementee workUnit skriptaa
+                
+                if(ConstrPercent >= 100){
+                    ConstrPercent = 100;
+                    Constructing = false;
+                   
+                    workManagerScript.RemoveAllConstructionJobsForThisGadget(this); //buuveeshana pabeigta, jaaizniicina darbinsh
+                }
+            }
+            
+            if(Destructing){
+                //ConstrPercent -= DestrTime * Time.deltaTime;
+                //konstrukcijas procentus inkrementee workUnit skriptaa
+                
+                if(ConstrPercent <= 0){
+                    workManagerScript.RemoveAllConstructionJobsForThisGadget(this); //nojaukshana pabeigta, jaaizniicina darbinsh
+                    Destroy(transform.gameObject); //aizvaac sho kluciiti no liimenja
+                    //Destructing = false;
+                    levelscript.CalculateNavgrid(); //lieku liimenim paarreekjinaat visus ejamos celjus, jo ir izmainjas
+                }
+                
+            }
+            
+
+        }
+
     }
 
     public override void InitFromString(string str) {

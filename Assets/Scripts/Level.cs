@@ -120,6 +120,8 @@ public class Level : MonoBehaviour {
                                                 0); 
         //offset_: poziicijaam x un y pieshauj 0,5, ja izmeers ir paara skaitlis(skat komentaaru faila apakshaa)
 
+
+
         levelobject.transform.parent = placer.transform; 
         levelobject.name = script.Prefabname + " " + (numRooms + 1);
         //levelobject.GetComponent<levelobject>().klucha_tips = "njigunjegu";  //@todo
@@ -152,6 +154,7 @@ public class Level : MonoBehaviour {
         }
         objectInPlacer = false;
         gadgetEditMode = false; //vienmeer sho rezhiimu atcelj, iesleegs tikai, ja ievietos pleiserii gadzhetu
+        placer.transform.position = new Vector3(0,0,0); //jaanoreseto pleiseris, citaad itajaa dazhreiz uzkraajaas nobiides pz Z asi
     }
     
     void mouse() {
@@ -180,6 +183,8 @@ public class Level : MonoBehaviour {
                 float roundy = Mathf.RoundToInt(hit.point.y / GridDecimalScale) * GridDecimalScale; //Y nedod offsetu, jo tam ir jaaatrodas mazliet virs zemes (telpas griidas biezums)
                 float roundz = Mathf.RoundToInt(hit.point.z / GridDecimalScale) * GridDecimalScale + GridDecimalScale / 2f;
 
+            
+
                 /**
                  * te jaaapskataas vai gadzhets nelien aarpus robezhaam (njemot veeraa gadzheta izmeerus)
                  * gan uz blakus telpaam gan uz priekshu/aizmuguri
@@ -193,6 +198,7 @@ public class Level : MonoBehaviour {
 
             }
 
+          //  print(LastPosDecGrid);
 
 
             placer.transform.position = LastPosDecGrid;
@@ -202,6 +208,10 @@ public class Level : MonoBehaviour {
 
         if(Input.GetMouseButtonDown(0)) { // 0 => klik left 
             //  print (lastPos);
+
+            if(guiscript.IsMouseOverGui()) { //kursors atrodas uz HUDa, nevajag ljaut novietot lietas 
+                return;
+            }
 
             if(objectInPlacer) { //PLEISERII ir ielaadeeds prefabs
                 Transform levelobject = placer.transform.GetChild(0); //pienjemu, ka tikai viens objekts tiek likts vienlaiciigi
