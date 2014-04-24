@@ -1,6 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum GridStickyness {
+    uniGrid,
+    deciGrid,
+    EEEAAGLE
+};
+
 public abstract class BaseLevelThing : MonoBehaviour {
 
 
@@ -15,10 +21,13 @@ public abstract class BaseLevelThing : MonoBehaviour {
     //[HideInInspector]
     public float ConstrPercent;  //cik % uzcelts/nojaukts
 
-    //skripts pieder prefabam un shos parametrus nomaina manuaali caur inspektoru - izveidojot prefabu un pieshkjirot tam sho skriptu
-    public int SizeX = 1;
-    public int SizeY = 1;
-    public int SizeZ = 1;
+
+    [HideInInspector]
+    public float SizeX = 1; //objekta izmeers abosluutajaas vieniibaas - sho apreekjinaas peec objektam piederoshaa boxCollider izmeeriem -- taapeec vajag kolaiderim noraadiit pareizas veertiibas
+    [HideInInspector]
+    public float SizeY = 1;
+    [HideInInspector]
+    public float SizeZ = 1;
     public string Prefabname = "kaads aizmirsis mani paarsaukt, ibio!"; //kaa sauc prefabu, kam shis pieder, atstarpes aizliegtas
 
 
@@ -38,7 +47,8 @@ public abstract class BaseLevelThing : MonoBehaviour {
     public float OffsetY;
 
     protected bool placedOnGrid; //vai novietots liimenii (pirms tam tiek vazaats apkaart PLEISERII)
-    
+
+    public GridStickyness Stickyness; //pie kura grida lips klaat - vieninieka vai desmitdaljnieka
     
 
 
@@ -57,6 +67,14 @@ public abstract class BaseLevelThing : MonoBehaviour {
             roomHolder = GameObject.Find("LevelobjectHolder");
             agentHolder = GameObject.Find("AgentHolder");
             gadgetHolder = GameObject.Find("GadgetHolder");
+        }
+
+        //peec kolaidera izmeera izreekjinaas objekta kanonisko izmeeru
+        BoxCollider collider = transform.GetComponent<BoxCollider>();
+        if(collider != null) { //agjentiem nav shii kolaidera un nav vajadziigi arii shie parametri
+            SizeX = collider.size.x;
+            SizeY = collider.size.y;
+            SizeZ = collider.size.z;
         }
 
     }

@@ -3,7 +3,8 @@ using System.Collections;
 
 public class Gadget : BaseLevelThing {
 
-    public Room parentRoom; //kurai telpai shis gadzhets pieder
+    [HideInInspector]
+    public Room parentRoom; //kurai telpai shis gadzhets pieder | atradiis rantaimaa
 
     void Awake() {
         baseInit();
@@ -13,7 +14,6 @@ public class Gadget : BaseLevelThing {
 
     void Update() {
     
-
         
         if(placedOnGrid){
             
@@ -63,9 +63,34 @@ public class Gadget : BaseLevelThing {
     
     public override void PlaceOnGrid(int mode) {
 
-        /**
-         * nepaarbauda vai atrodas atljautaa vietaa, to dara levelskriptaa pirms shiis funkchas izsaukshanas
-         */ 
+        float x = transform.position.x;
+        float y = transform.position.y;
+        if(mode == 0){ //manuaali peivienotajiem gadzhetiem paarbaudiis vai driikst te atrasties
+            if(levelscript.roomAtThisPosition(x,y) == null ){
+                print ("paga, paga, gazhets netiek nolikts telpaa!");
+                return;
+                /**
+                 * @todo -- paarbaudiit vai viss gadzhets ietilpst istabaa (ne tikai viduspunkts) 
+                 */ 
+            }
+
+            /**
+             * @todo -- paarbaudiit, vai gadzhets tiek novietots uz griidas vairaakstaaviigaas telpaas ()
+             */ 
+
+            if(!levelscript.IsThisSpotFree(this)){
+                print ("vietinja aiznjemta!");
+                return;
+            }
+
+        }
+
+        parentRoom = levelscript.roomAtThisPosition(x,y);
+        if(parentRoom == null) {
+            print("watwatwat!? objekts nav novietots telpaa");
+            return;
+        }
+
 
 
         if(mode == 0) { //nulltais rezhiims - speeleetaajs manuaali uzliek levelobjektu

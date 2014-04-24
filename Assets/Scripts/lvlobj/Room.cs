@@ -239,13 +239,17 @@ public class Room : BaseLevelThing {
                 //print ("par taalu uz augshu");
                 return;
             }
+
+            if(!levelscript.IsThisSpotFree(this) ){
+                print ("She nedriikst likt bloka !");
+                return;
+            }
         }
         
 
         
-        if(!levelscript.IsThisSpotFree(this) ){
-            print ("She nedriikst likt bloka !");
-        } else {
+      
+     
             //print ("Bloks tiek novietots uz laukuma (tochna) ");
             
             if(mode == 0){ //nulltais rezhiims - speeleetaajs manuaali uzliek levelobjektu
@@ -345,7 +349,7 @@ public class Room : BaseLevelThing {
             placedOnGrid = true;
             
             
-        }
+
         
     }
     

@@ -166,65 +166,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   QueryMode: 0
   QueryTarget: {fileID: 0}
-  highlightBox:
-    m_Name: 
-    m_Normal:
-      m_Background: {fileID: 0}
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_Hover:
-      m_Background: {fileID: 0}
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_Active:
-      m_Background: {fileID: 0}
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_Focused:
-      m_Background: {fileID: 0}
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_OnNormal:
-      m_Background: {fileID: 0}
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_OnHover:
-      m_Background: {fileID: 0}
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_OnActive:
-      m_Background: {fileID: 0}
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_OnFocused:
-      m_Background: {fileID: 0}
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_Border:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Margin:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Padding:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Overflow:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Font: {fileID: 0}
-    m_FontSize: 0
-    m_FontStyle: 0
-    m_Alignment: 0
-    m_WordWrap: 0
-    m_RichText: 1
-    m_TextClipping: 0
-    m_ImagePosition: 0
-    m_ContentOffset: {x: 0, y: 0}
-    m_FixedWidth: 0
-    m_FixedHeight: 0
-    m_StretchWidth: 1
-    m_StretchHeight: 0
 --- !u!1 &389551068
 GameObject:
   m_ObjectHideFlags: 0
@@ -427,6 +368,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugDrawNavgrid: 0
   ListOfRooms: []
+  ListOfGadgets: []
   LastPosGrid: {x: 0, y: 0, z: 0}
   LastPosDecGrid: {x: 0, y: 0, z: 0}
   objectInPlacer: 0
@@ -442,6 +384,7 @@ MonoBehaviour:
   TimeScaleHistoric: 0
   gridUnity: 0
   gridDecimal: 0
+  LastHoverObject: {fileID: 0}
 --- !u!114 &1111164274
 MonoBehaviour:
   m_ObjectHideFlags: 0

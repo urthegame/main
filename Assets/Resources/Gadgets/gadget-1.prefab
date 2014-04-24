@@ -81,13 +81,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edd13dac435a38641a3a2abaa10221dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ConstrTime: 1
+  DestrTime: 1
+  Price: 0
+  Constructing: 0
+  Destructing: 0
+  ConstrPercent: 0
   SizeX: 1
   SizeY: 1
   SizeZ: 1
   Prefabname: gadget-1
   OffsetX: 0
   OffsetY: 0
-  suitableForRooms: 0001010101
+  Stickyness: 2
+  parentRoom: {fileID: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

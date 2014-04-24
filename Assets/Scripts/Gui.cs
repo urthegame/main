@@ -30,36 +30,6 @@ public class Gui : MonoBehaviour {
         gResScript = GameObject.Find("Level").GetComponent<GlobalResources>(); //no-bullshit singleton
         camerascript = GameObject.Find("Camera").GetComponent<Camctrl>(); //no-bullshit singleton
 
-        /*
-        #if UNITY_EDITOR  <-- shii direktiiva nestraadaa (u)
-        DirectoryInfo dir = new DirectoryInfo("Assets/Resources/Gadgets");
-        FileInfo[] info = dir.GetFiles("*.prefab");
-        string prefablist = "";
-        foreach(FileInfo file in dir.GetFiles("*.prefab")){
-            string gadgetName = file.Name.Replace(".prefab","");
-            prefablist += "\"gadgetName\",\n";
-        }
-        print(prefablist); ///  <3--------- sho autputu jaaieliek zemaak defineetajaa masiivaa "visu gadhetprefabu nosaukumi"
-        #endif
-        //*/
-
-
-
-        /**
-         * vajag manuaali ierakstiit visus gadzhetu prefabu nosaukumus
-         * ielaadees katru prefabu, lai no taa skripta uzzinaatu
-         * kaadaam telpu lomaam (room.roles) shis gadgets ir deriigs
-         */ 
-        string[] allPrefabsInGadgetDirectoryBecauseICantGetThisListAtWebplayerRuntime = {
-            "gadget-1",
-            "gadget-2",
-        };
-
-     
-        foreach(string name in allPrefabsInGadgetDirectoryBecauseICantGetThisListAtWebplayerRuntime){
-            GameObject prefab = levelscript.loadLevelobjectPrefab(name);
-           // Gadget gadgetscript = prefab.GetComponent<Gadget>();
-        }
 
         Init();
     }
@@ -166,6 +136,8 @@ public class Gui : MonoBehaviour {
     void OnGUI() {
 
 
+        /**********************************menjucis**kreisajaa**puseee******************************/
+         
         int left = 20;
         int height = 20;
         int vSpace = 10;
@@ -173,7 +145,7 @@ public class Gui : MonoBehaviour {
 
 
         vert = 35;
-        GUI.Box(new Rect(15, vert, 90, 22), string.Format("€: {0}", gResScript.Money));
+        GUI.Box(new Rect(15, vert, 90, 22), string.Format("$: {0}", gResScript.Money));
 
         vert = 60;
         GUI.Box(new Rect(15, vert, 90, 50), string.Format("A: {0}/{1}\nE: {2}/{3}\nW: {4}/{5}",
@@ -289,6 +261,15 @@ public class Gui : MonoBehaviour {
             levelscript.PutObjInPlacer("gadget-2");
         }
 
+        vert += height + vSpace;
+        if(GUI.Button(new Rect(20, vert, 35, height), new GUIContent("B1", "Single Bed"))) {
+            levelscript.PutObjInPlacer("bed-single");
+        }
+        if(GUI.Button(new Rect(65, vert, 35, height), new GUIContent("B2", "Two storey Bed"))) {
+            levelscript.PutObjInPlacer("bed-stacked");
+        }
+
+
 
         vert += height;
 
@@ -301,7 +282,7 @@ public class Gui : MonoBehaviour {
 
     
 
-
+        /**********************************menjucis**labajaaa**puseee******************************/
         try {
             if(QueryMode) { //tagad tiek apskatiits
 
@@ -362,9 +343,28 @@ public class Gui : MonoBehaviour {
         }
 
 
+
+
+        /**********************************hoverojamaa**objekta**menjucis**viduu********************************/
+
+        if(levelscript.LastHoverObject != null){
+            string type = levelscript.LastHoverObject.GetType().ToString();
+
+            left = Mathf.RoundToInt((Screen.width /2f) - 65);
+            vert = 10;
+            height = 35;
+            GUI.Box(new Rect(left, vert, 130, height), "hovered "+ type +":\n" + levelscript.LastHoverObject.name);
+
+        }
+        
+
+
+
+
         
         //visaam pogaam ir shis tuultips (katrai savs teksts)
         GUI.Label(new Rect(Screen.width / 2f  , 15, 130, 60), GUI.tooltip);
+
 
 
 

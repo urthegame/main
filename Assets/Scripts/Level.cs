@@ -12,11 +12,13 @@ public class LevelLimits {
     public int YB = 0;
 }
 
+
 public class Level : MonoBehaviour {
 
     public bool DebugDrawNavgrid = true;
     public Dictionary<Vector4,float> Navgrid = new Dictionary<Vector4, float>(); //cik maksaa (un vai vispaar ir iespeejams) celjs no x,y uz citu x,y (shie 4 xyxy tiek iekodeeeti vector4, aspraatiigi, es zinu )
     public List<Room> ListOfRooms; //saraksts ar visiem liimenii esoshajiem leveloblokiem jeb telpam
+    public List<Gadget> ListOfGadgets;
 
     private GameObject roomHolder;
     private GameObject agentHolder;
@@ -34,11 +36,12 @@ public class Level : MonoBehaviour {
     private Vector3 LastPosGridPrecise;
     [HideInInspector]
     public Vector3 LastPosDecGrid;
-    private Vector3 LastPosDecGridPrecise;
     [HideInInspector]
     public bool objectInPlacer = false; //pleiseris ir konteineris, ko biida apkaart ar peli - priekshskatiijuma versija
+    private GridStickyness PlacerStickyness; //pie kura grida jaaliip klaat objektam, kas pashlaik atrodas pleiserii
     [HideInInspector]
     public Room lastRoomTargeted; //telpa kuraa tiek piezuumota - sho maina GUIskriptss
+
 
     private int numRooms = 0; //tikai aptuveni apjomi, lieto unikaaliem nosakumiem, neivs patiesai apjoma ntoeikshanai
     private int numAgents = 0;
@@ -62,6 +65,11 @@ public class Level : MonoBehaviour {
     public bool gridUnity; //vai ziimeet vieniibas gridu - levelobjektiem, ziimee plaknee, kas atrodas pretii kamerai
     public bool gridDecimal; //vai ziimeet decmaalgridu  - objektiem telpaa, ziimee uz telpas griidas
     private float GridDecimalScale = 0.1f; //cik liels ir decimaalgrida ruutojums 
+
+
+
+    [HideInInspector]
+    public BaseLevelThing LastHoverObject; //vissvariigaakais peedeejais hoverotais objekts (agjenti svariigaaki par gadzhetiem, gadzheti svariigaaki par telpaam)
 
     
     void Start() {
@@ -134,7 +142,7 @@ public class Level : MonoBehaviour {
         levelobject.layer = 11; //pleisholdera levelobjektu leijeris
         objectInPlacer = true;
         script.PlacedInPlacer();//pazinjoju levelobjektam, ka tas tiek ielikts PLEISERII
-
+        PlacerStickyness = script.Stickyness; 
         //print (" pos @create " + levelobject.transform.position + "  " + levelobject.transform.name);
 
 
@@ -155,6 +163,8 @@ public class Level : MonoBehaviour {
     
     void mouse() {
 
+        LastHoverObject = null;
+
         if(guiscript.IsMouseOverGui()) { //kursors atrodas uz HUDa,nevajag uzbaazties ar saviem kluchiem
             return;
         }
@@ -163,44 +173,55 @@ public class Level : MonoBehaviour {
         RaycastHit hit;
 
        
-        //vienmeer cheko poziiciju pret vieniibas gridu 
+
         if(Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << 8)) { // 1<<8 ir 8.slaanja bitmaska - neredzama plakne, kur lipinaat klaati limenobjektus
-            int roundx = Mathf.RoundToInt(hit.point.x);
-            int roundy = Mathf.RoundToInt(hit.point.y);
-            LastPosGrid = new Vector3(roundx, roundy, 0); 
+
+            //vieniibas grids
+            int roundUnityX = Mathf.RoundToInt(hit.point.x);
+            int roundUnityY = Mathf.RoundToInt(hit.point.y);
+            LastPosGrid = new Vector3(roundUnityX, roundUnityY, 0); 
             LastPosGridPrecise = new Vector3(hit.point.x, hit.point.y, 0); 
-            placer.transform.position = LastPosGrid;
-        }
 
-        /* @todo -- paartaisiit jauno decimaalgridu
-        //dazhreiz tikai cheko poziiciju pret decimaalgridu
-        if(gadgetEditMode) {//gadzhetu redigjeeshanas redzhiiims
-            if(Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << 10)) { // 10. slaanis ir neredzama plakne FloorBasePlane | GUI skripts to noliek apskataamaa levelobjekta griidas augstumaa
-                float roundx = Mathf.RoundToInt(hit.point.x / GridDecimalScale) * GridDecimalScale + GridDecimalScale / 2f;//x un z asiim pieskaita offsetu - pus ruutinju - lai atrastos grida ruutinjas viduu
-                float roundy = Mathf.RoundToInt(hit.point.y / GridDecimalScale) * GridDecimalScale; //Y nedod offsetu, jo tam ir jaaatrodas mazliet virs zemes (telpas griidas biezums)
-                float roundz = Mathf.RoundToInt(hit.point.z / GridDecimalScale) * GridDecimalScale + GridDecimalScale / 2f;
-
-            
-
-                / **
-                 * te jaaapskataas vai gadzhets nelien aarpus robezhaam (njemot veeraa gadzheta izmeerus)
-                 * gan uz blakus telpaam gan uz priekshu/aizmuguri
-                 * 
-                 * ja poziicija nav OK, tad neapdeitot LastPosDecGrid
-                 * / 
-
-                LastPosDecGrid = new Vector3(roundx, roundy, roundz); 
-                LastPosDecGridPrecise = new Vector3(hit.point.x, hit.point.y,hit.point.z); 
+            //decimaalgrids
+            float roundDeciX = Mathf.RoundToInt(hit.point.x / GridDecimalScale) * GridDecimalScale + GridDecimalScale / 2f;// pieskaita offsetu - pus ruutinju - lai atrastos grida ruutinjas viduu
+            float roundDeciY = roundUnityY; // -- pa Y nebuus decimaalgrids - lai liip tikai pa staaviem    Mathf.RoundToInt(hit.point.y / GridDecimalScale) * GridDecimalScale + GridDecimalScale / 2f;
+            LastPosDecGrid = new Vector3(roundDeciX, roundDeciY, 0); 
 
 
+            //PLEISERI pielipina pie taa grida, kaads noraadiits objektaa, kas palshlaik atrodas PLEISERII
+            if(PlacerStickyness == GridStickyness.uniGrid){
+                placer.transform.position = LastPosGrid;
+            } else if(PlacerStickyness == GridStickyness.deciGrid){
+                placer.transform.position = LastPosDecGrid;
+            } else {
+                //EEEAAGLE -- neliip pie grida
             }
 
-          //  print(LastPosDecGrid);
+
+            /**
+             * hoverojamaas lietas
+             * LastHoverObject <-- ir vissvariigaakasi pashreiz hoverojamais objekts  (agjents->gadzhets->telpa)
+             *
+             * @todo -- sho dereetu agresiivi keshot, citaadi katraa kadraa paarmeklee objektu sarakstus
+             */
 
 
-            placer.transform.position = LastPosDecGrid;
+           BaseLevelThing LastHoverRoom = roomAtThisPosition(roundUnityX,roundUnityY);
+           BaseLevelThing LastHoverGadget = gadgetAtThisPosition(roundDeciX,roundDeciY);
+            BaseLevelThing LastHoverAgent = null;// agentAtThisPosition(hit.point.x,hit.point.y); agjentu kjershana nav implementeeta
+            if(LastHoverAgent != null){
+                LastHoverObject = LastHoverAgent;
+            } else if(LastHoverGadget != null) {
+                LastHoverObject = LastHoverGadget;
+            } else if(LastHoverRoom != null) {
+                LastHoverObject = LastHoverRoom;
+            }
+
+
         }
-        */
+
+     
+     
 
 
         if(Input.GetMouseButtonDown(0)) { // 0 => klik left 
@@ -239,7 +260,7 @@ public class Level : MonoBehaviour {
 
 
         if(Input.GetMouseButtonDown(2)) { // 2 => klik mid 
-            print(LastPosGrid + ":" + LastPosGridPrecise + " deci: " + LastPosDecGrid + ":" + LastPosDecGridPrecise );
+            print("Uni:" + LastPosGrid + " Deci:" + LastPosDecGrid +" (" + LastPosGridPrecise + ")" );
         }
 
 
@@ -598,8 +619,18 @@ public class Level : MonoBehaviour {
         pathCache = new Dictionary<Vector4, List<Vector2>>(); //noreseto atrsto celju keshu
         Navgrid = new Dictionary<Vector4, float>(); //noreseto
         ListOfRooms = new List<Room>();//pie viena ieguus aktuaalaako levelobjektu sarakstu 
+        ListOfGadgets = new List<Gadget>();
 
         Dictionary<Vector2,int> directionsInCubes = new Dictionary<Vector2, int>(); //ikvienam blokam (x,y ) liimeenii, kam vinja prefabaa ir noraaditi iespeejamie virzieni (Waypoints.dirs), tiek ielikti te
+
+
+        for(int i = 0; i< gadgetHolder.transform.childCount; i++) { //ikviens gadzhets liimenii
+            Gadget gadget = gadgetHolder.transform.GetChild(i).GetComponent<Gadget>();
+            ListOfGadgets.Add(gadget);
+            /**
+             * @todo -- kad gadzheti arii buus speejiigi ietekmeet telpas navgridu, tad gadzhetu sniegumu vajadzees pieskaitiit kopeejam navgridam
+             */
+        }
 
 
         /**
@@ -1133,7 +1164,7 @@ public class Level : MonoBehaviour {
     }
 
     /**
-     * vai shii levelobjekta nevins kubiks neatrodas uz kaada cita levelobjekta [jebkura kluciisha]
+     * vai shiis telpas neviens kubiks neatrodas uz kaadas citas telpas jebkura kubika
      */ 
     public bool IsThisSpotFree(Room newRoom){
 
@@ -1152,6 +1183,49 @@ public class Level : MonoBehaviour {
 
         return true;
 
+    }
+
+    /**
+     * vai padotais gadzhets nepaarklaajas ar kaadu citu gadzhetu
+     * Lietos vienkaarshotu, manuaalu AABB koliiziju noteikshanu
+     */ 
+    public bool IsThisSpotFree(Gadget newGadget){
+
+        if(gadgetAtThisPosition(newGadget.transform.position.x,newGadget.transform.position.y,newGadget.SizeX,newGadget.SizeY) != null){
+            //shajaa poziicijaa ir atrasts kaads gadzhets
+            return false;
+        }
+
+        
+        return true;
+        
+    }
+
+
+    /**
+     * atgriezh gadzhetu vai null, kuraa ietilpst padotaas XY koordinaates
+     * WH ir platums,augstums, 
+     */
+    public Gadget gadgetAtThisPosition(float x, float y,float w = 0, float h = 0) {
+
+        w /= 2f; //puse no apskataamaa gadzheta platuma
+        h /= 2f;
+
+        int numGadgets = ListOfGadgets.Count;
+        for(int i = 0; i < numGadgets; i++) { //skatos visus liimenii esoshis gadzhetus
+
+            Gadget g = ListOfGadgets[i];
+            float halfWidth = g.SizeX / 2f;
+            float halfHeight = g.SizeY / 2f;
+
+            if(g.transform.position.x + halfWidth + w > x && g.transform.position.x - halfWidth - w < x && 
+               g.transform.position.y + halfHeight +h > y && g.transform.position.y - halfHeight - h < y) { // vienkaarsha AABB kooliiziju detekcija, gadzheta koordinaate ir taa centraa, taapeec +/- pusgarums/platums
+               return g;
+            }
+        }
+        
+        
+        return null;
     }
 
 
