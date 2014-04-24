@@ -6,16 +6,16 @@ using System.Collections.Generic;
 public class Gui : MonoBehaviour {
 
     [HideInInspector]
-    public bool QueryMode; //inforiiks sho uzsetos, lai GUIskripts raadiita vinja sagatavoto info
+    public bool QueryMode; 
     [HideInInspector]
-    public Room QueryTarget; //inforiika apskataamais levelobjets
+    public BaseLevelThing QueryTarget; //inforiika apskataamais levelobjets
 
     //private GUIStyle skin;
     private Level levelscript; //viens vieniigais Liimenja paarvaldniekskripts
     private GlobalResources gResScript; //globaalo resursu pieskatiitaaajs, arii singltons :P
     private Camctrl camerascript;
     private int vert;
-    private int lastRoomLookedAt;
+    private int lastLevelobjectLookedAt;
 
     private float rightPlaqueHeight;
     private float leftPlaqueHeight;
@@ -53,25 +53,28 @@ public class Gui : MonoBehaviour {
             return;
         }
 
-
-        
         if(Input.GetMouseButtonDown(1)) { // 0 => klik rait
 
 
-            Room room = levelscript.roomAtThisPosition(levelscript.LastPosGrid.x, levelscript.LastPosGrid.y);
 
-            if(room != null && room.FuncType == FuncTypes.ground){ //atrasta telpa, bet taa ir zemes kluciitis, ignoreejam
-                room = null; 
+            BaseLevelThing levelobject = levelscript.LastHoverObject; //LastHoverObject uzsit levelskriptaa katraa kadraa
+
+            if(levelobject != null && levelobject.GetType().ToString() == "Room" ){ //hoverotais objekts ir telpa
+                Room mightBeGroundCube = (Room)levelobject;
+                if(mightBeGroundCube.FuncType == FuncTypes.ground){ //shii telpa ir zemes kluciitis, shos ignoreejam - neljaujam hoverot
+                    levelobject = null; 
+                }
             }
 
-            if(room != null) {
 
-                if(room.GetHashCode() == lastRoomLookedAt){ //atkaaroti spiezh labo peli uz vienas telpas, taatad grib izsleegt kverijreezhiimu
+            if(levelobject != null) {
+
+                if(levelobject.GetHashCode() == lastLevelobjectLookedAt){ //atkaaroti spiezh labo peli uz vienas telpas, taatad grib izsleegt kverijreezhiimu
                     stopQueryMode();
-                    lastRoomLookedAt = -1;
+                    lastLevelobjectLookedAt = -1;
                     return;
                 }
-                lastRoomLookedAt = room.GetHashCode();
+                lastLevelobjectLookedAt = levelobject.GetHashCode();
 
                 if(!QueryMode) {//ieprieksh nebija kverijrezhiims
                     //pieseivo speeles aatrumu un kameras poziiciju, tikai ja neesam jau iekshaa zuumaa (saglabaaju peedeejos lietotaaja izveeleetos parametrus, pat vairaaku seciigu zuumu gadiijumaa)
@@ -82,13 +85,14 @@ public class Gui : MonoBehaviour {
                 }
 
                 QueryMode = true;
-                QueryTarget = room.GetComponent<Room>();
-                levelscript.lastRoomTargeted = QueryTarget;
-                camerascript.ZoomToRoom(room.transform.position.x, room.transform.position.y - (room.SizeY / 2f) + 1.5f); // centree uz punktu nvieniibas virs griidas 
+                QueryTarget = levelobject;       
+             
+
+                camerascript.ZoomToRoom(levelobject.transform.position.x, levelobject.transform.position.y - (levelobject.SizeY / 2f) + 1.5f); // centree uz punktu nvieniibas virs griidas 
                 levelscript.TimeScale = 0.25f; // paleenina aatrumu                
 
             } else {
-                if(QueryMode) { //ja nav atrasta telpa un ieprieksh bija , tikai tad ir nepiecieshams noresetot (citaadi noreseto kameras poziiciju, kas vispaar nav uzsetota un ir slikti )
+                if(QueryMode) { //ja nav nekas apskataams un ieprieksh bija , tikai tad ir nepiecieshams noresetot (citaadi noreseto kameras poziiciju, kas vispaar nav uzsetota un ir slikti )
                     stopQueryMode();
                 }
             }
@@ -286,55 +290,17 @@ public class Gui : MonoBehaviour {
         try {
             if(QueryMode) { //tagad tiek apskatiits
 
-                left = Screen.width - 10 - 130;
-                vert = 10;
-                rightPlaqueHeight = 190;
-                GUI.Box(new Rect(left, vert, 130, rightPlaqueHeight), "?\n" + QueryTarget.name);
-
-
-                vert += 40;
-                GUI.Box(new Rect(left+5, vert, 130-10, 55), string.Format("A: {0}/{1}\nE: {2}/{3}\nW: {4}/{5}",
-                                                                    QueryTarget.Generation[Res.air], QueryTarget.Usage[Res.air],
-                                                                    QueryTarget.Generation[Res.electricity], QueryTarget.Usage[Res.electricity],
-                                                                    QueryTarget.Generation[Res.water], QueryTarget.Usage[Res.water]
-                                                                    ));
-                vert += 60;
-                
-                string offText = "OFF";
-                string offTooltipText = "Turn Room off; currently not working";
-                string onText = "on";
-                string onTooltipText = "Turn Room on; currently not working";
-                if(QueryTarget.Working) {
-                    offText = "off";
-                    offTooltipText = "Turn Room off; currently working";
-                    onText = "ON";
-                    onTooltipText = "Turn Room on; currently working";
+                if(QueryTarget.GetType().ToString() == "Room"){
+                    QueryRoomGUI();
+                }
+                if(QueryTarget.GetType().ToString() == "Gadget"){
+                    QueryGadgetGUI();
+                }
+                if(QueryTarget.GetType().ToString() == "Agent"){
+                    QueryAgentGUI();
                 }
 
 
-               
-                if(GUI.Button(new Rect(left+5, vert, 35, 20), new GUIContent(offText, offTooltipText))) {
-                    QueryTarget.setWorkingStatus(false, true);
-                }
-                if(GUI.Button(new Rect(left + 45+5, vert, 35, 20), new GUIContent(onText, onTooltipText))) {
-                    QueryTarget.setWorkingStatus(true, true);
-                }
-                
-               
-                if(GUI.Button(new Rect(left + 5 + 90, vert, 30, 20), new GUIContent("X", "Remove room"))) {
-                    QueryTarget.RemovedFromGrid();
-                }  
-
-
-
-                vert += 30;
-
-               
-                GUI.Box(new Rect(left+5, vert, 130-10, 55), string.Format("Worklist: \n"));
-                
-
-
-             
             }
             
         } catch {
@@ -370,6 +336,118 @@ public class Gui : MonoBehaviour {
 
     }
 
+
+    public void QueryRoomGUI(){
+
+        Room room = (Room)QueryTarget; //zinu, ka querytarget ir room klase
+
+        int left = Screen.width - 10 - 130;
+        vert = 10;
+        rightPlaqueHeight = 190;
+        GUI.Box(new Rect(left, vert, 130, rightPlaqueHeight), "?room?\n" + room.name);
+        
+        
+        vert += 40;
+        GUI.Box(new Rect(left+5, vert, 130-10, 55), string.Format("A: {0}/{1}\nE: {2}/{3}\nW: {4}/{5}",
+                                                                  room.Generation[Res.air], room.Usage[Res.air],
+                                                                  room.Generation[Res.electricity], room.Usage[Res.electricity],
+                                                                  room.Generation[Res.water], room.Usage[Res.water]
+                                                                  ));
+        vert += 60;
+        
+        string offText = "OFF";
+        string offTooltipText = "Turn Room off; currently not working";
+        string onText = "on";
+        string onTooltipText = "Turn Room on; currently not working";
+        if(room.Working) {
+            offText = "off";
+            offTooltipText = "Turn Room off; currently working";
+            onText = "ON";
+            onTooltipText = "Turn Room on; currently working";
+        }
+        
+        
+        
+        if(GUI.Button(new Rect(left+5, vert, 35, 20), new GUIContent(offText, offTooltipText))) {
+            room.setWorkingStatus(false, true);
+        }
+        if(GUI.Button(new Rect(left + 45+5, vert, 35, 20), new GUIContent(onText, onTooltipText))) {
+            room.setWorkingStatus(true, true);
+        }
+        
+        
+        if(GUI.Button(new Rect(left + 5 + 90, vert, 30, 20), new GUIContent("X", "Remove room"))) {
+            room.RemovedFromGrid();
+        }  
+        
+        
+        
+        vert += 30;
+        
+        
+        GUI.Box(new Rect(left+5, vert, 130-10, 55), string.Format("Worklist: \n"));
+        
+
+    }
+    public void QueryGadgetGUI(){
+        Gadget gadget = (Gadget)QueryTarget; //zinu, ka querytarget ir Gadget klase
+
+        int left = Screen.width - 10 - 130;
+        vert = 10;
+        rightPlaqueHeight = 190;
+        GUI.Box(new Rect(left, vert, 130, rightPlaqueHeight), "?gadget?\n" + gadget.name);
+        
+        vert += 40;
+        GUI.Box(new Rect(left+5, vert, 130-10, 55), string.Format("A: {0}/{1}\nE: {2}/{3}\nW: {4}/{5}",
+                                                                  gadget.Generation[Res.air], gadget.Usage[Res.air],
+                                                                  gadget.Generation[Res.electricity], gadget.Usage[Res.electricity],
+                                                                  gadget.Generation[Res.water], gadget.Usage[Res.water]
+                                                                  ));
+        vert += 60;
+       
+        
+        if(GUI.Button(new Rect(left + 5 + 90, vert, 30, 20), new GUIContent("X", "Remove gadget"))) {
+            gadget.RemovedFromGrid();
+        }  
+        
+        
+        vert += 30;
+        
+        
+        GUI.Box(new Rect(left+5, vert, 130-10, 55), string.Format("Worklist: \n"));
+
+
+    }
+
+    public void QueryAgentGUI(){
+        Agent agent = (Agent)QueryTarget; //zinu, ka querytarget ir Agent klase
+        
+
+        int left = Screen.width - 10 - 130;
+        vert = 10;
+        rightPlaqueHeight = 190;
+        GUI.Box(new Rect(left, vert, 130, rightPlaqueHeight), "?agent?\n" + agent.name);
+        
+        
+        vert += 40;
+      
+
+        
+        
+        
+        if(GUI.Button(new Rect(left + 5 + 90, vert, 30, 20), new GUIContent("X", "Remove agent"))) {
+            agent.RemovedFromGrid();
+        }  
+        
+        
+        
+        vert += 30;
+        
+        
+        GUI.Box(new Rect(left+5, vert, 130-10, 55), string.Format("Worklist: \n"));
+
+    }
+    
     //vai peljuks atrodas virs kaada no shajaa skriptaa radiitajiem elementiem
     public bool IsMouseOverGui() {
 
@@ -388,6 +466,8 @@ public class Gui : MonoBehaviour {
 
         return false;
     }
+
+
 
 
 

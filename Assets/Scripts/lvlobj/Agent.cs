@@ -679,7 +679,10 @@ public class Agent : BaseLevelThing {
     public override void RemovedFromPlacer(){}
     
     
-    public override void PlaceOnGrid(int mode){}
+    public override void PlaceOnGrid(int mode){
+        transform.gameObject.layer = 11; //agjentu leijeris
+
+    }
     public override void RemovedFromGrid(){}
 
 

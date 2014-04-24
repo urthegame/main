@@ -4,86 +4,19 @@ using System.Collections;
 using System.Collections.Generic;
 
 
-
-[System.Serializable]
-public class Waypoints  {
-    
-    //iespeejamie paarvietoshanaas virzieni no 1 kubika uz naakamo
-    //n = nowhere; top,left,bottom,right ..; lb = left&bottom ...
-    public enum dirs {
-        n = 0,
-        t = 1,
-        l = 1 << 1, //2
-        b = 1 << 2, //4
-        r = 1 << 3, //8
-        tl = t | l,
-        tb = t | b,
-        tr = t | r,
-        lb = l | b,
-        lr = l | r,
-        tlb = t | l | b,
-        tlr = t | l | r,
-        lbr = l | b | r,
-        tbr = t | b | r,
-        tlbr = t | l | b | r 
-        
-    };
-    
-    
-    public dirs[] passableDirections;
-    /**
-     * prefabaa noraada "passableDirections" datu masiiva izmeeru - tik cik telpaa ir kubiku
-     * katram telpas kubikam noraadaa iespeejamos ieshanas virzienus gan uz blakus telpaam, gan uz citiem kubikiem 1 telpas ietvaros
-     * _____
-     * 1 34 3  
-     *   12 2
-     *      1
-     * 
-     * pa labi un uz augshu: taatad +x un +y virzienaa
-     * 
-     * JA nav noraadiiti passabliDirections visiem telpas kubikiem, tad telpa netiek iekljauta navgridaa - taa ir nepieejams
-     */ 
-    
-}
-
-[System.Serializable]
-public class ResourceInitInfo{
-    // sekojoshie publiskie mainiigie ir jaauzsit prefabaa (tie startapaa tiks salikt DICTIONARY datu struktuuraas, taa ka - nekaadas mainishanas peec speeles palaishanas ):
-    //ka ari shie ir manuali jatur lidzi aktualakajiem globalajiem resursiem :\
-    public float GenerationAir; 
-    public float GenerationElectricity;
-    public float GenerationWater;
-    public float UsageAir; 
-    public float UsageElectricity;
-    public float UsageWater;
-    
-    public float AgentNeedsWater; // agjentresursi - tie ies atsevishskjaa datu struktuuraa
-    public float AgentNeedsSleep;
-}
-
 public enum FuncTypes {
-    block, //noliekams bloks
-    ground, //ambience n stuff
+    room, //parasta telpa
+    ground, //zemes, ambience n stuff
 }
 
 
 
 public class Room : BaseLevelThing {
 
-
-    public Waypoints waypoints;  //prefabaa noraadaami weipointi   
-    public WorkUnit[] workUnits; //prefabaa noraadaami telpaa daraamie darbinji
-    public float[] AgentNeedsGeneration; //masiivs, kas nosaka, cik katru agjentresursu telpa rada
-
-    
-
     public FuncTypes FuncType;  //funkcionaalais tips; jaaizveelas no enuma
     public bool DEBUG_ME = false;
 
-    
-    public ResourceInitInfo resourceInitInfo = new ResourceInitInfo();
-    public Dictionary<Res,float> Generation; //cik resursvieniibas rada 1 sekundee 
-    public Dictionary<Res,float> Usage; //cik resursvieniibas teeree 1 sekundee 
+
     public Dictionary<string,TextMesh> blockinfos;//blokinfo objektaa esoshie 3d teksta objekti | vajag public, jo dazhreiz galvenais liimenjskripts DEV_ONLY noluukos grib papkjiikjereet uz kaadu no shiem
     
     
@@ -100,30 +33,9 @@ public class Room : BaseLevelThing {
        
         baseInit();
 
-        //masu inicializacija
-        Generation = new Dictionary<Res, float>();
-        Usage = new Dictionary<Res, float>(); 
+               
         blockinfos = new Dictionary<string, TextMesh>();
         neighbors = new Dictionary<Room,bool>(); 
-        
-        foreach (Res r in Enum.GetValues(typeof(Res))){
-            Generation[r] = 0;
-            Usage[r] = 0;
-        }
-        
-        
-        // prefabaa dfineetos mainiigos saliek Dictaa, pisnis, bet iebuuveetais inspektors neraada sarezshgiitas datu struktuuras [dictionary]
-        Generation[Res.air] = resourceInitInfo.GenerationAir;
-        Generation[Res.electricity] = resourceInitInfo.GenerationElectricity;
-        Generation[Res.water] = resourceInitInfo.GenerationWater;
-        Usage[Res.air] = resourceInitInfo.UsageAir;
-        Usage[Res.electricity] = resourceInitInfo.UsageElectricity;
-        Usage[Res.water] = resourceInitInfo.UsageWater;
-        
-        
-        AgentNeedsGeneration = new float[AgentNeeds.numTypes];
-        AgentNeedsGeneration[(int)AgentNeeds.Types.Water] = resourceInitInfo.AgentNeedsWater;
-        AgentNeedsGeneration[(int)AgentNeeds.Types.Sleep] = resourceInitInfo.AgentNeedsSleep;
 
         WantWorking = true;
 
@@ -266,7 +178,7 @@ public class Room : BaseLevelThing {
             findAndInformNeighbors();
             
             transform.parent = roomHolder.transform; //novieto liimenjobjektu konteinerii, kur dziivo liimenim piederoshie objekti       
-            transform.gameObject.layer = 9; //levelobjektu leijeris
+            transform.gameObject.layer = 9; //telpu leijeris
             Destroy(transform.gameObject.GetComponent<Rigidbody>()); // kameer levelobjekts ir PLEISHOLDERII, tam pieder rigidbodijs, lai var koliizijas kolideet, nu tas vairs nav nepiecieshams
             
             //bloks sev panjem blockinfo objketu, kas atteelos vinja resursus
@@ -383,13 +295,13 @@ public class Room : BaseLevelThing {
         //print ("meklee kaiminjus");
         
         neighbors = new Dictionary<Room, bool>(); //aizpilda visu sarakstu par jaunu (vienkaarshaak nekaa skipot jau zinaamos)
-        int levelobjectLayer = 1 << 9;
+        int roomLayer = 1 << 9;
         
         //pa labi
         float radius = (SizeY - 0.1f)/2; //mazliet mazaaks par augstumu (raadiuss, taapeec puse)
         float distance = SizeX; 
         Vector3 p1 = new Vector3(transform.position.x-distance/2f,transform.position.y,transform.position.z);
-        foreach( RaycastHit hit in Physics.SphereCastAll(p1,radius, Vector3.right,distance,levelobjectLayer) ){
+        foreach( RaycastHit hit in Physics.SphereCastAll(p1,radius, Vector3.right,distance,roomLayer) ){
             //  print ("got right " + hit.transform.name);
             
             //draudzeejaas tikai ar citiem levelobjektiem, ja objektam nav shii skripta, tas ir nesvariigs klucis un nav pelniijis tikt pieskaitiits pie kaiminjiem :P
@@ -403,7 +315,7 @@ public class Room : BaseLevelThing {
         }
         //pa kreisi
         p1 = new Vector3(transform.position.x+distance/2f,transform.position.y,transform.position.z);
-        foreach( RaycastHit hit in Physics.SphereCastAll(p1,radius, Vector3.left,distance,levelobjectLayer) ){
+        foreach( RaycastHit hit in Physics.SphereCastAll(p1,radius, Vector3.left,distance,roomLayer) ){
             //print ("got left " + hit.transform.name);
             Room otherRoom = hit.transform.gameObject.GetComponent<Room>(); 
             if(otherRoom){
@@ -416,7 +328,7 @@ public class Room : BaseLevelThing {
         radius = (SizeX - 0.1f)/2; 
         distance = SizeY; 
         p1 = new Vector3(transform.position.x,transform.position.y-distance/2f,transform.position.z);
-        foreach( RaycastHit hit in Physics.SphereCastAll(p1,radius, Vector3.up,distance,levelobjectLayer) ){
+        foreach( RaycastHit hit in Physics.SphereCastAll(p1,radius, Vector3.up,distance,roomLayer) ){
             //print ("got top " + hit.transform.name);
             Room otherRoom = hit.transform.gameObject.GetComponent<Room>(); 
             if(otherRoom){
@@ -429,7 +341,7 @@ public class Room : BaseLevelThing {
         radius = (SizeX - 0.1f)/2; 
         distance = SizeY; 
         p1 = new Vector3(transform.position.x,transform.position.y+distance/2f,transform.position.z);
-        foreach( RaycastHit hit in Physics.SphereCastAll(p1,radius, Vector3.down,distance,levelobjectLayer) ){
+        foreach( RaycastHit hit in Physics.SphereCastAll(p1,radius, Vector3.down,distance,roomLayer) ){
             //  print ("got bottom " + hit.transform.name);
             Room otherRoom = hit.transform.gameObject.GetComponent<Room>(); 
             if(otherRoom){

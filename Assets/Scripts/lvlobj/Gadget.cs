@@ -102,6 +102,7 @@ public class Gadget : BaseLevelThing {
 
 
         transform.parent = gadgetHolder.transform; //novieto gadzhetu konteinerii
+        transform.gameObject.layer = 10; //gadzhetu leijeris
         Destroy(transform.gameObject.GetComponent<Rigidbody>()); // kameer levelobjekts ir PLEISHOLDERII, tam pieder rigidbodijs, lai var koliizijas kolideet, nu tas vairs nav nepiecieshams
 
 

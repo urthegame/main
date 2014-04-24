@@ -372,7 +372,6 @@ MonoBehaviour:
   LastPosGrid: {x: 0, y: 0, z: 0}
   LastPosDecGrid: {x: 0, y: 0, z: 0}
   objectInPlacer: 0
-  lastRoomTargeted: {fileID: 0}
   limits:
     XA: -15
     XB: 15

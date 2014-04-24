@@ -17,7 +17,7 @@ public class Level : MonoBehaviour {
 
     public bool DebugDrawNavgrid = true;
     public Dictionary<Vector4,float> Navgrid = new Dictionary<Vector4, float>(); //cik maksaa (un vai vispaar ir iespeejams) celjs no x,y uz citu x,y (shie 4 xyxy tiek iekodeeeti vector4, aspraatiigi, es zinu )
-    public List<Room> ListOfRooms; //saraksts ar visiem liimenii esoshajiem leveloblokiem jeb telpam
+    public List<Room> ListOfRooms; //saraksts ar visaam liimenii esoshajaam telpam
     public List<Gadget> ListOfGadgets;
 
     private GameObject roomHolder;
@@ -40,7 +40,6 @@ public class Level : MonoBehaviour {
     public bool objectInPlacer = false; //pleiseris ir konteineris, ko biida apkaart ar peli - priekshskatiijuma versija
     private GridStickyness PlacerStickyness; //pie kura grida jaaliip klaat objektam, kas pashlaik atrodas pleiserii
     [HideInInspector]
-    public Room lastRoomTargeted; //telpa kuraa tiek piezuumota - sho maina GUIskriptss
 
 
     private int numRooms = 0; //tikai aptuveni apjomi, lieto unikaaliem nosakumiem, neivs patiesai apjoma ntoeikshanai
@@ -164,7 +163,11 @@ public class Level : MonoBehaviour {
     void mouse() {
 
         LastHoverObject = null;
+        BaseLevelThing LastHoverRoom = null;
+        BaseLevelThing LastHoverGadget = null;
+        BaseLevelThing LastHoverAgent = null;
 
+            
         if(guiscript.IsMouseOverGui()) { //kursors atrodas uz HUDa,nevajag uzbaazties ar saviem kluchiem
             return;
         }
@@ -198,30 +201,33 @@ public class Level : MonoBehaviour {
             }
 
 
-            /**
-             * hoverojamaas lietas
-             * LastHoverObject <-- ir vissvariigaakasi pashreiz hoverojamais objekts  (agjents->gadzhets->telpa)
-             *
-             * @todo -- sho dereetu agresiivi keshot, citaadi katraa kadraa paarmeklee objektu sarakstus
-             */
-
-
-           BaseLevelThing LastHoverRoom = roomAtThisPosition(roundUnityX,roundUnityY);
-           BaseLevelThing LastHoverGadget = gadgetAtThisPosition(roundDeciX,roundDeciY);
-            BaseLevelThing LastHoverAgent = null;// agentAtThisPosition(hit.point.x,hit.point.y); agjentu kjershana nav implementeeta
-            if(LastHoverAgent != null){
-                LastHoverObject = LastHoverAgent;
-            } else if(LastHoverGadget != null) {
-                LastHoverObject = LastHoverGadget;
-            } else if(LastHoverRoom != null) {
-                LastHoverObject = LastHoverRoom;
-            }
-
+            //peedeejo hoveroto telpu varu viennoziimig atrast peec shiim koordinaateem
+            LastHoverRoom = roomAtThisPosition(roundUnityX,roundUnityY);
 
         }
 
-     
-     
+        
+
+        //gadhzeta un agjenta atrashanai jaaveic reikaastings
+        if(Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << 10)) { //gadzhetu slaanis
+            LastHoverGadget = hit.transform.gameObject.GetComponent<BaseLevelThing>();
+        }
+        if(Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << 11)) { //agjentu slaanis
+            LastHoverAgent = hit.transform.gameObject.GetComponent<BaseLevelThing>();
+        }
+        
+
+        //atrod svariigaako no hoverotajaam lietaam
+        if(LastHoverAgent != null){
+            LastHoverObject = LastHoverAgent;
+        }  else if(LastHoverGadget != null) {
+            LastHoverObject = LastHoverGadget;
+        } else if(LastHoverRoom != null) {
+            LastHoverObject = LastHoverRoom;
+        }
+
+        
+        
 
 
         if(Input.GetMouseButtonDown(0)) { // 0 => klik left 
@@ -234,12 +240,7 @@ public class Level : MonoBehaviour {
             if(objectInPlacer) { //PLEISERII ir ielaadeeds prefabs
                 Transform levelobject = placer.transform.GetChild(0); //pienjemu, ka tikai viens objekts tiek likts vienlaiciigi
                 BaseLevelThing script = levelobject.GetComponent<BaseLevelThing>(); //objekts instanceeets un skriptaa varu apskatiities apreekjinaatos offsetus
-
-                if(script.GetType().ToString() == "Gadget"){
-                    Gadget gadgetscript = (Gadget)script;
-                    gadgetscript.parentRoom = lastRoomTargeted; //ja tiek likts gadzhets (nevis telpa) tad gadhetam pasaka kurai telpai tas pieder 
-                }
-
+             
                 script.PlaceOnGrid(0); //katrs bloks pats izlems, ko dariit, kad tas tiek klikskshkinaats uz grida (ja bloks tiek novietots, tad tas tiks aizvaakts no PLEISERA)
                 CalculateNavgrid();//kaut kas iespeejams ir mainiijies, jaaparreekjina
 
@@ -367,7 +368,7 @@ public class Level : MonoBehaviour {
 
         var stopwatch = new System.Diagnostics.Stopwatch();
         stopwatch.Start();
-
+        bool roomsNotYetCounted = true;
 
         //dzeesh levelobjektus
         while(roomHolder.transform.childCount > 0){
@@ -443,6 +444,18 @@ public class Level : MonoBehaviour {
                 numAgents++;
 
             } else if(script.GetType().ToString() == "Gadget"){
+                /**
+                 * neliels haxxxinsh: 
+                 * lai gadzhetu vareetu pievienot, telpaam jau jaabuut liimenii 
+                 * taas tagad ir, bet to saraksts nav atjaunots un gadzheti nevar ieguut sev piederoshaas telpas referenci
+                 * taapeec tikliidz saaku gadzhetus (visas telpas jau ir ielaadeetas)
+                 * vajag paarskaitiit telpas
+                 * 
+                 */ 
+                if(roomsNotYetCounted){
+                    CalculateNavgrid(); //parreekjina navgridu, pie viena paarskaita telpas
+                    roomsNotYetCounted = false;
+                }
                 levelobject.transform.parent = gadgetHolder.transform; 
                 levelobject.name = script.Prefabname + " " + (numGadgets + 1);
                 numGadgets++;
@@ -464,7 +477,7 @@ public class Level : MonoBehaviour {
         CheckWorkingStatusEveryBlock(1); //kad vissi levelobjekti novietoti, varu sleegt tos iekshaa; ir/vai jaasleedz iekshaa, shis statuss jau ir uzsetots levelobjektaa
         CheckWorkingStatusEveryBlock(1); //divreiz, jo paarbauda ljoti nesistemaatiski un, ja gjenerators ir peedeejais objekts, tad var gadiities, ka neiesleedz nevienu levelobjektu, jo nav elektriibas >:)
         CheckWorkingStatusEveryBlock(1); //triisreiz!11
-        CalculateNavgrid();
+        CalculateNavgrid(); //lai gan nesen jau parreekjinaats, bet peec taas reizes ir ielaadeeti gadzheti, kas dazhreiz arii nodroshina celjoshanu pa telpaam
 
 
         stopwatch.Stop();
@@ -513,7 +526,7 @@ public class Level : MonoBehaviour {
      * @note -- ljoti leens, ja meegjina atkaarotit izpildiit( jo tiek atrastas koliizija ar jau esoshiem kluciishiem)
      */ 
     public void FillWithGroundcubes() {
-        int gameobjectLayer = 1 << 9; //9. slaanis ir visi levelobjekti
+        int roomLayer = 1 << 9; //9. slaanis ir visas telpas
         GameObject prefab;//
         GameObject groundCube = loadLevelobjectPrefab("groundcube-1");    
         GameObject groundFlat = loadLevelobjectPrefab("groundcube-flat-1");    
@@ -524,7 +537,7 @@ public class Level : MonoBehaviour {
 
                 Vector3 positionInGrid = new Vector3(i, j, 0);
 
-                if(Physics.CheckSphere(positionInGrid, 0.25f, gameobjectLayer)) { //vai laucinsh nav jau aiznjemts ar kaadu geimobjektu
+                if(Physics.CheckSphere(positionInGrid, 0.25f, roomLayer)) { //vai laucinsh nav jau aiznjemts ar kaadu geimobjektu
                     //  print ("aiznjemts " +positionInGrid );
                     continue;
                 }
@@ -547,7 +560,7 @@ public class Level : MonoBehaviour {
                 levelobject.transform.parent = roomHolder.transform; 
                 levelobject.name = script.Prefabname + " " + (numRooms + 1);
                 numRooms++;
-                levelobject.gameObject.layer = 9; //levelobjektu leijeris
+                levelobject.gameObject.layer = 9; //telpu leijeris
                 
                 script.PlaceOnGrid(1); //zinjoju blokam, ka tas novietots speeles laukumaa
                 script.ConstrPercent = 100; //haks - pasaku, ka gatavs
@@ -1245,6 +1258,8 @@ public class Level : MonoBehaviour {
         agent.name = script.Prefabname + " " + (numAgents + 1);
         numAgents++;
         script.Init();
+        script.PlaceOnGrid(0);
+
 
     }
 
@@ -1257,6 +1272,7 @@ public class Level : MonoBehaviour {
             Destroy(agentHolder.transform.GetChild(0).gameObject );
         }
 
+     
     }
         
 }
