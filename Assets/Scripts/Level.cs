@@ -43,7 +43,7 @@ public class Level : MonoBehaviour {
     [HideInInspector]
 
 
-    private int numRooms = 0; //tikai aptuveni apjomi, lieto unikaaliem nosakumiem, neivs patiesai apjoma ntoeikshanai
+    private int numRooms = 0; //tikai aptuveni apjomi, lieto unikaaliem nosakumiem, neivs patiesai apjoma noteikshanai
     private int numAgents = 0;
     private int numGadgets = 0;
     private Dictionary<string,GameObject> prefabCache = new Dictionary<string,GameObject>(); // lai katru unikaalo prefabu ielaadeetu tikai vienreiz

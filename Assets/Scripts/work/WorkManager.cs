@@ -79,9 +79,15 @@ public class WorkManager : MonoBehaviour {
 
 
             bool includingNeightborCubes = false;
-            if( (int)potentialJob.WorkUnitTypeNumber <= 2){ //buuvdarbus var dariit arii no kaiminjkubikiem
+            if( (int)potentialJob.WorkUnitTypeNumber <= 2){ //telpu buuvdarbus var dariit arii no kaiminjkubikiem
                 includingNeightborCubes = true;
             }
+
+            /**
+             * @todo -- darba poziicija
+             *          nejaushs kubiks der tikai telpas buuvdarbiem
+             *          gadzhetu darbiem vajag staaveet uz gadzheta (varbuut gadzhetu buuvdarbam vajag blakus gadzhetam)
+             */ 
 
             List<Vector2> allCubes = levelscript.AllAccessableCubesInThisRoom(potentialJob.parentRoom,includingNeightborCubes); //visi kubiki telpaa, kurai pieder darbs (+ visi kaiminjkubiki, ja iipashi paluudz)
 

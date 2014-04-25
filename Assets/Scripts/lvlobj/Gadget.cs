@@ -75,18 +75,27 @@ public class Gadget : BaseLevelThing {
 
         float x = transform.position.x;
         float y = transform.position.y;
+        parentRoom = levelscript.roomAtThisPosition(x,y); //gadzhets vienmeer pieder 1 telpai
+
         if(mode == 0){ //manuaali peivienotajiem gadzhetiem paarbaudiis vai driikst te atrasties
-            if(levelscript.roomAtThisPosition(x,y) == null ){
+            if(parentRoom == null ){
                 print ("paga, paga, gazhets netiek nolikts telpaa!");
-                return;
-                /**
-                 * @todo -- paarbaudiit vai viss gadzhets ietilpst istabaa (ne tikai viduspunkts) 
-                 */ 
+                return;            
             }
 
-            /**
-             * @todo -- paarbaudiit, vai gadzhets tiek novietots uz griidas vairaakstaaviigaas telpaas ()
-             */ 
+            //paarbauda ai viss gadzhets (taa robezhas nosaka kolaideris) ietilpst shajaa telpaa (t.i. gadzhets neatrodas ar vienu kaaju aaraa)
+            float halfWidth = parentRoom.SizeX / 2f;
+            float halfHeight = parentRoom.SizeY / 2f;
+            float w = SizeX / 2f;
+            float h = SizeY / 2f;
+            if(parentRoom.transform.position.x + halfWidth - w > x && parentRoom.transform.position.x - halfWidth + w < x /* &&  ---neesmu paarliecinaats par Y pareiziibu, bet tagad pietiek ar X
+               parentRoom.transform.position.y + halfHeight -h > y && parentRoom.transform.position.y - halfHeight + h < y */ ) { 
+               
+            } else {
+                print("gadzhets neietilpst VISS vienaa telpaa");
+                return; 
+            }
+
 
             if(!levelscript.IsThisSpotFree(this)){
                 print ("vietinja aiznjemta!");
@@ -95,7 +104,7 @@ public class Gadget : BaseLevelThing {
 
         }
 
-        parentRoom = levelscript.roomAtThisPosition(x,y);
+
         if(parentRoom == null) {
             print("watwatwat!? objekts nav novietots telpaa");
             return;
@@ -176,12 +185,8 @@ public class Gadget : BaseLevelThing {
         percentageShowingFiller.transform.localScale = new Vector3(SizeX,SizeY,SizeZ);
         percentageShowingFiller.renderer.material.color = new Color(0,0,0, (100-ConstrPercent)/200f + 0.25f);  
 
-
-
         
         placedOnGrid = true;
-        
-        
         
     }
 

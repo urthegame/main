@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.IO;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -14,6 +15,7 @@ public class Gui : MonoBehaviour {
     private Level levelscript; //viens vieniigais Liimenja paarvaldniekskripts
     private GlobalResources gResScript; //globaalo resursu pieskatiitaaajs, arii singltons :P
     private Camctrl camerascript;
+    private WorkManager workManagerScript;
     private int vert;
     private int lastLevelobjectLookedAt;
 
@@ -28,6 +30,7 @@ public class Gui : MonoBehaviour {
     public void Awake() {
         levelscript = GameObject.Find("Level").GetComponent<Level>(); //no-bullshit singleton
         gResScript = GameObject.Find("Level").GetComponent<GlobalResources>(); //no-bullshit singleton
+        workManagerScript = GameObject.Find("Level").GetComponent<WorkManager>(); 
         camerascript = GameObject.Find("Camera").GetComponent<Camctrl>(); //no-bullshit singleton
 
 
@@ -343,7 +346,7 @@ public class Gui : MonoBehaviour {
 
         int left = Screen.width - 10 - 130;
         vert = 10;
-        rightPlaqueHeight = 190;
+        rightPlaqueHeight = 125;
         GUI.Box(new Rect(left, vert, 130, rightPlaqueHeight), "?room?\n" + room.name);
         
         
@@ -380,12 +383,45 @@ public class Gui : MonoBehaviour {
             room.RemovedFromGrid();
         }  
         
-        
+
         
         vert += 30;
+
+
+        string worklist = "";
+        int numlines = 0;
+        foreach(WorkUnit w in workManagerScript.worklist) {
+            if(w.parentRoom != room) { //skataas tikai darbus, kas pieder shai telpai
+                continue;
+            }
+
+            if(w.on) {  //vai iesleegts
+                worklist += "+ ";
+            } else {
+                worklist += "- ";
+            }
+
+            worklist += "@" + w.parentRoom.name; //kuraa telpa atrodas
+           
+            if(w.parentGadget != null) { //opcinaaali - gadzhets, kam pieder darbs
+                worklist += "\n  " + w.parentGadget.name;
+                numlines++;
+            }
+
+            worklist += "\n  " + w.WorkUnitTypeNumber.ToString();
+
+            if(w.agentWorkingOn != null) { //agjents kursh straadaa
+                worklist += "\n  " + w.agentWorkingOn.name;
+                numlines++;
+            }
+
+
+
+            worklist += "\n\n";
+            numlines += 2;
+        }
         
-        
-        GUI.Box(new Rect(left+5, vert, 130-10, 55), string.Format("Worklist: \n"));
+        GUI.Box(new Rect(left+5, vert, 130-10, 25+numlines*15), string.Format("Worklist: \n"+worklist));
         
 
     }
@@ -394,7 +430,7 @@ public class Gui : MonoBehaviour {
 
         int left = Screen.width - 10 - 130;
         vert = 10;
-        rightPlaqueHeight = 190;
+        rightPlaqueHeight = 125;
         GUI.Box(new Rect(left, vert, 130, rightPlaqueHeight), "?gadget?\n" + gadget.name);
         
         vert += 40;
@@ -414,7 +450,41 @@ public class Gui : MonoBehaviour {
         vert += 30;
         
         
-        GUI.Box(new Rect(left+5, vert, 130-10, 55), string.Format("Worklist: \n"));
+        
+        string worklist = "";
+        int numlines = 0;
+        foreach(WorkUnit w in workManagerScript.worklist) {
+            if(w.parentGadget != gadget) { //skataas tikai darbus, kas pieder shim gadzhetams
+                continue;
+            }
+            
+            if(w.on) {  //vai iesleegts
+                worklist += "+ ";
+            } else {
+                worklist += "- ";
+            }
+            
+            worklist += "@" + w.parentRoom.name; //kuraa telpa atrodas
+            
+
+            worklist += "\n  " + w.parentGadget.name;
+            numlines++;
+
+            
+            worklist += "\n  " + w.WorkUnitTypeNumber.ToString();
+            
+            if(w.agentWorkingOn != null) { //agjents kursh straadaa
+                worklist += "\n  " + w.agentWorkingOn.name;
+                numlines++;
+            }
+            
+            
+            
+            worklist += "\n\n";
+            numlines += 2;
+        }
+        
+        GUI.Box(new Rect(left+5, vert, 130-10, 25+numlines*15), string.Format("Worklist: \n"+worklist));
 
 
     }
@@ -425,7 +495,7 @@ public class Gui : MonoBehaviour {
 
         int left = Screen.width - 10 - 130;
         vert = 10;
-        rightPlaqueHeight = 190;
+        rightPlaqueHeight = 65;
         GUI.Box(new Rect(left, vert, 130, rightPlaqueHeight), "?agent?\n" + agent.name);
         
         
@@ -444,7 +514,35 @@ public class Gui : MonoBehaviour {
         vert += 30;
         
         
-        GUI.Box(new Rect(left+5, vert, 130-10, 55), string.Format("Worklist: \n"));
+        
+        string worklist = "";
+        int numlines = 0;
+        foreach(WorkUnit w in workManagerScript.worklist) {
+            if(w.agentWorkingOn != agent) { //skataas tikai darbus, ko dara shis agjents
+                continue;
+            }
+            
+            if(w.on) {  //vai iesleegts
+                worklist += "+ ";
+            } else {
+                worklist += "- ";
+            }
+            
+            worklist += "@" + w.parentRoom.name; //kuraa telpa atrodas
+            
+            if(w.parentGadget != null) { //opcinaaali - gadzhets, kam pieder darbs
+                worklist += "\n  " + w.parentGadget.name;
+                numlines++;
+            }
+            
+            worklist += "\n  " + w.WorkUnitTypeNumber.ToString();
+           
+
+            worklist += "\n\n";
+            numlines += 2;
+        }
+        
+        GUI.Box(new Rect(left+5, vert, 130-10, 25+numlines*15), string.Format("Worklist: \n"+worklist));
 
     }
     

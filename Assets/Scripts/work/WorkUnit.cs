@@ -28,8 +28,7 @@ public class WorkUnit {
      * vai darbinju var dariit
      * ja telpaa nav elektriiba vai uudens utt. (prefabaa ir noraadiids, ka telpa teeree), tad telpa izsleegs sho darbinju
      */ 
-    private bool on;
-    [HideInInspector]
+    public bool on;
     public Agent agentWorkingOn; //kursh agjents pashlaik straada sho darbinju
     [HideInInspector]
     public Vector2 BestPositionToStandWhileWorking = new Vector2(); //pozciicija liimeni, kur jaaatrodas straadaajot, tiks uzsista, atrodot darbinju agjentam
