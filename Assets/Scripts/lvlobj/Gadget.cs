@@ -6,6 +6,9 @@ public class Gadget : BaseLevelThing {
     [HideInInspector]
     public Room parentRoom; //kurai telpai shis gadzhets pieder | atradiis rantaimaa
 
+    private float lastConstrPercent = -1f;
+    private GameObject percentageShowingFiller; //puscaurspiidiigs kubs, kas aizpilda visu objekta tilpuu - taa puscaurpiidiiba tiks mainiita atkariibaa no pabeigtiibas procentiem
+
     void Awake() {
         baseInit();
        
@@ -25,7 +28,7 @@ public class Gadget : BaseLevelThing {
                 if(ConstrPercent >= 100){
                     ConstrPercent = 100;
                     Constructing = false;
-                   
+
                     workManagerScript.RemoveAllConstructionJobsForThisGadget(this); //buuveeshana pabeigta, jaaizniicina darbinsh
                 }
             }
@@ -36,14 +39,21 @@ public class Gadget : BaseLevelThing {
                 
                 if(ConstrPercent <= 0){
                     workManagerScript.RemoveAllConstructionJobsForThisGadget(this); //nojaukshana pabeigta, jaaizniicina darbinsh
+                    transform.parent = levelscript.destroyHolder.transform; //ievieto sepciaalaa konteinerii, kur sagadiis savu izniicinaashanu (naakamaja kadraa) jo man vajag, lai jau shajaa kadraa pareizais konteineris satureetu tikai deriigos objektus 
                     Destroy(transform.gameObject); //aizvaac sho kluciiti no liimenja
-                    //Destructing = false;
                     levelscript.CalculateNavgrid(); //lieku liimenim paarreekjinaat visus ejamos celjus, jo ir izmainjas
                 }
                 
             }
             
+            if(ConstrPercent != lastConstrPercent){
+                lastConstrPercent = ConstrPercent;
 
+                percentageShowingFiller.renderer.material.color = new Color(0,0,0, (100-ConstrPercent)/200f + 0.25f); // puscaurspiidiiba  0.25 - 0.75 
+                if(ConstrPercent >= 100){
+                    percentageShowingFiller.renderer.material.color = new Color(0,0,0,0); //pilniigi caurspiidiigs
+                }
+            }
         }
 
     }
@@ -122,7 +132,6 @@ public class Gadget : BaseLevelThing {
          * to buus jaaizvaac, kad pabeigs
          */ 
         
-        
         if(Constructing) { 
             if(ConstrTime == 0) { //momentaa buuveejamaas telpas
                 //darbinju neveido
@@ -130,6 +139,7 @@ public class Gadget : BaseLevelThing {
             } else {
                 workManagerScript.CreateAndAddConstructionJob(parentRoom,this, WorkUnit.WorkUnitTypes._ConstructionGadget);
             }
+
         }
         
         //tas pats ar nost jaukshanu
@@ -153,7 +163,21 @@ public class Gadget : BaseLevelThing {
             workManagerScript.AddWork(w);
         } //*/
 
+
+
+        GameObject prefab = levelscript.loadLevelobjectPrefab("filler-1");
         
+        percentageShowingFiller = Instantiate(
+            prefab, 
+            Vector3.zero,
+            Quaternion.identity) as GameObject;
+        percentageShowingFiller.transform.parent = transform;
+        percentageShowingFiller.transform.localPosition = new Vector3(0,0,0);
+        percentageShowingFiller.transform.localScale = new Vector3(SizeX,SizeY,SizeZ);
+        percentageShowingFiller.renderer.material.color = new Color(0,0,0, (100-ConstrPercent)/200f + 0.25f);  
+
+
+
         
         placedOnGrid = true;
         
@@ -162,6 +186,23 @@ public class Gadget : BaseLevelThing {
     }
 
     public override void RemovedFromGrid() {
+        
+        
+        workManagerScript.RemoveAllConstructionJobsForThisGadget(this); //jaapaartrauc visi celtnieciibas darbi, if-any
+        
+        if(DestrTime == 0){
+            ConstrPercent = 0; // ja konstrukcijas laiks ir nulle, tad uzsit 0 procentuis (naakamais UPDATE finalizees un aizvaaks sho kluciiti)
+        } else {
+            //ja ir konstrukcijas laiks, tad jaaveido darbinsh
+            workManagerScript.CreateAndAddConstructionJob(parentRoom,this,WorkUnit.WorkUnitTypes._DestructionGadget );
+        }
+        
+        //setWorkingStatus(false,true);//jaaizsleedz pirms aizvaakshanas, lai var atskaitiit savus resursus no globaalaa kopuma
+        Destructing = true; //saakam jaukt nost
+        Constructing = false; //paarstaaj celt, ja veel nebija pabeidzis
+
+        percentageShowingFiller.renderer.material.color = new Color(0,0,0,0.25f);
+
     }
     
     

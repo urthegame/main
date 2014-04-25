@@ -82,6 +82,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cce0c3909ed6fa341b383f95894f9640, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  waypoints:
+    passableDirections: 
+  workUnits: []
+  AgentNeedsGeneration: []
+  resourceInitInfo:
+    GenerationAir: 0
+    GenerationElectricity: 0
+    GenerationWater: 0
+    UsageAir: 0
+    UsageElectricity: 0
+    UsageWater: 0
+    AgentNeedsWater: 0
+    AgentNeedsSleep: 0
   ConstrTime: 0
   DestrTime: 0
   Price: 0
@@ -94,6 +107,7 @@ MonoBehaviour:
   Prefabname: digg-1
   OffsetX: 0
   OffsetY: 0
+  Stickyness: 0
 --- !u!114 &11400002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -102,9 +116,39 @@ MonoBehaviour:
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d340051dcf8e274094963844b6d4e3d, type: 3}
+  m_Script: {fileID: 0}
   m_Name: 
   m_EditorClassIdentifier: 
+  waypoints:
+    passableDirections: 
+  workUnits: []
+  AgentNeedsGeneration: []
+  resourceInitInfo:
+    GenerationAir: 0
+    GenerationElectricity: 0
+    GenerationWater: 0
+    UsageAir: 0
+    UsageElectricity: 0
+    UsageWater: 0
+    AgentNeedsWater: 0
+    AgentNeedsSleep: 0
+  ConstrTime: 1
+  DestrTime: 1
+  Price: 0
+  Constructing: 0
+  Destructing: 0
+  ConstrPercent: 0
+  SizeX: 1
+  SizeY: 1
+  SizeZ: 1
+  Prefabname: 6b616164732061697a6d6972736973206d616e6920706161727361756b742c206962696f21
+  OffsetX: 0
+  OffsetY: 0
+  Stickyness: 0
+  FuncType: 0
+  DEBUG_ME: 0
+  Working: 0
+  WantWorking: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

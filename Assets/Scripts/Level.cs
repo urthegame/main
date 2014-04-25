@@ -23,7 +23,8 @@ public class Level : MonoBehaviour {
     private GameObject roomHolder;
     private GameObject agentHolder;
     private GameObject gadgetHolder;
-    private GameObject destroyHolder;
+    [HideInInspector]
+    public GameObject destroyHolder;
     private GameObject placer;
     private Gui guiscript; //vieniigais/globalais GUI skripts
     private GlobalResources gResScript; //globaalo resursu pieskatiitaaajs, arii singltons :P
@@ -1269,7 +1270,7 @@ public class Level : MonoBehaviour {
     public void RemAgent(){
 
         if(agentHolder.transform.childCount > 0){
-            Destroy(agentHolder.transform.GetChild(0).gameObject );
+            agentHolder.transform.GetChild(0).gameObject.GetComponent<BaseLevelThing>().RemovedFromGrid();
         }
 
      

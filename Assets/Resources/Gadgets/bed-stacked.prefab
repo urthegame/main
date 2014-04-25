@@ -638,8 +638,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edd13dac435a38641a3a2abaa10221dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConstrTime: 1
-  DestrTime: 1
+  waypoints:
+    passableDirections: 
+  workUnits: []
+  AgentNeedsGeneration: []
+  resourceInitInfo:
+    GenerationAir: 0
+    GenerationElectricity: 0
+    GenerationWater: 0
+    UsageAir: 0
+    UsageElectricity: 0
+    UsageWater: 0
+    AgentNeedsWater: 0
+    AgentNeedsSleep: 0
+  ConstrTime: 10
+  DestrTime: 5
   Price: 0
   Constructing: 0
   Destructing: 0

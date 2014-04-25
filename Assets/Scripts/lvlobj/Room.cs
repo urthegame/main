@@ -68,7 +68,7 @@ public class Room : BaseLevelThing {
                     Constructing = false;
                     setWorkingStatus(WantWorking,true); //ieszleedz iekshaa (ja vien speeleetaajs nav paguvis buuveesahnas laikaa izsleegt aaraa)
                     blockinfos["percent"].renderer.enabled = false;
-                    workManagerScript.RemoveAllConstructionJobsForThisBlock(this); //buuveeshana pabeigta, jaaizniicina darbinsh
+                    workManagerScript.RemoveAllConstructionJobsForThisRoom(this); //buuveeshana pabeigta, jaaizniicina darbinsh
                 }
             }
             
@@ -77,7 +77,8 @@ public class Room : BaseLevelThing {
                 //konstrukcijas procentus inkrementee workUnit skriptaa
                 
                 if(ConstrPercent <= 0){
-                    workManagerScript.RemoveAllConstructionJobsForThisBlock(this); //nojaukshana pabeigta, jaaizniicina darbinsh
+                    workManagerScript.RemoveAllConstructionJobsForThisRoom(this); //nojaukshana pabeigta, jaaizniicina darbinsh
+                    transform.parent = levelscript.destroyHolder.transform; //ievieto sepciaalaa konteinerii, kur sagadiis savu izniicinaashanu (naakamaja kadraa) jo man vajag, lai jau shajaa kadraa pareizeis konteineris satureetu tikai deriigos objektus 
                     Destroy(transform.gameObject); //aizvaac sho kluciiti no liimenja
                     //Destructing = false;
                     levelscript.CalculateNavgrid(); //lieku liimenim paarreekjinaat visus ejamos celjus, jo ir izmainjas
@@ -268,7 +269,7 @@ public class Room : BaseLevelThing {
     override public void RemovedFromGrid(){
         
         
-        workManagerScript.RemoveAllConstructionJobsForThisBlock(this); //jaapaartrauc visi celtnieciibas darbi, if-any
+        workManagerScript.RemoveAllConstructionJobsForThisRoom(this); //jaapaartrauc visi celtnieciibas darbi, if-any
         
         if(DestrTime == 0){
             ConstrPercent = 0; // ja konstrukcijas laiks ir nulle, tad uzsit 0 procentuis (naakamais UPDATE finalizees un aizvaaks sho kluciiti)
@@ -281,7 +282,8 @@ public class Room : BaseLevelThing {
         Destructing = true; //saakam jaukt nost
         Constructing = false; //paarstaaj celt, ja veel nebija pabeidzis
         blockinfos["percent"].renderer.enabled = true; //iesleedzu procentraadiitaaju
-        
+
+
     }
     
     

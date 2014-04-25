@@ -79,7 +79,7 @@ public class WorkManager : MonoBehaviour {
 
 
             bool includingNeightborCubes = false;
-            if( (int)potentialJob.WorkUnitTypeNumber < 10){ //buuvdarbus var dariit arii no kaiminjkubikiem
+            if( (int)potentialJob.WorkUnitTypeNumber <= 2){ //buuvdarbus var dariit arii no kaiminjkubikiem
                 includingNeightborCubes = true;
             }
 
@@ -140,7 +140,13 @@ public class WorkManager : MonoBehaviour {
     public void CreateAndAddConstructionJob(Room block, Gadget gadget, WorkUnit.WorkUnitTypes workType){
 
         WorkUnit constructionJob = new WorkUnit();
-        constructionJob.parentGameobject = block.gameObject;
+
+
+            constructionJob.parentGameobject = block.gameObject;
+            constructionJob.parentGadget = gadget;//null, ja shis nav gadzheta darbs
+
+
+
 
         constructionJob.WorkUnitTypeNumber = workType;
         constructionJob.setOn(true);
@@ -149,18 +155,18 @@ public class WorkManager : MonoBehaviour {
     }
 
     /**
-     * izniicina visus buuvdarbus shim levelobjektam
+     * izniicina visus buuvdarbus shai telpai
      */ 
-    public void RemoveAllConstructionJobsForThisBlock(Room block){
-        print("droshi zini, ka visus konstrukcijas darbinjus ? kaa ar gadzhetu konstrukcijaam ?");
+    public void RemoveAllConstructionJobsForThisRoom(Room block){
+
         int i = 0;
         foreach(WorkUnit w in worklist) {
             
-            if(w.parentRoom == block && (int)w.WorkUnitTypeNumber < 10) { //shai telpai piederoshs Buuvdarbs darbinsh
+            if(w.parentRoom == block && (int)w.WorkUnitTypeNumber <= 2) { //shai telpai piederoshs Buuvdarbs darbinsh
                 w.setOn(false,true); //svariigi izsleegt, citaadi nabaga agjents straadaas liidz darbalaika beigaam
                 worklist.RemoveAt(i);
                 
-                RemoveAllConstructionJobsForThisBlock(block);   //izmainiiju listi, taapeec nevaru turpinaat ciklu, atlikushos jaaskata jaunaa ciklaa
+                RemoveAllConstructionJobsForThisRoom(block);   //izmainiiju listi, taapeec nevaru turpinaat ciklu, atlikushos jaaskata jaunaa ciklaa
                 return;
             }
             
@@ -173,7 +179,21 @@ public class WorkManager : MonoBehaviour {
 
 
     public void RemoveAllConstructionJobsForThisGadget(Gadget gadget){
-
+        
+        int i = 0;
+        foreach(WorkUnit w in worklist) {
+            
+            if(w.parentGadget == gadget && (int)w.WorkUnitTypeNumber > 2 &&(int)w.WorkUnitTypeNumber <= 4) { //shim gadzhetam piederoshs buuvdarbs
+                w.setOn(false,true); //svariigi izsleegt, citaadi nabaga agjents straadaas liidz darbalaika beigaam
+                worklist.RemoveAt(i);
+                
+                RemoveAllConstructionJobsForThisGadget(gadget);   //izmainiiju listi, taapeec nevaru turpinaat ciklu, atlikushos jaaskata jaunaa ciklaa
+                return;
+            }
+            
+            
+            i++;
+        }
     }
 
 

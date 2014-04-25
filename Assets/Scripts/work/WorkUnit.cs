@@ -89,11 +89,11 @@ public class WorkUnit {
             break;
 
         case WorkUnitTypes._ConstructionGadget:
-            //todo
+            parentGadget.ConstrPercent += parentGadget.ConstrTime * Time.deltaTime * 2.5f;
             
             break;
         case WorkUnitTypes._DestructionGadget:
-            //todo
+            parentGadget.ConstrPercent -= parentGadget.ConstrTime * Time.deltaTime * 2.5f;
             
             break;
         case WorkUnitTypes.ManualLabor:

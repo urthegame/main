@@ -366,7 +366,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f38e7ab3ec385d14ab126a9dbb860960, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DebugDrawNavgrid: 0
+  DebugDrawNavgrid: 1
   ListOfRooms: []
   ListOfGadgets: []
   LastPosGrid: {x: 0, y: 0, z: 0}

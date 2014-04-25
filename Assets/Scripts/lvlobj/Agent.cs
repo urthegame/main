@@ -683,7 +683,9 @@ public class Agent : BaseLevelThing {
         transform.gameObject.layer = 11; //agjentu leijeris
 
     }
-    public override void RemovedFromGrid(){}
+    public override void RemovedFromGrid(){
+        Destroy(gameObject);
+    }
 
 
 }
