@@ -92,9 +92,7 @@ public class WorkManager : MonoBehaviour {
             List<Vector2> allCubes = levelscript.AllAccessableCubesInThisRoom(potentialJob.parentRoom,includingNeightborCubes); //visi kubiki telpaa, kurai pieder darbs (+ visi kaiminjkubiki, ja iipashi paluudz)
 
 
-            /**
-             * @bug -- ja celtnieciibas darbs atgriezh poziiciju, kas ir ejama, bet nav pieejama agjentam 4x2 koridoraa pie griestiem pieliek gadzhetu, agjents meegjina piekljuut tam no augshas, bet vinsh nespeej uzkaapt uz jumta
-             */ 
+
             foreach(Vector2 cube in allCubes.OrderBy(a => System.Guid.NewGuid())) {
 
                 if(levelscript.FindPath(agX,agY,Mathf.RoundToInt(cube.x),Mathf.RoundToInt(cube.y)).Count > 0 ){

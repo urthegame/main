@@ -707,7 +707,6 @@ public class Level : MonoBehaviour {
          *                        satur 0 vai vairaak navgrida instrukcijas (waypoint) (pirmais ir gadzheta centra kubaa, otrais ir virs vinja utt -- gluzhi telpaam)
          *                        atrodas kubika centraa
          */ 
-        print("G-nav: paarreeekjina" );
         for(int i = 0; i< gadgetHolder.transform.childCount; i++) { //ikviens gadzhets liimenii
             Gadget gadget = gadgetHolder.transform.GetChild(i).GetComponent<Gadget>();
             ListOfGadgets.Add(gadget); //svariigi - apdeito aktuaalo gadzhetu sarakstu
@@ -726,14 +725,10 @@ public class Level : MonoBehaviour {
                     int sumDirs = originalDirs | gadgetDirs;  //atljauju visus virzienus, kas deriigi origjinaalajaa kubikaa vai gadzhetaa
                     directionsInCubes.Remove(pos);
                     directionsInCubes.Add(pos, sumDirs);
-                    print("G-nav: ++ " + pos + "  D:"  + sumDirs);
-                } else {
-                    print("G-nav: nav shaada kubika "+ pos);
                 }
             }
         }
 
-        print("numdirs: " + directionsInCubes.Count);
 
 
 

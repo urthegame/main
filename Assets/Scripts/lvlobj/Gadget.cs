@@ -58,11 +58,24 @@ public class Gadget : BaseLevelThing {
 
     }
 
-    public override void InitFromString(string str) {
+    override public void InitFromString(string str){
+        string[] c = str.Split(' '); 
+      
+        Destructing = bool.Parse(c[4]);
+        Constructing = bool.Parse(c[5]);
+        ConstrPercent = float.Parse(c[6]);
+              
     }
 
-    public override string InitToString() {
-        return "";
+    override public string InitToString(){
+        
+        return string.Format(" {0} {1} {2}",
+                             Destructing,
+                             Constructing,                                           
+                             Mathf.RoundToInt(ConstrPercent)
+                             
+                             );
+        
     }
     
     public override void PlacedInPlacer() {
@@ -130,7 +143,7 @@ public class Gadget : BaseLevelThing {
             Constructing = true; //saak buuveeshanu 
             
         } else { //levelobjekts tiek likts ielaadeejot seivgemu
-                        
+                       
         }
 
 
@@ -141,7 +154,7 @@ public class Gadget : BaseLevelThing {
          * to buus jaaizvaac, kad pabeigs
          */ 
         
-        if(Constructing) { 
+        if(Constructing) {
             if(ConstrTime == 0) { //momentaa buuveejamaas telpas
                 //darbinju neveido
                 ConstrPercent = 100; //100 procenti, taatad naakamajaa UPDATE funkchaa konstrukcija tiks finalizeeta
