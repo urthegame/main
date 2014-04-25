@@ -638,13 +638,7 @@ public class Level : MonoBehaviour {
         Dictionary<Vector2,int> directionsInCubes = new Dictionary<Vector2, int>(); //ikvienam blokam (x,y ) liimeenii, kam vinja prefabaa ir noraaditi iespeejamie virzieni (Waypoints.dirs), tiek ielikti te
 
 
-        for(int i = 0; i< gadgetHolder.transform.childCount; i++) { //ikviens gadzhets liimenii
-            Gadget gadget = gadgetHolder.transform.GetChild(i).GetComponent<Gadget>();
-            ListOfGadgets.Add(gadget);
-            /**
-             * @todo -- kad gadzheti arii buus speejiigi ietekmeet telpas navgridu, tad gadzhetu sniegumu vajadzees pieskaitiit kopeejam navgridam
-             */
-        }
+     
 
 
         /**
@@ -703,10 +697,50 @@ public class Level : MonoBehaviour {
             }
         }
 
+   
+
+        ///directionsInCubes = new Dictionary<Vector2, int>();
+        /**
+         * A++) bonusaa: gadzheti rada iespeeju iet jau eksisteejoshaa kluciitii papildus veidos
+         * pienjemu, ka gadzhets: ir 1 kubiku liels 
+         *                        ir pielipinaats pie vieniibas grida
+         *                        satur 0 vai vairaak navgrida instrukcijas (waypoint) (pirmais ir gadzheta centra kubaa, otrais ir virs vinja utt -- gluzhi telpaam)
+         *                        atrodas kubika centraa
+         */ 
+        print("G-nav: paarreeekjina" );
+        for(int i = 0; i< gadgetHolder.transform.childCount; i++) { //ikviens gadzhets liimenii
+            Gadget gadget = gadgetHolder.transform.GetChild(i).GetComponent<Gadget>();
+            ListOfGadgets.Add(gadget); //svariigi - apdeito aktuaalo gadzhetu sarakstu
+
+
+            int x = Mathf.RoundToInt(gadget.transform.position.x); //noapaljo gadzheta poziiciju uz kubika poziiciju
+            int y = Mathf.RoundToInt(gadget.transform.position.y);
+
+            for(int h =0; h < gadget.waypoints.passableDirections.Count(); h++) {
+
+                Vector2 pos = new Vector2 (x,y+h);
+                int gadgetDirs = (int)gadget.waypoints.passableDirections[h]; //gadzheta virzieni sahjaa kubikaa
+
+                int originalDirs;
+                if(directionsInCubes.TryGetValue(pos, out originalDirs)) {  //ieguustu pashreizeejos virzienus shajaa kubikaa
+                    int sumDirs = originalDirs | gadgetDirs;  //atljauju visus virzienus, kas deriigi origjinaalajaa kubikaa vai gadzhetaa
+                    directionsInCubes.Remove(pos);
+                    directionsInCubes.Add(pos, sumDirs);
+                    print("G-nav: ++ " + pos + "  D:"  + sumDirs);
+                } else {
+                    print("G-nav: nav shaada kubika "+ pos);
+                }
+            }
+        }
+
+        print("numdirs: " + directionsInCubes.Count);
+
+
+
 
       
         /**
-         * B) zinot, kuri kubiki ir atveerti satiksmei, varu salikt patiesaas celja maksas (galvenais vai vispaar no a uz b var aiziet)
+         * B) zinot, kuri kubiki ir atveerti satiksmei, varu noskaidrot, kur no katra kubika var aiziet
          */
         foreach(KeyValuePair<Vector2,int> cube in directionsInCubes) { 
             float x = cube.Key.x;

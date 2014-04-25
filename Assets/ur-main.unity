@@ -234,7 +234,7 @@ MonoBehaviour:
 --- !u!1 &899144622
 GameObject:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_PrefabParentObject: {fileID: 100000, guid: 1fd05f3d507c34e4db121311c57615bc, type: 2}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
@@ -249,7 +249,7 @@ GameObject:
 --- !u!4 &899144623
 Transform:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_PrefabParentObject: {fileID: 400000, guid: 1fd05f3d507c34e4db121311c57615bc, type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 899144622}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -369,6 +369,7 @@ MonoBehaviour:
   DebugDrawNavgrid: 1
   ListOfRooms: []
   ListOfGadgets: []
+  destroyHolder: {fileID: 0}
   LastPosGrid: {x: 0, y: 0, z: 0}
   LastPosDecGrid: {x: 0, y: 0, z: 0}
   objectInPlacer: 0

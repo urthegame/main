@@ -188,7 +188,10 @@ public class Gui : MonoBehaviour {
         }
 
         vert += height + vSpace;
-        if(GUI.Button(new Rect(20, vert, 35, height), new GUIContent("Digg", "Delete ground cube (or any other stucture)"))) {
+        if(GUI.Button(new Rect(20, vert, 35, height), new GUIContent("Grond", "Ground"))) {
+            levelscript.PutObjInPlacer("groundcube-1");
+        }
+        if(GUI.Button(new Rect(65, vert, 35, height), new GUIContent("Digg", "Delete ground cube (or any other stucture)"))) {
             levelscript.PutObjInPlacer("digg-1");
         }
        
@@ -258,15 +261,6 @@ public class Gui : MonoBehaviour {
         }
 
 
-           
-
-        vert += height + vSpace;
-        if(GUI.Button(new Rect(20, vert, 35, height), new GUIContent("g1", "Gadget MkI"))) {
-            levelscript.PutObjInPlacer("gadget-1");
-        }
-        if(GUI.Button(new Rect(65, vert, 35, height), new GUIContent("g2", "Gadget MkII"))) {
-            levelscript.PutObjInPlacer("gadget-2");
-        }
 
         vert += height + vSpace;
         if(GUI.Button(new Rect(20, vert, 35, height), new GUIContent("B1", "Single Bed"))) {
@@ -274,6 +268,13 @@ public class Gui : MonoBehaviour {
         }
         if(GUI.Button(new Rect(65, vert, 35, height), new GUIContent("B2", "Two storey Bed"))) {
             levelscript.PutObjInPlacer("bed-stacked");
+        }
+        vert += height + vSpace;
+        if(GUI.Button(new Rect(20, vert, 35, height), new GUIContent("St1", "Fancy Stairwell"))) {
+            levelscript.PutObjInPlacer("stairwell-fancy");
+        }
+        if(GUI.Button(new Rect(65, vert, 35, height), new GUIContent("St2", "Simple Stairwell"))) {
+            levelscript.PutObjInPlacer("stairwell-simple");
         }
 
 
