@@ -82,6 +82,15 @@ public class Room : BaseLevelThing {
                     Destroy(transform.gameObject); //aizvaac sho kluciiti no liimenja
                     //Destructing = false;
                     levelscript.CalculateNavgrid(); //lieku liimenim paarreekjinaat visus ejamos celjus, jo ir izmainjas
+
+                    //jaaizvaac visi gadzheti, kas atrodas shajaa telpaa
+                    foreach(Gadget g in levelscript.ListOfGadgets){
+                        if(g.parentRoom == this){//shai telpai piederoshie gadzheti
+                            g.RemovedFromGrid(); //lieku dzeesties aaraa 
+                            g.ConstrPercent = 0; //uzsitu 0% - taatad naakamajaa kadraa pazudiis
+                        }
+                    }
+
                 }
                 
             }
